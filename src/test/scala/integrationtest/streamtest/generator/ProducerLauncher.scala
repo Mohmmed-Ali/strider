@@ -1,6 +1,4 @@
-package engine.launcher
-
-import engine.launcher.streamgenerator.{Generator1, Generator2}
+package integrationtest.streamtest.generator
 
 
 /**

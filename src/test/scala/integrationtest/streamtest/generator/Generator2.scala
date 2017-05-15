@@ -1,5 +1,6 @@
-package engine.launcher.streamgenerator
+package integrationtest.streamtest.generator
 
+import engine.launcher.streamgenerator.StreamGenerator
 import engine.stream.{KafkaStreamProducer, MsgRDFTriple, RDFTriple}
 import kafka.producer.{Producer, ProducerConfig}
 

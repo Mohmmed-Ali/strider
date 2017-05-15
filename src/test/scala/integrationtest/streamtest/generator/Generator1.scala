@@ -1,8 +1,9 @@
-package engine.launcher.streamgenerator
+package integrationtest.streamtest.generator
 
 import java.text.{DateFormat, SimpleDateFormat}
 import java.util.Locale
 
+import engine.launcher.streamgenerator.StreamGenerator
 import engine.stream.{KafkaStreamProducer, MsgRDFTriple, RDFTriple}
 import kafka.producer.{Producer, ProducerConfig}
 
