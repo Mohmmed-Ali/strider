@@ -31,9 +31,9 @@ case class Generator2(workLoad: Long,
 
   override def generate(): Unit = {
     var messageId: Long = 0
-    var numTypeFlow: Int = 500
-    var numTypeTemperature: Int = 100
-    var numTypeChlorine: Int = 100
+    var numTypeFlow: Int = randomProportion()
+    var numTypeTemperature: Int = randomProportion()
+    var numTypeChlorine: Int = randomProportion()
 
     val f_unitWorkLoad: (Int, Int, Int) => Int =
       (numTypeFlow: Int,
@@ -127,10 +127,10 @@ case class Generator2(workLoad: Long,
         numTypeFlow,
         numTypeTemperature,
         numTypeChlorine) >= workLoad) {
-//
-//        numTypeFlow = randomProportion()
-//        numTypeTemperature = randomProportion()
-//        numTypeChlorine = randomProportion()
+
+        numTypeFlow = randomProportion()
+        numTypeTemperature = randomProportion()
+        numTypeChlorine = randomProportion()
 
         messageId = 0
         Thread.sleep(sleepDuration * 1000)

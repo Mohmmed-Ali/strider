@@ -10,27 +10,27 @@ trait QueryInitializer {
 
 object SparqlQueryInitializer extends QueryInitializer{
 
-  override def initializeQueryStr(queryId: String = "eval_5"): String = queryId match {
+  override def initializeQueryStr(queryId: String = "waves_5"): String = queryId match {
 
     ////////////////////////
     // Eval Queries
     ////////////////////////
 
-    case "eval_0" =>
+    case "waves_0" =>
       "select ?s ?o2 " +
         " { " +
         " ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o ; " +
         "    <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o2 ." +
         "} "
 
-    case "eval_1" =>
+    case "waves_1" =>
       "select ?s ?o1 " +
         " { " +
         " ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o ; " +
         "    <http://purl.oclc.org/NET/ssnx/ssn/isProducedBy> ?o1 ." +
         "} "
 
-    case "eval_2" =>
+    case "waves_2" =>
       "select ?s ?o1 ?o2 ?o3 ?o4 ?o5" +
         " { " +
         " { " +
@@ -46,7 +46,7 @@ object SparqlQueryInitializer extends QueryInitializer{
         " } " +
         " } "
 
-    case "eval_3" =>
+    case "waves_3" =>
       "select ?s ?o1 ?o2 ?o3 ?o4 ?o5 ?o6 " +
         " { " +
         " ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o ; " +
@@ -58,7 +58,7 @@ object SparqlQueryInitializer extends QueryInitializer{
         "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o6 . " +
         " } "
 
-    case "eval_4" =>
+    case "waves_4" =>
       "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +
         "select ?s ?o1 ?o2 ?o3" +
         " { " +
@@ -70,7 +70,7 @@ object SparqlQueryInitializer extends QueryInitializer{
         " ?o3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.cuahsi.org/waterML/chlorine> . " +
         "} "
 
-    case "eval_5" =>
+    case "waves_5" =>
       "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +
         "select ?o11 ?o21 ?o31" +
         " { " +

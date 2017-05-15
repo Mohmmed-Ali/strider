@@ -1,9 +1,9 @@
-package engine.launcher
+package integrationtest.coretest.localtest
 
 import engine.core.conf.{StriderConfBase, StriderCxt}
-import engine.core.sparql.executor.SelectExecutor
 import engine.core.optimizer.AdapStrategy.{Backward, Forward}
 import engine.core.optimizer.trigger.TriggerRules
+import engine.core.sparql.executor.SelectExecutor
 import engine.core.sparql.{SparqlQueryInitializer, StriderQueryFactory}
 import engine.stream._
 import engine.util.Helper

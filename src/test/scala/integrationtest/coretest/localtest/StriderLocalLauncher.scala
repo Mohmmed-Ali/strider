@@ -1,11 +1,12 @@
-package engine.launcher
+package integrationtest.coretest.localtest
 
 import java.util.Calendar
 
 import engine.core.conf.{StriderConfBase, StriderCxt}
-import engine.core.sparql.executor.SelectExecutor
 import engine.core.label.LabelBase
+import engine.core.sparql.executor.SelectExecutor
 import engine.core.sparql.{SparqlQueryInitializer, StriderQueryFactory}
+import engine.launcher.SparkSessionSingleton
 import engine.stream.{KafkaStreamConsumer, MsgRDFTriple, RDFTriple, StreamDeserializer}
 import kafka.serializer.StringDecoder
 import org.apache.spark.storage.StorageLevel
