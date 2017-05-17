@@ -27,10 +27,12 @@ class SparkBGP(val opBGP: OpBGP,
   private[this] val adap_handler = AdaptiveEPHandler
 
   def update(opName: String,
-             inputDF: DataFrame): Unit = {
-    log.info("Switch to backward adaptivity.")
-    adap_handler.currentAdapPlan =
-      Option(getAdapPlan(computDFMap(triples, inputDF)))
+             inputDF: DataFrame): Unit = ucg.edgeExistence match {
+    case true =>
+      log.info("Switch to backward adaptivity.")
+      adap_handler.currentAdapPlan =
+        Option(getAdapPlan(computDFMap(triples, inputDF)))
+    case false =>
   }
 
   override def execute(opName: String,
@@ -55,7 +57,8 @@ class SparkBGP(val opBGP: OpBGP,
             computeEP(oldAdapPlan, dfMap)
         }
       } else computeEP(getStaticPlan, dfMap)
-    } else {
+    }
+    else {
       computeEP(getStaticPlan, dfMap)
     }
   }

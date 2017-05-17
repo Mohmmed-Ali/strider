@@ -10,6 +10,7 @@ import engine.core.optimizer.{AdapStrategy, BGPOptimizer}
 import org.apache.log4j.LogManager
 
 import scala.collection.mutable
+import scala.language.implicitConversions
 
 /**
   * Created by xiangnanren on 06/12/2016.
@@ -27,7 +28,8 @@ case class StaticTrigger(ucg: UCGraph)
     */
   def triggerGreedyEP(): List[BGPGraph] = {
     log.info("Optimizer of HeuByNode is created. ")
-    GreedyEPGenerator(StaticGreedy).generate(ucg)
+    if (ucg.edgeExistence) GreedyEPGenerator(StaticGreedy).generate(ucg)
+    else ucg.ucgNodes
   }
 
   /**
@@ -38,7 +40,8 @@ case class StaticTrigger(ucg: UCGraph)
     */
   def triggerBushyEP(): List[BGPGraph] = {
     log.info("Optimizer of HeuByEdge is created. ")
-    BushyEPGenerator(StaticBushy).generate(ucg)
+    if (ucg.edgeExistence) BushyEPGenerator(StaticBushy).generate(ucg)
+    else ucg.ucgNodes
   }
 }
 

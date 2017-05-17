@@ -14,6 +14,7 @@ import org.apache.spark.util.SizeEstimator
   */
 @Experimental
 class SqlContextResolver(sc: SparkContext) {
+  val sqlContext = new SQLContext(sc)
 
   private lazy val rowRDD = SqlContextResolver.createRDDRow(sc)
   // Setting SQL context configurations for performance tuning
@@ -22,7 +23,6 @@ class SqlContextResolver(sc: SparkContext) {
   sqlContext.setConf("spark.sql.inMemoryColumnarStorage.compressed", "true")
   sqlContext.setConf("spark.sql.autoBroadcastJoinThreshold", "170000000")
   sqlContext.setConf("spark.sql.tungsten.enabled", "true")
-  val sqlContext = new SQLContext(sc)
   val wdf = sqlContext
     .createDataFrame(rowRDD, SqlContextResolver.schema)
 

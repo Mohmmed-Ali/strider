@@ -11,11 +11,11 @@ import scala.collection.JavaConversions._
   * Created by xiangnanren on 07/
   * 07/16.
   */
-class SparqlAlgebraWalker(val visitor: OpVisitor)
+class SparqlOpWalker(val visitor: OpVisitor)
   extends OpVisitorByType with Serializable {
   @transient
   private[this] lazy val log = LogManager.
-    getLogger(SparqlAlgebraWalker.getClass)
+    getLogger(SparqlOpWalker.getClass)
 
   def walkBottomUp(op: Op): Unit = {
     log.debug("walkBottomUp called.")
@@ -72,7 +72,7 @@ class SparqlAlgebraWalker(val visitor: OpVisitor)
 }
 
 
-object SparqlAlgebraWalker {
+object SparqlOpWalker {
   def apply(visitor: OpVisitor):
-  SparqlAlgebraWalker = new SparqlAlgebraWalker(visitor)
+  SparqlOpWalker = new SparqlOpWalker(visitor)
 }

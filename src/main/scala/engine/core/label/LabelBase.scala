@@ -13,5 +13,4 @@ object LabelBase {
   val SUBJECT_COLUMN_NAME = "sDefault"
   val PREDICATE_COLUMN_NAME = "pDefault"
   val OBJECT_COLUMN_NAME = "oDefault"
-  val INPUT_QUERY = "/Users/xiangnanren/IDEAWorkspace/spark-rdf-1.0/queries/q1.txt"
 }

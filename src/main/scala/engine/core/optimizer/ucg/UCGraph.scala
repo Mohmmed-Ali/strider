@@ -16,7 +16,7 @@ import org.apache.jena.graph
   * @param ucgNodes : initial BGP execution plan
   */
 class UCGraph(val ucgNodes: List[BGPNode]) extends BGPOptimizerHelper {
-
+  val edgeExistence: Boolean = ucgNodes.size > 1
   val ucgEdges: List[BGPEdge] = generateUCGEdges()
   this.ucgNodes.map(node =>
     node.setStarJoinNodes(this.ucgNodes))
@@ -57,16 +57,19 @@ class UCGraph(val ucgNodes: List[BGPNode]) extends BGPOptimizerHelper {
     * @return UCGraph : a list of connected triple pattern ((tp1, tp2)...)
     */
   private def generateUCGEdges(): List[BGPEdge] = {
+    if (edgeExistence) {
+      val edgeSeq: IndexedSeq[BGPEdge] =
+        for {
+          i <- ucgNodes.indices
+          j <- i + 1 until ucgNodes.length
+          if graphConnection(ucgNodes(i), ucgNodes(j))
+        } yield BGPEdge(ucgNodes(i), ucgNodes(j))
 
-    val edgeSeq: IndexedSeq[BGPEdge] =
-      for {
-        i <- ucgNodes.indices
-        j <- i + 1 until ucgNodes.length
-        if graphConnection(ucgNodes(i), ucgNodes(j))
-      } yield BGPEdge(ucgNodes(i), ucgNodes(j))
-
-    edgeSeq.toList
+      edgeSeq.toList
+    }
+    else Nil
   }
+
 }
 
 

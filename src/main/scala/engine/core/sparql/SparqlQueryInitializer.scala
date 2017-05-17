@@ -10,17 +10,17 @@ trait QueryInitializer {
 
 object SparqlQueryInitializer extends QueryInitializer {
 
-  override def initializeQueryStr(queryId: String = "eval_5"): String = queryId match {
+  override def initializeQueryStr(queryId: String = "eval_0"): String = queryId match {
 
     ////////////////////////
     // Eval Queries
     ////////////////////////
 
     case "eval_0" =>
-      "select ?s ?o2 " +
+      "select ?s ?o " +
         " { " +
         " ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o ; " +
-        "    <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o2 ." +
+//        "    <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o2 ." +
         "} "
 
     case "eval_1" =>

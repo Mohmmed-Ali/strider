@@ -7,13 +7,13 @@ import engine.core.sparkop.op._
 /**
   * Created by xiangnanren on 11/07/16.
   */
-class SparkAlgebraPrinter(logWriter: PrintWriter)
+class SparkOpPrinter(logWriter: PrintWriter)
   extends SparkOpVisitorByType {
 
   private[this] var delimiter: String = ""
 
   def printAlgebra(op: SparkOp): Unit = {
-    op.visit(SparkAlgebraPrinter(logWriter))
+    op.visit(SparkOpPrinter(logWriter))
   }
 
   def visit0(op: SparkOp0): Unit = {
@@ -48,7 +48,7 @@ class SparkAlgebraPrinter(logWriter: PrintWriter)
 }
 
 
-object SparkAlgebraPrinter {
-  def apply(writer: PrintWriter): SparkAlgebraPrinter
-  = new SparkAlgebraPrinter(writer)
+object SparkOpPrinter {
+  def apply(writer: PrintWriter): SparkOpPrinter
+  = new SparkOpPrinter(writer)
 }

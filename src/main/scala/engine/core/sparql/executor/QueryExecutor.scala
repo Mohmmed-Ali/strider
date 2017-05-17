@@ -2,7 +2,7 @@ package engine.core.sparql.executor
 
 import java.io.{File, PrintWriter}
 
-import engine.core.sparkop.compiler.{SparkAlgebraPrinter, SparkOpUpdater}
+import engine.core.sparkop.compiler.{SparkOpPrinter, SparkOpUpdater}
 import engine.core.sparkop.op.{SparkAskRes, SparkConstructRes, SparkOpRes, SparkRes}
 import engine.core.sparql._
 import org.apache.spark.sql.{DataFrame, Row}
@@ -52,7 +52,7 @@ class QueryExecutor[T <: SparqlQuery](@transient val query: T) {
     logWriter.println("#################################")
     logWriter.println("### The algebra of SPARK SQL: ###")
     logWriter.println("#################################")
-    SparkAlgebraPrinter(logWriter).printAlgebra(sparkOpRoot)
+    SparkOpPrinter(logWriter).printAlgebra(sparkOpRoot)
 
     logWriter.close()
   }
