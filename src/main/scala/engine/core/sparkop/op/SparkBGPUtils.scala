@@ -15,7 +15,7 @@ trait SparkBGPUtils extends Serializable {
   @transient
   protected lazy val log = LogManager.
     getLogger(this.getClass)
-  
+
   /**
     * Compute the projection for each triple pattern in BGP.
     *
