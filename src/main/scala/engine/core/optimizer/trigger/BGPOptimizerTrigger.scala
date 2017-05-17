@@ -134,7 +134,7 @@ object TriggerRules {
     val value = triggerSettings.
       getOrElse(
         "adaptivity.strategySwitch.threshold",
-        "0.7"
+        "0.6"
       ) match {
       case t if t <= 1 && t >= 0 => t
       case _ =>
