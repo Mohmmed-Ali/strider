@@ -22,13 +22,13 @@ object AlgebraOptimizerConf {
     if (key == null) {
       throw new NullPointerException("Null key for settings")
     }
-    if(!opSettingsKey.contains(key)) {
+    if (!opSettingsKey.contains(key)) {
       throw new NullPointerException("Invalid key for settings")
     }
     if (value == null) {
       throw new NullPointerException("Null value for settings")
     }
-    settings.put(key,value)
+    settings.put(key, value)
     this
   }
 }

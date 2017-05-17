@@ -1,4 +1,5 @@
 package engine.core.sparkexpr.expr
+
 import engine.core.sparkexpr.compiler.SparkExprVisitor
 import org.apache.jena.sparql.expr.E_GreaterThan
 
@@ -8,7 +9,7 @@ import org.apache.jena.sparql.expr.E_GreaterThan
 class SparkGreaterThan(val expr: E_GreaterThan,
                        leftExpr: SparkExpr,
                        rightExpr: SparkExpr) extends
-  SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr){
+  SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
   }

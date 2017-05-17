@@ -80,6 +80,48 @@ class BushyEPGenerator[T <: ExecutionPlanType](epType: T)
     candidates
   }
 
+  /**
+    * Initialize the temporary UCG to create edge candidates,
+    * all the edges of temporary UCG are not visited.
+    *
+    * @param ucgEdges : edges in UCG
+    * @return : temporary UCG
+    */
+  private[this] def initTempUCG(ucgEdges: List[BGPEdge]): List[BGPEdge] = {
+    for (edge <- ucgEdges
+         if !edge.visited) yield edge
+  }
+
+  /**
+    * Get all non-visited edges which are intersected to the given edges
+    */
+  private[this] def createIntersectEdges(candidates: Seq[BGPEdge],
+                                         tempUCG: Seq[BGPEdge]): List[BGPEdge] = {
+    for (
+      i <- candidates;
+      j <- tempUCG
+      if isIntersected(i, j) && !j.visited
+    ) yield j
+
+  }.toList
+
+  /**
+    * Mark the UCG nodes and edges with respect to the given edge
+    *
+    * @param edge : the edge (include the two nodes of the edge) to
+    *             be remarked as visited
+    * @param ucg  : The query UCG
+    */
+  private[this] def markVisited(edge: BGPEdge,
+                                ucg: UCGraph): Unit = {
+    edge.node1.visited = true
+    edge.node2.visited = true
+
+    ucg.ucgEdges.foreach(_edge => {
+      if (_edge.node1.visited && _edge.node2.visited)
+        _edge.visited = true
+    })
+  }
 
   /**
     * Recursively create (top down) the abstract syntax tree of execution plan.
@@ -163,52 +205,6 @@ class BushyEPGenerator[T <: ExecutionPlanType](epType: T)
       }
     }
     stack
-  }
-
-
-  /**
-    * Initialize the temporary UCG to create edge candidates,
-    * all the edges of temporary UCG are not visited.
-    *
-    * @param ucgEdges : edges in UCG
-    * @return : temporary UCG
-    */
-  private[this] def initTempUCG(ucgEdges: List[BGPEdge]): List[BGPEdge] = {
-    for (edge <- ucgEdges
-         if !edge.visited) yield edge
-  }
-
-
-  /**
-    * Get all non-visited edges which are intersected to the given edges
-    */
-  private[this] def createIntersectEdges(candidates: Seq[BGPEdge],
-                                         tempUCG: Seq[BGPEdge]): List[BGPEdge] = {
-    for (
-      i <- candidates;
-      j <- tempUCG
-      if isIntersected(i, j) && !j.visited
-    ) yield j
-
-  }.toList
-
-
-  /**
-    * Mark the UCG nodes and edges with respect to the given edge
-    *
-    * @param edge : the edge (include the two nodes of the edge) to
-    *             be remarked as visited
-    * @param ucg  : The query UCG
-    */
-  private[this] def markVisited(edge: BGPEdge,
-                                ucg: UCGraph): Unit = {
-    edge.node1.visited = true
-    edge.node2.visited = true
-
-    ucg.ucgEdges.foreach(_edge => {
-      if (_edge.node1.visited && _edge.node2.visited)
-        _edge.visited = true
-    })
   }
 }
 

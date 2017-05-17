@@ -16,6 +16,14 @@ trait SparkBGPUtils extends Serializable {
   protected lazy val log = LogManager.
     getLogger(this.getClass)
 
+  protected def computDFMap(triples: List[graph.Triple],
+                            inputDF: DataFrame):
+  Map[graph.Triple, DataFrame] = {
+    triples.map(triple =>
+      triple ->
+        computeTriplePattern(triple, inputDF)).toMap
+  }
+
   /**
     * Compute the projection for each triple pattern in BGP.
     *
@@ -68,14 +76,6 @@ trait SparkBGPUtils extends Serializable {
     outputDF
   }
 
-  protected def computDFMap(triples: List[graph.Triple],
-                            inputDF: DataFrame):
-  Map[graph.Triple, DataFrame] = {
-    triples.map(triple =>
-      triple ->
-        computeTriplePattern(triple, inputDF)).toMap
-  }
-
   protected def computeEP(ep: Seq[BGPGraph],
                           dfMap: Map[graph.Triple, DataFrame]): DataFrame = {
     val stack = new mutable.Stack[DataFrame]
@@ -104,12 +104,12 @@ trait SparkBGPUtils extends Serializable {
 
   protected def getEPAsString(ep: List[BGPGraph]): String = {
     ep.map(_.toString).
-      reduceLeft((x,y) => x + "\n" + y)
+      reduceLeft((x, y) => x + "\n" + y)
   }
 
   protected def getEPInfo(ep: List[BGPGraph]): String = {
     ep.map(_.getInfo).
-      reduceLeft((x,y) => x + "\n" + y)
+      reduceLeft((x, y) => x + "\n" + y)
   }
 
 }

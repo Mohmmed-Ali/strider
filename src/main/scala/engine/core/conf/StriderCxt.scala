@@ -12,7 +12,7 @@ class StriderCxt(val batch: Duration,
                  val slide: Duration = Milliseconds(0L),
                  val window: Duration = Milliseconds(0L)) extends CxtResolver {
   val updateFrequency =
-    if(slide.isZero) batch.milliseconds
+    if (slide.isZero) batch.milliseconds
     else slide.milliseconds
 
   def getStreamingCtx(striderConf: StriderConfBase): StreamingContext = {
@@ -31,7 +31,7 @@ class StriderCxt(val batch: Duration,
     spark.sqlContext.setConf("spark.sql.inMemoryColumnarStorage.compressed", "true")
     spark.sqlContext.setConf("spark.sql.autoBroadcastJoinThreshold", threshold)
     spark.sqlContext.setConf("spark.sql.tungsten.enabled", "true")
-    spark.sqlContext.setConf("spark.sql.shuffle.partitions","4")
+    spark.sqlContext.setConf("spark.sql.shuffle.partitions", "4")
 
     spark
   }

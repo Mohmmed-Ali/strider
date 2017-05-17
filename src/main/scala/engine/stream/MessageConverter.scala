@@ -25,15 +25,17 @@ object MessageConverter {
     * RDFGraphToDF/WavesEventToDF) to create DataFrame if it is possible.
     *
     * @param sparkSession : A existing singleton spark session.
-    * @param rdd : the micro-batch rdd in DStream.
+    * @param rdd          : the micro-batch rdd in DStream.
     * @tparam T : type parameter of RDFData.
-    * @return  The initial DataFrame which is DataFrame from input DStream.
+    * @return The initial DataFrame which is DataFrame from input DStream.
     */
+
   def RDFToDF[T: ClassTag](sparkSession: SparkSession,
                            rdd: RDD[(String, T)]): DataFrame = {
     import sparkSession.implicits._
+
     rdd.map(x => x._2) match {
-      case _rdd: RDD[RDFTriple @unchecked]
+      case _rdd: RDD[RDFTriple@unchecked]
         if classTag[T] == classTag[RDFTriple] =>
         _rdd.toDF(
           LabelBase.SUBJECT_COLUMN_NAME,

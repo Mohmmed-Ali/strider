@@ -1,6 +1,5 @@
 package engine.core.optimizer
 
-import engine.core.sparkop._
 import engine.core.sparkop.compiler.{SparkOpVisitorBase, SparkOpWalker}
 import engine.core.sparkop.op._
 

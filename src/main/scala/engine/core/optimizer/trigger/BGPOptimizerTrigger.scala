@@ -18,7 +18,7 @@ sealed abstract class BGPOptimizerTrigger extends BGPOptimizer
 
 case class StaticTrigger(ucg: UCGraph)
   extends BGPOptimizerTrigger {
-  
+
   /**
     * Apply the node-heuristic execution plan (the execution plan
     * will be presented by a left deep binary tree)
@@ -94,7 +94,7 @@ object TriggerRules {
     case _numBGPs if _numBGPs > 2 => true
     case _numBGPs if _numBGPs <= 2 => false
   }
-  val f_adaptiveTrigger: (Long) => Boolean = (workLoad: Long) =>  {
+  val f_adaptiveTrigger: (Long) => Boolean = (workLoad: Long) => {
     dataSizeThreshold match {
       case _workLoad if _workLoad > dataSizeThreshold => true
       case _workLoad if _workLoad <= dataSizeThreshold => false
@@ -108,8 +108,8 @@ object TriggerRules {
       log.info(
         "taskTime (=" + taskTime +
           ")/batchSize (=" +
-          batchSize + ") = " +  r)
-      if ( r >= 0.6) {
+          batchSize + ") = " + r)
+      if (r >= 0.6) {
         log.info("Take forward adaptivity for the next execution")
         Forward
       }

@@ -25,10 +25,6 @@ class QueryExecutor[T <: SparqlQuery](@transient val query: T) {
   @transient
   private val sparkOpRoot = query.sparkOpRoot
 
-  protected def executeAlgebra(inputDF: DataFrame): SparkOpRes = {
-    SparkOpExecutor(inputDF).execute(sparkOpRoot)
-  }
-
   def updateAlgebra(inputDF: DataFrame): Unit = {
     SparkOpUpdater(inputDF).update(sparkOpRoot)
   }
@@ -59,6 +55,10 @@ class QueryExecutor[T <: SparqlQuery](@transient val query: T) {
     SparkAlgebraPrinter(logWriter).printAlgebra(sparkOpRoot)
 
     logWriter.close()
+  }
+
+  protected def executeAlgebra(inputDF: DataFrame): SparkOpRes = {
+    SparkOpExecutor(inputDF).execute(sparkOpRoot)
   }
 }
 
@@ -95,23 +95,6 @@ case class ConstructExecutor(@transient override val query: ConstructQuery) exte
     SparkConstructRes(resConstruct)
   }
 
-  /** Lookup the value to be filled up in the new RDD from
-    * the already-computed DataFrame with the respect to
-    * the construct template. If the node is variable, the method
-    * reveals the value directly from the DataFrame and assign it
-    * to the specified position of Row (or the method assign the
-    * mapping of the node).
-    *
-    * @param row  : row in original DataFrame
-    * @param node : node mapping of triples in construct clause
-    */
-  private def lookup(row: Row, node: NodeMapping): String = {
-    node.isVariable match {
-      case true => row.getAs(node.mapping)
-      case false => node.mapping
-    }
-  }
-
   /**
     * Transform original DataFrame to new RDD row by row with the
     * respect to the definition of the given construct clause
@@ -130,6 +113,23 @@ case class ConstructExecutor(@transient override val query: ConstructQuery) exte
       Row(lookup(row, triple.subjectNode),
         lookup(row, triple.predicateNode),
         lookup(row, triple.objectNode) + " ."))
+  }
+
+  /** Lookup the value to be filled up in the new RDD from
+    * the already-computed DataFrame with the respect to
+    * the construct template. If the node is variable, the method
+    * reveals the value directly from the DataFrame and assign it
+    * to the specified position of Row (or the method assign the
+    * mapping of the node).
+    *
+    * @param row  : row in original DataFrame
+    * @param node : node mapping of triples in construct clause
+    */
+  private def lookup(row: Row, node: NodeMapping): String = {
+    node.isVariable match {
+      case true => row.getAs(node.mapping)
+      case false => node.mapping
+    }
   }
 }
 

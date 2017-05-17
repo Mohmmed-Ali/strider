@@ -1,4 +1,5 @@
 package engine.core.sparkexpr.expr
+
 import engine.core.sparkexpr.compiler.SparkExprVisitor
 import org.apache.jena.sparql.expr.E_Add
 
@@ -8,7 +9,7 @@ import org.apache.jena.sparql.expr.E_Add
 class SparkAdd(val add: E_Add,
                leftExpr: SparkExpr,
                rightExpr: SparkExpr) extends
-  SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr){
+  SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
 
 
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {

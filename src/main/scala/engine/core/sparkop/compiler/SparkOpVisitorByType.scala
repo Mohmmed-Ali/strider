@@ -7,15 +7,6 @@ import engine.core.sparkop.op._
   */
 abstract class SparkOpVisitorByType extends SparkOpVisitor {
 
-  def visit0(op: SparkOp0)
-
-  def visit1(op: SparkOp1[SparkOp])
-
-  def visit2(op: SparkOp2[SparkOp, SparkOp])
-
-  def visitN(op: SparkOpN)
-
-
   /**
     * Define basic visit methods as final,
     * the override is not permitted.
@@ -55,5 +46,13 @@ abstract class SparkOpVisitorByType extends SparkOpVisitor {
   override final def visit(sparkProject: SparkProjection): Unit = {
     visit1(sparkProject)
   }
+
+  def visit0(op: SparkOp0)
+
+  def visit1(op: SparkOp1[SparkOp])
+
+  def visit2(op: SparkOp2[SparkOp, SparkOp])
+
+  def visitN(op: SparkOpN)
 
 }

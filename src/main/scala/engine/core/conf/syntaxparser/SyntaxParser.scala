@@ -11,22 +11,6 @@ trait SyntaxParser extends JavaTokenParsers {
   @transient
   protected lazy val log = LogManager.
     getLogger(this.getClass)
-
-  /**
-    * Define the keywords.
-    *
-    * @param keyword : The keywords defined in syntax. 'pattern' presents the regex pattern,
-    *                'normalized' converts input keywords into uppercase
-    */
-  protected class SyntaxToken(keyword: String) {
-    val pattern = s"(?i)$keyword".r
-    val normalized = keyword.toUpperCase
-  }
-
-  protected object SyntaxToken {
-    def apply(keyword: String): SyntaxToken = new SyntaxToken(keyword)
-  }
-
   protected val STREAMING = SyntaxToken("STREAMING")
   protected val WINDOW = SyntaxToken("WINDOW")
   protected val SLIDE = SyntaxToken("SLIDE")
@@ -38,6 +22,26 @@ trait SyntaxParser extends JavaTokenParsers {
   protected val QUERYID = SyntaxToken("QUERYID")
   protected val SPARQL = SyntaxToken("SPARQL")
   protected val ANYCHAR = SyntaxToken("[^\\[^\\]]*")
+
+  /**
+    * Get the streaming context configuration.
+    *
+    * @return The map of streaming context configurations (keyword -> config).
+    */
+  protected def getStreamingConfig: Parser[Map[String, (Long, String)]] =
+    streamingClause ~ rep(registerClause) ^^ {
+      case s ~ r => s
+    }
+
+  /**
+    * Get the configuration of queries.
+    *
+    * @return The list of query context configurations.
+    */
+  protected def getRegisterConfig: Parser[List[Map[String, String]]] =
+    streamingClause ~ rep(registerClause) ^^ {
+      case s ~ r => r
+    }
 
   /**
     * Parse the clause of streaming context.
@@ -127,27 +131,21 @@ trait SyntaxParser extends JavaTokenParsers {
       v => (SPARQL.normalized, v)
     }
 
-
   /**
-    * Get the streaming context configuration.
+    * Define the keywords.
     *
-    * @return The map of streaming context configurations (keyword -> config).
+    * @param keyword : The keywords defined in syntax. 'pattern' presents the regex pattern,
+    *                'normalized' converts input keywords into uppercase
     */
-  protected def getStreamingConfig: Parser[Map[String, (Long, String)]] =
-    streamingClause ~ rep(registerClause) ^^ {
-      case s ~ r => s
-    }
+  protected class SyntaxToken(keyword: String) {
+    val pattern = s"(?i)$keyword".r
+    val normalized = keyword.toUpperCase
+  }
 
 
-  /**
-    * Get the configuration of queries.
-    *
-    * @return The list of query context configurations.
-    */
-  protected def getRegisterConfig: Parser[List[Map[String, String]]] =
-    streamingClause ~ rep(registerClause) ^^ {
-      case s ~ r => r
-    }
+  protected object SyntaxToken {
+    def apply(keyword: String): SyntaxToken = new SyntaxToken(keyword)
+  }
 }
 
 

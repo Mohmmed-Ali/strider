@@ -12,7 +12,6 @@ case class RDFTriple(s: String,
                      o: String) extends RDFData {
 
 
-
   override def toString: String = s + " " + p + " " + o + " ."
 
 }

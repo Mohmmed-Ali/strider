@@ -1,6 +1,6 @@
 package engine.core.sparql
 
-import engine.core.sparkop.compiler.AlgebraTransformer
+import engine.core.sparkop.compiler.OpTransformer
 import engine.core.sparkop.op.SparkOp
 import org.apache.jena.graph
 import org.apache.jena.query.Query
@@ -25,7 +25,7 @@ import scala.collection.JavaConversions._
   */
 abstract class SparqlQuery(val query: Query, val id: String) extends java.io.Serializable {
   val opRoot: Op = Algebra.compile(query)
-  val algebraTransformer: AlgebraTransformer = new AlgebraTransformer()
+  val algebraTransformer: OpTransformer = new OpTransformer()
   val sparkOpRoot: SparkOp = algebraTransformer.transform(opRoot)
 
   override def toString: String = query.toString
@@ -61,12 +61,11 @@ object SelectQuery {
   */
 case class ConstructQuery(override val query: Query,
                           override val id: String) extends SparqlQuery(query, id) {
-  def this(query: Query) = this(query, "")
-
   val constructTemplate: List[graph.Triple] =
     query.getConstructTemplate.getTriples.toList
-
   val templateMapping = constructMapping(constructTemplate)
+
+  def this(query: Query) = this(query, "")
 
   /**
     * Get the mapping of construct template.

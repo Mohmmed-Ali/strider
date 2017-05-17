@@ -15,16 +15,14 @@ import org.apache.spark.util.SizeEstimator
 @Experimental
 class SqlContextResolver(sc: SparkContext) {
 
-  val sqlContext = new SQLContext(sc)
+  private lazy val rowRDD = SqlContextResolver.createRDDRow(sc)
   // Setting SQL context configurations for performance tuning
   //  sqlContext.setConf("spark.sql.codegen", "true")
   //  sqlContext.setConf("spark.sql.inMemoryColumnarStorage.batchSize", "10000")
   sqlContext.setConf("spark.sql.inMemoryColumnarStorage.compressed", "true")
   sqlContext.setConf("spark.sql.autoBroadcastJoinThreshold", "170000000")
   sqlContext.setConf("spark.sql.tungsten.enabled", "true")
-
-  private lazy val rowRDD = SqlContextResolver.createRDDRow(sc)
-
+  val sqlContext = new SQLContext(sc)
   val wdf = sqlContext
     .createDataFrame(rowRDD, SqlContextResolver.schema)
 

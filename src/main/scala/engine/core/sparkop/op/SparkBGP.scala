@@ -26,34 +26,38 @@ class SparkBGP(val opBGP: OpBGP,
   private[this] val static_handler = StaticEPHandler
   private[this] val adap_handler = AdaptiveEPHandler
 
+  def update(opName: String,
+             inputDF: DataFrame): Unit = {
+    log.info("Switch to backward adaptivity.")
+    adap_handler.currentAdapPlan =
+      Option(getAdapPlan(computDFMap(triples, inputDF)))
+  }
+
+  override def execute(opName: String,
+                       inputDF: DataFrame): SparkOpRes = {
+    SparkOpRes(computeBGP(inputDF))
+  }
+
   private def computeBGP(inputDF: DataFrame): DataFrame = {
     val dfMap = computDFMap(triples, inputDF)
 
-    if (globalTrigger) { //TriggerRules.f_trigger(SizeEstimator.estimate(inputDF))
-      if (TriggerRules.f_trigger_test){
+    if (globalTrigger) {
+      //TriggerRules.f_trigger(SizeEstimator.estimate(inputDF))
+      if (TriggerRules.f_trigger_test) {
         adap_handler.currentAdapPlan match {
           case None =>
             log.info("Switch to forward adaptivity.")
-            computeEP(getAdapPlan(dfMap),dfMap)
+            computeEP(getAdapPlan(dfMap), dfMap)
           case Some(oldAdapPlan) =>
             log.warn("\n \n Detailed Query plan info: \n" + getEPInfo(oldAdapPlan))
             adap_handler.currentAdapPlan = None // Reinitialize adaptive plan
 
-            computeEP(oldAdapPlan,dfMap)
+            computeEP(oldAdapPlan, dfMap)
         }
-      } else computeEP(getStaticPlan,dfMap)
+      } else computeEP(getStaticPlan, dfMap)
     } else {
       computeEP(getStaticPlan, dfMap)
     }
-  }
-
-  /**
-    * Initialize the list of BGPNodes without the assignment of statistic weight
-    * @param triples: Input triple pattern parsed by Jena ARQ
-    * @return All BGPNodes present in current BGP graph
-    */
-  private def initStaticEP(triples: List[graph.Triple]): List[BGPNode] = {
-    triples.map(tp => BGPNode(tp))
   }
 
   private def getStaticPlan: List[BGPGraph] = {
@@ -67,14 +71,15 @@ class SparkBGP(val opBGP: OpBGP,
     }
   }
 
-
   private def getAdapPlan(dfMap: Map[graph.Triple, DataFrame],
                           persistence: Boolean = true): List[BGPGraph] = {
     def setNodesStatistic(dfMap: Map[graph.Triple, DataFrame]): Map[graph.Triple, Long] = dfMap.
-        map( tpDF => (tpDF._1, { if (persistence)
+      map(tpDF => (tpDF._1, {
+        if (persistence)
           tpDF._2.persist(StorageLevel.MEMORY_ONLY).count()
-        else tpDF._2.count() }
-          ))
+        else tpDF._2.count()
+      }
+        ))
 
     ucg.updateWeight(setNodesStatistic(dfMap))
     val trigger = AdaptiveTrigger(ucg)
@@ -89,20 +94,18 @@ class SparkBGP(val opBGP: OpBGP,
     }
   }
 
-  def update(opName: String,
-             inputDF: DataFrame): Unit = {
-    log.info("Switch to backward adaptivity.")
-    adap_handler.currentAdapPlan =
-      Option(getAdapPlan(computDFMap(triples, inputDF)))
-  }
-
-  override def execute(opName: String,
-                       inputDF: DataFrame): SparkOpRes = {
-    SparkOpRes(computeBGP(inputDF))
-  }
-
   override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {
     sparkOpVisitor.visit(this)
+  }
+
+  /**
+    * Initialize the list of BGPNodes without the assignment of statistic weight
+    *
+    * @param triples : Input triple pattern parsed by Jena ARQ
+    * @return All BGPNodes present in current BGP graph
+    */
+  private def initStaticEP(triples: List[graph.Triple]): List[BGPNode] = {
+    triples.map(tp => BGPNode(tp))
   }
 
   /**
@@ -152,6 +155,7 @@ class SparkBGP(val opBGP: OpBGP,
       value
     }
   }
+
 }
 
 object SparkBGP {

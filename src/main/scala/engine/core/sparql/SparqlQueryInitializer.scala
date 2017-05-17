@@ -8,7 +8,7 @@ trait QueryInitializer {
 }
 
 
-object SparqlQueryInitializer extends QueryInitializer{
+object SparqlQueryInitializer extends QueryInitializer {
 
   override def initializeQueryStr(queryId: String = "eval_5"): String = queryId match {
 

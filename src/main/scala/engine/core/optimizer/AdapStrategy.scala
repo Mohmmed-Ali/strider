@@ -9,10 +9,13 @@ trait AdapStrategy {
 }
 
 object AdapStrategy {
+
   case object Forward extends AdapStrategy {
     override val strategy: String = "adaptivity.forward"
   }
+
   case object Backward extends AdapStrategy {
     override val strategy: String = "adaptivity.backward"
   }
+
 }

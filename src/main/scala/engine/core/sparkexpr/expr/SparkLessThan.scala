@@ -1,4 +1,5 @@
 package engine.core.sparkexpr.expr
+
 import engine.core.sparkexpr.compiler.SparkExprVisitor
 import org.apache.jena.sparql.expr.E_LessThan
 
@@ -8,8 +9,7 @@ import org.apache.jena.sparql.expr.E_LessThan
 class SparkLessThan(val expr: E_LessThan,
                     leftExpr: SparkExpr,
                     rightExpr: SparkExpr) extends
-  SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr){
-
+  SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
 
 
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
@@ -21,6 +21,6 @@ object SparkLessThan {
   def apply(expr: E_LessThan,
             leftExpr: SparkExpr,
             rightExpr: SparkExpr): SparkLessThan =
-     new SparkLessThan(expr, leftExpr, rightExpr)
+    new SparkLessThan(expr, leftExpr, rightExpr)
 
 }

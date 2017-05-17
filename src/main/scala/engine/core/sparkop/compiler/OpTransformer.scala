@@ -13,10 +13,10 @@ import scala.collection.mutable
 /**
   * Created by xiangnanren on 07/07/16.
   */
-class AlgebraTransformer extends OpVisitorBase with Serializable {
+class OpTransformer extends OpVisitorBase with Serializable {
   @transient
   private[this] val log = LogManager.
-    getLogger(AlgebraTransformer.getClass)
+    getLogger(OpTransformer.getClass)
 
   private val stack = new mutable.Stack[SparkOp]
   private var opID = -1
@@ -135,7 +135,7 @@ class AlgebraTransformer extends OpVisitorBase with Serializable {
 
 }
 
-object AlgebraTransformer {
-  def apply: AlgebraTransformer = new AlgebraTransformer()
+object OpTransformer {
+  def apply: OpTransformer = new OpTransformer()
 }
 

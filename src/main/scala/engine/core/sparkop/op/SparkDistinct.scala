@@ -9,12 +9,9 @@ import org.apache.jena.sparql.algebra.op.OpDistinct
   */
 
 /**
-  * :: Experimental ::
   * The 'distinct' on Spark. Current version simplifies the hierarchy
   * relation from solution modifier and reducedDistinct
   *
-  * @param opDistinct :
-  * @param subOp      :
   */
 
 class SparkDistinct(val opDistinct: OpDistinct,

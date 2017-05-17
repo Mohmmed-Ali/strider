@@ -31,7 +31,7 @@ class GreedyEPGenerator[T <: ExecutionPlanType](epType: T)
         reduce((node1, node2) => node1.minNode(node2, epType))
 
       ep.append(currentMinNode)
-      ep.append(getConnectedEdge(nodeCandidates,currentMinNode))
+      ep.append(getConnectedEdge(nodeCandidates, currentMinNode))
 
       nodeCandidates.append(currentMinNode)
       markVisited(currentMinNode)
@@ -47,7 +47,7 @@ class GreedyEPGenerator[T <: ExecutionPlanType](epType: T)
     for (i <- nodeCandidates;
          j <- ucgNodes
          if graphConnection(i, j) && !j.visited
-    ){
+    ) {
       set.add(j)
     }
     set
@@ -55,7 +55,7 @@ class GreedyEPGenerator[T <: ExecutionPlanType](epType: T)
 
 
   private[this] def getConnectedEdge(nodeCandidates: Seq[BGPNode],
-                 currentMinNode:BGPNode): BGPEdge = {
+                                     currentMinNode: BGPNode): BGPEdge = {
     val node = nodeCandidates.
       find(_node => graphConnection(_node, currentMinNode)).get
 

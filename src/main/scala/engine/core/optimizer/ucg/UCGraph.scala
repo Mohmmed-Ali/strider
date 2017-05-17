@@ -22,34 +22,17 @@ class UCGraph(val ucgNodes: List[BGPNode]) extends BGPOptimizerHelper {
     node.setStarJoinNodes(this.ucgNodes))
 
   /**
-    * Create the undirected connected graph for a given execution plan.
-    * Only considering unbound node as join key
-    *
-    * @return UCGraph : a list of connected triple pattern ((tp1, tp2)...)
-    */
-  private def generateUCGEdges(): List[BGPEdge] = {
-
-    val edgeSeq: IndexedSeq[BGPEdge] =
-      for {
-        i <- ucgNodes.indices
-        j <- i + 1 until ucgNodes.length
-        if graphConnection(ucgNodes(i), ucgNodes(j))
-      } yield BGPEdge(ucgNodes(i), ucgNodes(j))
-
-    edgeSeq.toList
-  }
-
-
-  /**
     * This method updates the statistic weight of
     * all BGPNodes weight in current UCG graph
-    * @param nodeMapping: Map[graph.Triple, Long], graph.Triple: triple pattern,
+    *
+    * @param nodeMapping : Map[graph.Triple, Long], graph.Triple: triple pattern,
     *                    Long: the statistic weight of the triple pattern
     */
   def updateWeight(nodeMapping: Map[graph.Triple, Long]): Unit = {
     // Update nodes weight
     ucgNodes.foreach(node => {
-      node.statisticWeight = nodeMapping(node.triple)})
+      node.statisticWeight = nodeMapping(node.triple)
+    })
     // Update edge weight
     ucgEdges.foreach(edge => edge.updateEdgeStaticWeight())
   }
@@ -66,6 +49,24 @@ class UCGraph(val ucgNodes: List[BGPNode]) extends BGPOptimizerHelper {
         edge.node2.triple +
         ")")
   )
+
+  /**
+    * Create the undirected connected graph for a given execution plan.
+    * Only considering unbound node as join key
+    *
+    * @return UCGraph : a list of connected triple pattern ((tp1, tp2)...)
+    */
+  private def generateUCGEdges(): List[BGPEdge] = {
+
+    val edgeSeq: IndexedSeq[BGPEdge] =
+      for {
+        i <- ucgNodes.indices
+        j <- i + 1 until ucgNodes.length
+        if graphConnection(ucgNodes(i), ucgNodes(j))
+      } yield BGPEdge(ucgNodes(i), ucgNodes(j))
+
+    edgeSeq.toList
+  }
 }
 
 

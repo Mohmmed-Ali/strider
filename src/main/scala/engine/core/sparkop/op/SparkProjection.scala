@@ -17,16 +17,16 @@ class SparkProjection(val opProject: OpProject,
   val projects = opProject.getVars.toList
   val selectVars = projects.map(x => x.getVarName)
 
+  override def execute(opName: String,
+                       child: SparkOpRes): SparkOpRes = {
+    SparkOpRes(computeProject(child.result))
+  }
+
   private def computeProject(inputDF: DataFrame): DataFrame =
     selectVars.length match {
       case 1 => inputDF.select(selectVars.head)
       case _ => inputDF.select(selectVars.head, selectVars.tail: _*)
     }
-
-  override def execute(opName: String,
-                       child: SparkOpRes): SparkOpRes = {
-    SparkOpRes(computeProject(child.result))
-  }
 
   override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {
     sparkOpVisitor.visit(this)

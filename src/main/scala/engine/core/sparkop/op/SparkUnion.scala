@@ -14,6 +14,18 @@ class SparkUnion(val opUnion: OpUnion,
                  leftOp: SparkOp,
                  rightOp: SparkOp) extends
   SparkOp2[SparkOp, SparkOp](leftOp, rightOp) {
+  override def execute(opName: String,
+                       leftChild: SparkOpRes,
+                       rightChild: SparkOpRes): SparkOpRes = {
+    SparkOpRes(computeUnion(
+      leftChild.result,
+      rightChild.result))
+  }
+
+  override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {
+    sparkOpVisitor.visit(this)
+  }
+
   @tailrec
   private def convertSchema(toAddColLeft: List[String],
                             accumDF: DataFrame): DataFrame = {
@@ -48,18 +60,6 @@ class SparkUnion(val opUnion: OpUnion,
     }
 
     leftDF1.union(rightDF1)
-  }
-
-  override def execute(opName: String,
-                       leftChild: SparkOpRes,
-                       rightChild: SparkOpRes): SparkOpRes = {
-    SparkOpRes(computeUnion(
-      leftChild.result,
-      rightChild.result))
-  }
-
-  override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {
-    sparkOpVisitor.visit(this)
   }
 }
 

@@ -13,6 +13,15 @@ class SparkLeftJoin(val opLeftJoin: OpLeftJoin,
                     rightOp: SparkOp) extends
   SparkOp2(leftOp, rightOp) {
 
+  override def execute(opName: String,
+                       leftChild: SparkOpRes,
+                       rightChild: SparkOpRes): SparkOpRes = {
+    SparkOpRes(
+      computeLefJoin(
+        leftChild.result,
+        rightChild.result))
+  }
+
   private def computeLefJoin(leftDF: DataFrame,
                              rightDF: DataFrame): DataFrame = {
     val leftColName = leftDF.columns
@@ -30,15 +39,6 @@ class SparkLeftJoin(val opLeftJoin: OpLeftJoin,
     )
 
     leftJoinResult
-  }
-
-  override def execute(opName: String,
-                       leftChild: SparkOpRes,
-                       rightChild: SparkOpRes): SparkOpRes = {
-    SparkOpRes(
-      computeLefJoin(
-        leftChild.result,
-        rightChild.result))
   }
 
   override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {

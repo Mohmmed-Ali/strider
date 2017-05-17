@@ -1,7 +1,7 @@
 package engine.core.sparkexpr.compiler
 
 import engine.core.sparkexpr.expr._
-import engine.core.sparkop.compiler.AlgebraTransformer
+import engine.core.sparkop.compiler.OpTransformer
 import org.apache.jena.sparql.expr._
 import org.apache.log4j.LogManager
 
@@ -10,10 +10,10 @@ import scala.collection.mutable
 /**
   * Created by xiangnanren on 03/05/2017.
   */
-class SparkExprTransformer extends ExprVisitor{
+class SparkExprTransformer extends ExprVisitor {
   @transient
   private[this] val log = LogManager.
-    getLogger(AlgebraTransformer.getClass)
+    getLogger(OpTransformer.getClass)
 
   private val stack = new mutable.Stack[SparkExpr]
   private var exprID = -1
