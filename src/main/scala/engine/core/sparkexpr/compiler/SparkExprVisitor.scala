@@ -9,6 +9,8 @@ trait SparkExprVisitor {
 
   def visit(sparkAdd: SparkAdd): Unit = {}
 
+  def visit(sparkAnd: SparkAnd): Unit = {}
+
   def visit(sparkBound: SparkBound): Unit = {}
 
   def visit(sparkExprVar: SparkExprVar): Unit = {}
@@ -20,6 +22,5 @@ trait SparkExprVisitor {
   def visit(sparkNodeValue: SparkNodeValue): Unit = {}
 
   def visit(sparkNot: SparkNot): Unit = {}
-
 
 }

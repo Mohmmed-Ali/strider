@@ -1,6 +1,6 @@
 package engine.core.sparkop.op
 
-import engine.core.sparkexpr.compiler.SparkExprTransformerTest
+import engine.core.sparkexpr.compiler.SparkExprTransformer
 import engine.core.sparkop.compiler.SparkOpVisitor
 import org.apache.jena.sparql.algebra.op.OpFilter
 import org.apache.jena.sparql.expr.Expr
@@ -25,7 +25,10 @@ class SparkFilter(val opFilter: OpFilter,
 
   private def transform(opFilter: OpFilter): String = {
     val expr = opFilter.getExprs.iterator.next()
-    (new SparkExprTransformerTest).transform[Expr](expr)
+    println("Number of var: " + expr.getVarsMentioned.size())
+
+    (new SparkExprTransformer).transform(expr)
+    ""
   }
 }
 

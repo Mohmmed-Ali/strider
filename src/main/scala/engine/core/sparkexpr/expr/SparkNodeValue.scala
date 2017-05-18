@@ -8,7 +8,6 @@ import org.apache.jena.sparql.expr.NodeValue
   */
 class SparkNodeValue(val nv: NodeValue) extends SparkExpr {
 
-
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
   }

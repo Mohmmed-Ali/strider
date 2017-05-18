@@ -1,7 +1,7 @@
 package engine.core.sparkexpr.compiler
 
 import engine.core.sparkexpr.expr._
-import engine.core.sparkop.compiler.OpTransformer
+import engine.core.sparkop.compiler.SparkOpTransformer
 import org.apache.jena.sparql.expr._
 import org.apache.log4j.LogManager
 
@@ -13,7 +13,7 @@ import scala.collection.mutable
 class SparkExprTransformer extends ExprVisitor {
   @transient
   private[this] val log = LogManager.
-    getLogger(OpTransformer.getClass)
+    getLogger(SparkOpTransformer.getClass)
 
   private val stack = new mutable.Stack[SparkExpr]
   private var exprID = -1
@@ -49,9 +49,11 @@ class SparkExprTransformer extends ExprVisitor {
     val subExpr = stack.pop()
 
     val tempExpr = func match {
-      case f: E_Bound => SparkBound(f, subExpr)
+      case f: E_Bound => exprID += 1
+        SparkBound(f, subExpr)
 
-      case f: E_LogicalNot => SparkNot(f, subExpr)
+      case f: E_LogicalNot => exprID += 1
+        SparkNot(f, subExpr)
     }
     stack.push(tempExpr)
   }
@@ -59,13 +61,20 @@ class SparkExprTransformer extends ExprVisitor {
   override def visit(func: ExprFunction2): Unit = {
     val rightExpr = stack.pop()
     val leftExpr = stack.pop()
+    exprID += 1
 
     val tempExpr = func match {
-      case f: E_Add => SparkAdd(f, leftExpr, rightExpr)
+      case f: E_Add => log.debug(s"opID: $exprID, E_Add: $f")
+        SparkAdd(f, leftExpr, rightExpr)
 
-      case f: E_GreaterThan => SparkGreaterThan(f, leftExpr, rightExpr)
+      case f: E_LogicalAnd => log.debug(s"opID: $exprID, E_LogicalAnd: $f")
+        SparkAnd(f, leftExpr, rightExpr)
 
-      case f: E_LessThan => SparkLessThan(f, leftExpr, rightExpr)
+      case f: E_GreaterThan => log.debug(s"opID: $exprID, E_GreaterThan: $f")
+        SparkGreaterThan(f, leftExpr, rightExpr)
+
+      case f: E_LessThan => log.debug(s"opID: $exprID, E_LessThan: $f")
+        SparkLessThan(f, leftExpr, rightExpr)
     }
     stack.push(tempExpr)
   }
@@ -77,10 +86,18 @@ class SparkExprTransformer extends ExprVisitor {
   override def visit(funcOp: ExprFunctionOp): Unit = {}
 
   override def visit(nv: NodeValue): Unit = {
+    exprID += 1
+    log.debug(s"opID: $exprID, opDistinct: ${nv.asQuotedString}")
 
+    println(nv)
+    stack.push(SparkNodeValue(nv))
   }
 
+
   override def visit(exprVar: ExprVar): Unit = {
+    exprID += 1
+
+    println(exprVar.getVarName)
     stack.push(SparkExprVar(exprVar))
   }
 

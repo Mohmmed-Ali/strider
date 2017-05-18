@@ -1,6 +1,6 @@
 package engine.core.sparql
 
-import engine.core.sparkop.compiler.OpTransformer
+import engine.core.sparkop.compiler.SparkOpTransformer
 import engine.core.sparkop.op.SparkOp
 import org.apache.jena.graph
 import org.apache.jena.query.Query
@@ -25,7 +25,7 @@ import scala.collection.JavaConversions._
   */
 abstract class SparqlQuery(val query: Query, val id: String) extends java.io.Serializable {
   val opRoot: Op = Algebra.compile(query)
-  val algebraTransformer: OpTransformer = new OpTransformer()
+  val algebraTransformer: SparkOpTransformer = new SparkOpTransformer()
   val sparkOpRoot: SparkOp = algebraTransformer.transform(opRoot)
 
   override def toString: String = query.toString
