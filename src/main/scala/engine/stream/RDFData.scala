@@ -1,7 +1,7 @@
 package engine.stream
 
 import org.apache.jena.rdf.model.Model
-import protobuf.Messages
+import protobuf.target.Messages
 
 /**
   * Created by xiangnanren on 16/11/2016.

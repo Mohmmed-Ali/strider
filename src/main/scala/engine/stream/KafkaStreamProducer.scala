@@ -2,6 +2,7 @@ package engine.stream
 
 import java.util.Properties
 
+import engine.stream.kryo.KryoStreamSerializer
 import kafka.producer.{KeyedMessage, Producer}
 import kafka.serializer.StringEncoder
 import org.apache.log4j.LogManager
@@ -31,7 +32,7 @@ class KafkaStreamProducer(brokerAddr: String,
     val props = new Properties()
     props.put("metadata.broker.list", brokerAddr)
     props.put("key.serializer.class", classOf[StringEncoder].getName)
-    props.put("serializer.class", classOf[StreamSerializer[RDFTriple]].getName)
+    props.put("serializer.class", classOf[KryoStreamSerializer[RDFTriple]].getName)
 
     props
   }
@@ -42,7 +43,7 @@ class KafkaStreamProducer(brokerAddr: String,
   def getConfigMaps: Map[String, String] =
     Map("metadata.broker.list" -> brokerAddr,
       "key.serializer" -> "org.apache.kafka.common.serialization.StringSerializer",
-      "value.serializer" -> "engine.stream.StreamSerializer")
+      "value.serializer" -> "engine.stream.kryo.StreamSerializer")
 
 
   def setTopics(): Option[Set[String]] = {

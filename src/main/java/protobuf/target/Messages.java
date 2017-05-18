@@ -1,4 +1,4 @@
-package protobuf;
+package protobuf.target;
 // source: Messages.proto
 
 public final class Messages {

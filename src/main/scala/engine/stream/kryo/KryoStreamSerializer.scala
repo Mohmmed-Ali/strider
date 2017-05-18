@@ -1,4 +1,4 @@
-package engine.stream
+package engine.stream.kryo
 
 import java.io.ByteArrayOutputStream
 
@@ -9,7 +9,7 @@ import kafka.utils.VerifiableProperties
 /**
   * Created by xiangnanren on 16/11/2016.
   */
-class StreamSerializer[T](props: VerifiableProperties = null) extends Encoder[T] {
+class KryoStreamSerializer[T](props: VerifiableProperties = null) extends Encoder[T] {
 
   override def toBytes(t: T): Array[Byte] = {
     val byteArrayOutput = new ByteArrayOutputStream()

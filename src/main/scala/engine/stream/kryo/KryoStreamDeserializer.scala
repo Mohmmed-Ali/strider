@@ -1,4 +1,4 @@
-package engine.stream
+package engine.stream.kryo
 
 import com.esotericsoftware.kryo.io.Input
 import engine.core.conf.StriderDeserializerConf
@@ -9,7 +9,7 @@ import kafka.utils.VerifiableProperties
   * Created by xiangnanren on 16/11/2016.
   */
 
-class StreamDeserializer[T](props: VerifiableProperties = null) extends Decoder[T] {
+class KryoStreamDeserializer[T](props: VerifiableProperties = null) extends Decoder[T] {
 
   override def fromBytes(messageBytes: Array[Byte]): T = {
 
