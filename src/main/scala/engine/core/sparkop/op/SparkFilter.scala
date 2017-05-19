@@ -25,7 +25,6 @@ class SparkFilter(val opFilter: OpFilter,
 
   private def transform(opFilter: OpFilter): String = {
     val expr = opFilter.getExprs.iterator.next()
-    println("Number of var: " + expr.getVarsMentioned.size())
 
     (new SparkExprTransformer).transform(expr)
     ""
