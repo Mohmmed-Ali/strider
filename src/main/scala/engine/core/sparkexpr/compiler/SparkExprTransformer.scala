@@ -67,11 +67,15 @@ class SparkExprTransformer extends ExprVisitor {
       case f: E_Add => log.debug(s"opID: $exprID, E_Add: $f")
         SparkAdd(f, leftExpr, rightExpr)
 
-      case f: E_LogicalAnd => log.debug(s"opID: $exprID, E_LogicalAnd: $f")
-        SparkAnd(f, leftExpr, rightExpr)
+      case f: E_Equals => log.debug(s"opID: $exprID, E_Equals: $f")
+        println("Expr name: " )
+        SparkEquals(f, leftExpr, leftExpr)
 
       case f: E_GreaterThan => log.debug(s"opID: $exprID, E_GreaterThan: $f")
         SparkGreaterThan(f, leftExpr, rightExpr)
+
+      case f: E_LogicalAnd => log.debug(s"opID: $exprID, E_LogicalAnd: $f")
+        SparkAnd(f, leftExpr, rightExpr)
 
       case f: E_LessThan => log.debug(s"opID: $exprID, E_LessThan: $f")
         SparkLessThan(f, leftExpr, rightExpr)

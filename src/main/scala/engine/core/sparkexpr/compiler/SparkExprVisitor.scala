@@ -13,6 +13,8 @@ trait SparkExprVisitor {
 
   def visit(sparkBound: SparkBound): Unit = {}
 
+  def visit(sparkEquals: SparkEquals): Unit = {}
+
   def visit(sparkExprVar: SparkExprVar): Unit = {}
 
   def visit(sparkGreaterThan: SparkGreaterThan): Unit = {}

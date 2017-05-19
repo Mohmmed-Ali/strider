@@ -90,21 +90,21 @@ object SparqlQueryInitializer extends QueryInitializer {
     ////////////////////////
     // Test Queries
     ////////////////////////
-    case "test_0" =>
-      "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> " +
-        " select ?s " +
-        "{ ?s <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o ." +
-        "  ?o <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o1. " +
-        "  filter((?o > \"32\"^^xsd:double) &&  " +
-        "(?o1 < \"35\"^^xsd:double)) }"
-
 //    case "test_0" =>
 //      "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> " +
 //        " select ?s " +
 //        "{ ?s <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o ." +
 //        "  ?o <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o1. " +
-//        "  filter((?o > \"32\"^^xsd:double)) " +
-//        "}"
+//        "  filter((?o > \"32\"^^xsd:double) &&  " +
+//        "(?o1 < \"35\"^^xsd:double)) }"
+
+    case "test_0" =>
+      "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> " +
+        " select ?s " +
+        "{ ?s <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o ." +
+        "  ?o <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o1. " +
+        "  filter((?o = \"32\"^^xsd:double)) " +
+        "}"
 
     case "test_1" =>
       "PREFIX val: <http://purl.oclc.org/NET/ssnx/ssn/> " +
