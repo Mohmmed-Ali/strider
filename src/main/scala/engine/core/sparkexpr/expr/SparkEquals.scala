@@ -10,10 +10,12 @@ class SparkEquals(val equals: E_Equals,
                   leftExpr: SparkExpr,
                   rightExpr: SparkExpr) extends
   SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
+
+
+
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
   }
-
 
 }
 

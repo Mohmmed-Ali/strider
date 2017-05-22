@@ -5,11 +5,11 @@ import org.apache.jena.sparql.expr.{ExprAggregator, ExprVar, NodeValue, _}
 /**
   * Created by xiangnanren on 06/10/16.
   */
-class SparqlExprWalker(private val exprVisitor: ExprVisitor)
+class SparkExprWalker(private val exprVisitor: ExprVisitor)
   extends ExprVisitorFunction {
 
   def walkBottomUp(expr: Expr) = {
-    expr.visit(SparqlExprWalker(exprVisitor))
+    expr.visit(SparkExprWalker(exprVisitor))
   }
 
   /**
@@ -47,7 +47,7 @@ class SparqlExprWalker(private val exprVisitor: ExprVisitor)
 }
 
 
-object SparqlExprWalker {
-  def apply(exprVisitor: ExprVisitor): SparqlExprWalker =
-    new SparqlExprWalker(exprVisitor)
+object SparkExprWalker {
+  def apply(exprVisitor: ExprVisitor): SparkExprWalker =
+    new SparkExprWalker(exprVisitor)
 }

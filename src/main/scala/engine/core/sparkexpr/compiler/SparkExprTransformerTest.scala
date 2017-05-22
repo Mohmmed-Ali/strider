@@ -17,7 +17,7 @@ class SparkExprTransformerTest extends ExprVisitor {
     * @tparam T The class type with upper bound of Expr
     */
   def transform[T <: Expr](expr: T): String = {
-    SparqlExprWalker(this).walkBottomUp(expr)
+    SparkExprWalker(this).walkBottomUp(expr)
 
     val result = stack.isEmpty match {
       case true => ""

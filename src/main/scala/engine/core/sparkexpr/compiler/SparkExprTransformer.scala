@@ -20,7 +20,7 @@ class SparkExprTransformer extends ExprVisitor {
 
   def transform(expr: Expr): SparkExpr = {
 
-    SparqlExprWalker(this).walkBottomUp(expr)
+    SparkExprWalker(this).walkBottomUp(expr)
     stack.pop()
   }
 
@@ -68,7 +68,6 @@ class SparkExprTransformer extends ExprVisitor {
         SparkAdd(f, leftExpr, rightExpr)
 
       case f: E_Equals => log.debug(s"opID: $exprID, E_Equals: $f")
-        println("Expr name: " )
         SparkEquals(f, leftExpr, leftExpr)
 
       case f: E_GreaterThan => log.debug(s"opID: $exprID, E_GreaterThan: $f")
@@ -93,7 +92,7 @@ class SparkExprTransformer extends ExprVisitor {
     exprID += 1
     log.debug(s"opID: $exprID, opDistinct: ${nv.asQuotedString}")
 
-    println(nv)
+    println("nv: " + nv)
     stack.push(SparkNodeValue(nv))
   }
 
@@ -101,7 +100,7 @@ class SparkExprTransformer extends ExprVisitor {
   override def visit(exprVar: ExprVar): Unit = {
     exprID += 1
 
-    println(exprVar.getVarName)
+    println("exprVar: " + exprVar.getVarName)
     stack.push(SparkExprVar(exprVar))
   }
 
