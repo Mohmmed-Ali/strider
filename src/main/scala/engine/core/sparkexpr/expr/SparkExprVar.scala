@@ -9,6 +9,8 @@ import org.apache.jena.sparql.expr.ExprVar
 class SparkExprVar(val expr: ExprVar) extends SparkExpr {
   val exprVar = expr.getVarName
 
+  def execute(arg: Any): Any = arg
+
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
   }

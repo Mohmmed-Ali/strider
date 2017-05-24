@@ -11,17 +11,17 @@ class SparkNodeValue(@transient val nv: NodeValue) extends SparkExpr {
   val dataTypeURI = nv.getDatatypeURI
   val resMapping = getResMapping
 
-  def getResMapping: ExprResMapping = {
+  def getResMapping: Any = {
     dataTypeURI match {
-      case ExprDataType.boolTypeURI => BoolMapping(nv.isBoolean)
+      case ExprDataType.boolTypeURI => nv.isBoolean
 
-      case ExprDataType.doubleTypeURI => DoubleMapping(nv.getDouble)
+      case ExprDataType.doubleTypeURI => nv.getDouble
 
-      case ExprDataType.floatTypeURI => FloatMapping(nv.getFloat)
+      case ExprDataType.floatTypeURI => nv.getFloat
 
-      case ExprDataType.integerTypeURI => IntMapping(nv.getInteger)
+      case ExprDataType.integerTypeURI => nv.getInteger
 
-      case ExprDataType.stringTypeURI => StringMapping(nv.getString)
+      case ExprDataType.stringTypeURI => nv.getString
     }
   }
 

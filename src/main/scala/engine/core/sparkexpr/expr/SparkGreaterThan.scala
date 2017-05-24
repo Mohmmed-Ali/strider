@@ -14,7 +14,7 @@ class SparkGreaterThan(val expr: E_GreaterThan,
     sparkExprVisitor.visit(this)
   }
 
-  override def execute(exprName: String, leftChild: ExprResMapping, rightExpr: ExprResMapping): ExprResMapping = ???
+  override def execute(exprName: String, leftChild: Any, rightExpr: Any): Any = ???
 }
 
 object SparkGreaterThan {
