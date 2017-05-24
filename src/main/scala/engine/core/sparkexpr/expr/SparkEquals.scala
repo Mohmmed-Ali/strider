@@ -6,6 +6,14 @@ import org.apache.jena.sparql.expr.E_Equals
 /**
   * Created by xiangnanren on 19/05/2017.
   */
+
+
+/**
+  * For the comparison of two expression, currently we only consider
+  * the primitive types (AnyVal), String and BigInteger. I.e., this allows to
+  * simplify the comparison by directly using "==".
+  *
+  */
 class SparkEquals(val equals: E_Equals,
                   leftExpr: SparkExpr,
                   rightExpr: SparkExpr) extends
@@ -13,9 +21,8 @@ class SparkEquals(val equals: E_Equals,
 
   override def execute(exprName: String,
                        leftChild: Any,
-                       rightExpr: Any): Any = {
-    leftChild == rightExpr
-  }
+                       rightExpr: Any): Any = leftChild == rightExpr
+
 
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
