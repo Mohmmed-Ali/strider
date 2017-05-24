@@ -11,12 +11,15 @@ class SparkEquals(val equals: E_Equals,
                   rightExpr: SparkExpr) extends
   SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
 
-
+  override def execute(exprName: String,
+                       leftChild: ExprResMapping,
+                       rightExpr: ExprResMapping): ExprResMapping = {
+    BoolMapping(leftChild.res == rightExpr.res)
+  }
 
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
   }
-
 }
 
 

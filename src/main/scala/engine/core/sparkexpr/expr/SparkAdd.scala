@@ -15,6 +15,8 @@ class SparkAdd(val add: E_Add,
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
   }
+
+  override def execute(exprName: String, leftChild: ExprResMapping, rightExpr: ExprResMapping): ExprResMapping = ???
 }
 
 

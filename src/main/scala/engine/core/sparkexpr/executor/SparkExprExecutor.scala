@@ -1,12 +1,12 @@
 package engine.core.sparkexpr.executor
 
 import engine.core.sparkexpr.compiler.{SparkExprVisitorByType, SparkExprWalker}
-import engine.core.sparkexpr.expr.{ExprResMapping, SparkExpr}
+import engine.core.sparkexpr.expr.{ExprResMapping, SparkExpr, SparkNodeValue}
 
 /**
   * Created by xiangnanren on 19/05/2017.
   */
-class SparkExprExecutor() extends SparkExprVisitorByType {
+class SparkExprExecutor(arg: Any) extends SparkExprVisitorByType {
   private[this] val stack = new scala.collection.mutable.Stack[ExprResMapping]
 
   def execute(expr: SparkExpr): ExprResMapping = {
@@ -14,5 +14,9 @@ class SparkExprExecutor() extends SparkExprVisitorByType {
     stack.pop()
   }
 
-  
+  override def visit(sparkNodeValue: SparkNodeValue): Unit = {
+    stack.push(sparkNodeValue.resMapping)
+  }
+
+
 }

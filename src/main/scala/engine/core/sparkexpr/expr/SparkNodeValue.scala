@@ -7,6 +7,7 @@ import org.apache.jena.sparql.expr.NodeValue
   * Created by xiangnanren on 05/05/2017.
   */
 class SparkNodeValue(@transient val nv: NodeValue) extends SparkExpr {
+  val quotedValue = nv.asQuotedString()
   val dataTypeURI = nv.getDatatypeURI
   val resMapping = getResMapping
 

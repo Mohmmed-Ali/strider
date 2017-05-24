@@ -6,4 +6,8 @@ package engine.core.sparkexpr.expr
 abstract class SparkExpr2[S, T <: SparkExpr](val leftExpr: S,
                                              val rightExpr: T) extends SparkExpr {
 
+  def execute(exprName: String,
+              leftChild: ExprResMapping,
+              rightExpr: ExprResMapping): ExprResMapping
+
 }

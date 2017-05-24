@@ -13,6 +13,8 @@ class SparkGreaterThan(val expr: E_GreaterThan,
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
   }
+
+  override def execute(exprName: String, leftChild: ExprResMapping, rightExpr: ExprResMapping): ExprResMapping = ???
 }
 
 object SparkGreaterThan {

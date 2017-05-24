@@ -15,6 +15,8 @@ class SparkLessThan(val expr: E_LessThan,
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
   }
+
+  override def execute(exprName: String, leftChild: ExprResMapping, rightExpr: ExprResMapping): ExprResMapping = ???
 }
 
 object SparkLessThan {

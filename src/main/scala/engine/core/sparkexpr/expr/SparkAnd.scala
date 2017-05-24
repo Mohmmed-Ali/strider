@@ -15,6 +15,7 @@ class SparkAnd (val expr: E_LogicalAnd,
     sparkExprVisitor.visit(this)
   }
 
+  override def execute(exprName: String, leftChild: ExprResMapping, rightExpr: ExprResMapping): ExprResMapping = ???
 }
 
 
