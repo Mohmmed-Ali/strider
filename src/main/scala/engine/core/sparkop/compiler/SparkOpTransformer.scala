@@ -29,7 +29,7 @@ class SparkOpTransformer extends OpVisitorBase with Serializable {
   def transform(op: Op): SparkOp = {
     log.info(s"op: $op")
 
-    SparqlOpWalker(this).walkBottomUp(op)
+    OriginalOpWalker(this).walkBottomUp(op)
     stack.pop()
   }
 

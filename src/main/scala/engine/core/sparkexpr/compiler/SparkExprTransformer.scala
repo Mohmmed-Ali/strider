@@ -20,7 +20,7 @@ class SparkExprTransformer extends ExprVisitor {
 
   def transform(expr: Expr): SparkExpr = {
 
-    SparkExprWalker(this).walkBottomUp(expr)
+    OriginalExprWalker(this).walkBottomUp(expr)
     stack.pop()
   }
 
@@ -92,7 +92,8 @@ class SparkExprTransformer extends ExprVisitor {
     exprID += 1
     log.debug(s"opID: $exprID, opDistinct: ${nv.asQuotedString}")
 
-    println("nv: " + nv)
+    println("nv: " + nv.asQuotedString())
+    println("nv: " + nv.getDatatypeURI)
     stack.push(SparkNodeValue(nv))
   }
 

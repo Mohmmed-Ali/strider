@@ -1,30 +1,18 @@
 package engine.core.sparkexpr.executor
 
-import org.apache.jena.sparql.expr._
+import engine.core.sparkexpr.compiler.{SparkExprVisitorByType, SparkExprWalker}
+import engine.core.sparkexpr.expr.{ExprResMapping, SparkExpr}
 
 /**
   * Created by xiangnanren on 19/05/2017.
   */
-class SparkExprExecutor extends ExprVisitor {
-  override def visit(func: ExprFunction0): Unit = ???
+class SparkExprExecutor() extends SparkExprVisitorByType {
+  private[this] val stack = new scala.collection.mutable.Stack[ExprResMapping]
 
-  override def visit(func: ExprFunction1): Unit = ???
+  def execute(expr: SparkExpr): ExprResMapping = {
+    SparkExprWalker(this).walkBottomUp(expr)
+    stack.pop()
+  }
 
-  override def visit(func: ExprFunction2): Unit = ???
-
-  override def visit(func: ExprFunction3): Unit = ???
-
-  override def visit(func: ExprFunctionN): Unit = ???
-
-  override def visit(funcOp: ExprFunctionOp): Unit = ???
-
-  override def visit(nv: NodeValue): Unit = ???
-
-  override def visit(nv: ExprVar): Unit = ???
-
-  override def visit(eAgg: ExprAggregator): Unit = ???
-
-  override def finishVisit(): Unit = ???
-
-  override def startVisit(): Unit = ???
+  
 }

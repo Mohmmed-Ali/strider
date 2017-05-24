@@ -8,8 +8,6 @@ import engine.core.sparkexpr.compiler.SparkExprVisitor
 trait SparkExpr {
   var exprName: String = "SPARK_EXPR"
 
-
-
   def visit(sparkExprVisitor: SparkExprVisitor): Unit
 
 

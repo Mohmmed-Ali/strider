@@ -1,53 +1,40 @@
 package engine.core.sparkexpr.compiler
 
-import org.apache.jena.sparql.expr.{ExprAggregator, ExprVar, NodeValue, _}
+import engine.core.sparkexpr.expr._
 
 /**
-  * Created by xiangnanren on 06/10/16.
+  * Created by xiangnanren on 24/05/2017.
   */
-class SparkExprWalker(private val exprVisitor: ExprVisitor)
-  extends ExprVisitorFunction {
+class SparkExprWalker(val visitor: SparkExprVisitor)
+  extends SparkExprVisitorByType{
 
-  def walkBottomUp(expr: Expr) = {
-    expr.visit(SparkExprWalker(exprVisitor))
+  def walkBottomUp(expr: SparkExpr): Unit = {
+    expr.visit(new SparkExprWalker(visitor))
   }
 
-  /**
-    * Override the method in superclass, invoked by
-    * visit(func: ExprFunction1), visit(func: ExprFunction2)...
-    */
-  override def visitExprFunction(func: ExprFunction): Unit = {
-    (1 to func.numArgs()).
-      takeWhile(i => Option(func.getArg(i)).nonEmpty).
-      foreach(i => func.getArg(i).visit(this))
-
-    func.visit(exprVisitor)
+  override def visit(expr: SparkExpr1[SparkExpr]): Unit = {
+    if (Option(expr.subExpr).nonEmpty) expr.subExpr.visit(this)
+    expr.visit(visitor)
   }
 
-  override def visit(funcOp: ExprFunctionOp): Unit = {
-    funcOp.visit(exprVisitor)
+  override def visit(expr: SparkExpr2[SparkExpr, SparkExpr]): Unit = {
+    if(Option(expr.leftExpr).nonEmpty) expr.leftExpr.visit(this)
+    if(Option(expr.rightExpr).nonEmpty) expr.rightExpr.visit(this)
+
+    expr.visit(visitor)
   }
 
-  override def visit(nv: NodeValue): Unit = {
-    nv.visit(exprVisitor)
+  override def visit(expr: SparkExprVar): Unit = {
+    expr.visit(visitor)
   }
 
-  override def visit(nv: ExprVar): Unit = {
-    nv.visit(exprVisitor)
+  override def visit(expr: SparkNodeValue): Unit = {
+    expr.visit(visitor)
   }
-
-  override def visit(eAgg: ExprAggregator): Unit = {
-    eAgg.visit(exprVisitor)
-  }
-
-  override def finishVisit(): Unit = {}
-
-  override def startVisit(): Unit = {}
-
 }
 
 
 object SparkExprWalker {
-  def apply(exprVisitor: ExprVisitor): SparkExprWalker =
-    new SparkExprWalker(exprVisitor)
+  def apply(visitor: SparkExprVisitor): SparkExprWalker =
+    new SparkExprWalker(visitor)
 }
