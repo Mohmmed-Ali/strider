@@ -42,7 +42,6 @@ class SparkExprExecutor(arg: Any) extends SparkExprVisitorByType {
       sparkEquals.
         execute(sparkEquals.exprName,leftChild, rightChild))
   }
-
 }
 
 

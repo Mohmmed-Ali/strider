@@ -14,6 +14,7 @@ libraryDependencies ++= Seq(
   "org.apache.jena" % "jena-arq" % "3.0.1"
 )
 
+
 val meta = """META.INF(.)*""".r
 
 assemblyMergeStrategy in assembly := {

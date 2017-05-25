@@ -27,9 +27,11 @@ class SparkFilter(val opFilter: OpFilter,
       throw NullExprException("The expression in" + this.opName + "is null")
   }
 
+  val filterUDF = computeFilterExpr(transformedExpr)
+
   @throws(classOf[VarOutOfBoundException])
   def setColumnName(expr: Expr): String = {
-    expr.getExprVar.getVarNamesMentioned.size match {
+    expr.getVarsMentioned.size match {
       case size if size > 1 =>
         throw VarOutOfBoundException(
           "The number of variable in an expression should be less than 1")
@@ -37,15 +39,20 @@ class SparkFilter(val opFilter: OpFilter,
     }
   }
 
-  def computeExpr(expr: SparkExpr) = udf(
+  def computeFilterExpr(expr: SparkExpr) = udf(
     (arg: Any) => {
-      SparkExprExecutor(arg).execute(expr)
+      SparkExprExecutor(arg).execute(expr) match {
+        case res: Boolean => res
+      }
     }
   )
 
+
+
   override def execute(opName: String,
                        child: SparkOpRes): SparkOpRes = {
-
+    val df = child.result
+    df.filter(filterUDF(df("$columnName")))
 
     null
   }
@@ -58,7 +65,7 @@ class SparkFilter(val opFilter: OpFilter,
     val expr = opFilter.getExprs.iterator.next()
 
     (new SparkExprTransformer).transform(expr)
-}
+  }
 }
 
 

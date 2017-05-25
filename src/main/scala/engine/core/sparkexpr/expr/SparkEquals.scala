@@ -23,7 +23,6 @@ class SparkEquals(val equals: E_Equals,
                        leftChild: Any,
                        rightExpr: Any): Any = leftChild == rightExpr
 
-
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
   }
