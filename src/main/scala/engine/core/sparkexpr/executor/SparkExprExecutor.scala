@@ -1,6 +1,6 @@
 package engine.core.sparkexpr.executor
 
-import engine.core.sparkexpr.compiler.{SparkExprVisitorByType, SparkExprWalker}
+import engine.core.sparkexpr.compiler.{SparkExprVisitor, SparkExprWalker}
 import engine.core.sparkexpr.expr._
 
 /**
@@ -12,7 +12,7 @@ import engine.core.sparkexpr.expr._
   * @param arg: Argument of a given DataFrame.
   *             "arg" is used as the input for the user defined function.
   */
-class SparkExprExecutor(arg: Any) extends SparkExprVisitorByType {
+class SparkExprExecutor(arg: Any) extends SparkExprVisitor {
   private[this] val stack = new scala.collection.mutable.Stack[Any]
 
   /**
@@ -23,15 +23,24 @@ class SparkExprExecutor(arg: Any) extends SparkExprVisitorByType {
     */
   def execute(expr: SparkExpr): Any = {
     SparkExprWalker(this).walkBottomUp(expr)
+
+    println("stack pop " +  stack.isEmpty)
+
     stack.pop()
   }
 
   override def visit(sparkExprVar: SparkExprVar): Unit = {
+
+    println("SparkExprVar in " + arg)
+
     stack.push(sparkExprVar.execute(arg))
   }
 
   override def visit(sparkNodeValue: SparkNodeValue): Unit = {
-    stack.push(sparkNodeValue.resMapping)
+
+    println("SparkNodeValue in stack: " + sparkNodeValue.valueMapping)
+
+    stack.push(sparkNodeValue)
   }
 
   override def visit(sparkEquals: SparkEquals): Unit = {
@@ -40,7 +49,7 @@ class SparkExprExecutor(arg: Any) extends SparkExprVisitorByType {
 
     stack.push(
       sparkEquals.
-        execute(sparkEquals.exprName,leftChild, rightChild))
+        execute(sparkEquals.exprName, leftChild, rightChild))
   }
 }
 

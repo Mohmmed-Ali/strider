@@ -12,12 +12,12 @@ class SparkExprWalker(val visitor: SparkExprVisitor)
     expr.visit(new SparkExprWalker(visitor))
   }
 
-  override def visit(expr: SparkExpr1[SparkExpr]): Unit = {
+  override def visit1(expr: SparkExpr1[SparkExpr]): Unit = {
     if (Option(expr.subExpr).nonEmpty) expr.subExpr.visit(this)
     expr.visit(visitor)
   }
 
-  override def visit(expr: SparkExpr2[SparkExpr, SparkExpr]): Unit = {
+  override def visit2(expr: SparkExpr2[SparkExpr, SparkExpr]): Unit = {
     if(Option(expr.leftExpr).nonEmpty) expr.leftExpr.visit(this)
     if(Option(expr.rightExpr).nonEmpty) expr.rightExpr.visit(this)
 

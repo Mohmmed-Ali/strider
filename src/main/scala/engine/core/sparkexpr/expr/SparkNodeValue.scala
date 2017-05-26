@@ -7,21 +7,21 @@ import org.apache.jena.sparql.expr.NodeValue
   * Created by xiangnanren on 05/05/2017.
   */
 class SparkNodeValue(@transient val nv: NodeValue) extends SparkExpr {
-  val quotedValue = nv.asQuotedString()
-  val dataTypeURI = nv.getDatatypeURI
-  val resMapping = getResMapping
+  val quotedValue: String = nv.asQuotedString()
+  val dataTypeURI: String = nv.getDatatypeURI
+  val valueMapping: Any = getValueMapping
 
-  def getResMapping: Any = {
+  def getValueMapping: Any = {
     dataTypeURI match {
-      case ExprDataType.boolTypeURI => nv.isBoolean
+      case ExprHelper.boolTypeURI => nv.isBoolean
 
-      case ExprDataType.doubleTypeURI => nv.getDouble
+      case ExprHelper.decimalTypeURI => nv.getDecimal
 
-      case ExprDataType.floatTypeURI => nv.getFloat
+      case ExprHelper.doubleTypeURI => nv.getDouble
 
-      case ExprDataType.integerTypeURI => nv.getInteger
+      case ExprHelper.integerTypeURI => nv.getInteger
 
-      case ExprDataType.stringTypeURI => nv.getString
+      case ExprHelper.stringTypeURI => nv.getString
     }
   }
 

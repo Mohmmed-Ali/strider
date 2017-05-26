@@ -5,10 +5,9 @@ import engine.core.sparkexpr.compiler.SparkExprVisitor
 /**
   * Created by xiangnanren on 03/05/2017.
   */
-trait SparkExpr {
+trait SparkExpr extends Serializable{
   var exprName: String = "SPARK_EXPR"
 
   def visit(sparkExprVisitor: SparkExprVisitor): Unit
-
 
 }

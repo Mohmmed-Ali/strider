@@ -10,7 +10,7 @@ trait QueryInitializer {
 
 object SparqlQueryInitializer extends QueryInitializer {
 
-  override def initializeQueryStr(queryId: String = "eval_0"): String = queryId match {
+  override def initializeQueryStr(queryId: String = "test_0"): String = queryId match {
 
     ////////////////////////
     // Eval Queries
@@ -100,10 +100,10 @@ object SparqlQueryInitializer extends QueryInitializer {
 
     case "test_0" =>
       "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> " +
-        " select ?s " +
+        " select ?s ?o1" +
         "{ ?s <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o ." +
-        "  ?o <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o1. " +
-        "  filter((?o = \"32\"^^xsd:double)) " +
+        "  ?o <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o1. " +
+        "  filter((?o1 = \"0.22\"^^xsd:double)) " +
         "}"
 
     case "test_1" =>

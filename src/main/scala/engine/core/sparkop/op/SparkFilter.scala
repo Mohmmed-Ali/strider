@@ -1,12 +1,13 @@
 package engine.core.sparkop.op
 
 import engine.core.sparkexpr.compiler.SparkExprTransformer
-import engine.core.sparkexpr.executor.SparkExprExecutor
-import engine.core.sparkexpr.expr.{NullExprException, SparkExpr, VarOutOfBoundException}
+import engine.core.sparkexpr.executor.ExprUDF
+import engine.core.sparkexpr.expr.{NullExprException, VarOutOfBoundException}
 import engine.core.sparkop.compiler.SparkOpVisitor
 import org.apache.jena.sparql.algebra.op.OpFilter
 import org.apache.jena.sparql.expr.Expr
-import org.apache.spark.sql.functions.udf
+import scala.collection.JavaConversions._
+
 
 
 /**
@@ -27,7 +28,7 @@ class SparkFilter(val opFilter: OpFilter,
       throw NullExprException("The expression in" + this.opName + "is null")
   }
 
-  val filterUDF = computeFilterExpr(transformedExpr)
+  val filterUDF = ExprUDF.UDFWithBoolean(transformedExpr)
 
   @throws(classOf[VarOutOfBoundException])
   def setColumnName(expr: Expr): String = {
@@ -35,37 +36,21 @@ class SparkFilter(val opFilter: OpFilter,
       case size if size > 1 =>
         throw VarOutOfBoundException(
           "The number of variable in an expression should be less than 1")
-      case size if size == 1  => expr.getVarName
+      case size if size == 1  => expr.getVarsMentioned.head.getVarName
     }
   }
-
-  def computeFilterExpr(expr: SparkExpr) = udf(
-    (arg: Any) => {
-      SparkExprExecutor(arg).execute(expr) match {
-        case res: Boolean => res
-      }
-    }
-  )
-
 
 
   override def execute(opName: String,
                        child: SparkOpRes): SparkOpRes = {
     val df = child.result
-    df.filter(filterUDF(df("$columnName")))
-
-    null
+    SparkOpRes(df.filter(filterUDF(df(s"$columnName"))))
   }
 
   override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {
     sparkOpVisitor.visit(this)
   }
 
-  private def transform(opFilter: OpFilter): SparkExpr = {
-    val expr = opFilter.getExprs.iterator.next()
-
-    (new SparkExprTransformer).transform(expr)
-  }
 }
 
 

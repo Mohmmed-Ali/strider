@@ -7,12 +7,8 @@ import engine.core.sparkexpr.expr._
   */
 abstract class SparkExprVisitorByType extends SparkExprVisitor{
 
-  def visit(sparkExpr1: SparkExpr1[SparkExpr]): Unit = {
-    visit(sparkExpr1)
-  }
-
-  def visit(sparkExpr2: SparkExpr2[SparkExpr, SparkExpr]): Unit = {
-    visit(sparkExpr2)
+  override def visit(sparkEquals: SparkEquals): Unit = {
+    visit2(sparkEquals)
   }
 
   override def visit(sparkExprVar: SparkExprVar): Unit = {
@@ -22,4 +18,11 @@ abstract class SparkExprVisitorByType extends SparkExprVisitor{
   override def visit(sparkNodeValue: SparkNodeValue): Unit = {
     visit(sparkNodeValue)
   }
+
+
+  def visit1(sparkExpr1: SparkExpr1[SparkExpr])
+
+  def visit2(sparkExpr2: SparkExpr2[SparkExpr, SparkExpr])
+
+
 }

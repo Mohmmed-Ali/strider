@@ -14,14 +14,21 @@ import org.apache.jena.sparql.expr.E_Equals
   * simplify the comparison by directly using "==".
   *
   */
-class SparkEquals(val equals: E_Equals,
+class SparkEquals(@transient val equals: E_Equals,
                   leftExpr: SparkExpr,
                   rightExpr: SparkExpr) extends
   SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
 
   override def execute(exprName: String,
                        leftChild: Any,
-                       rightExpr: Any): Any = leftChild == rightExpr
+                       rightChild: Any): Any = {
+
+    println("left: "+ leftChild)
+    println("right: " + rightChild)
+
+
+    leftChild == rightChild
+  }
 
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
