@@ -100,11 +100,18 @@ object SparqlQueryInitializer extends QueryInitializer {
 
     case "test_0" =>
       "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> " +
-        " select ?s ?o1" +
-        "{ ?s <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o ." +
-        "  ?o <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o1. " +
-        "  filter((?o1 = \"0.22\"^^xsd:double)) " +
-        "}"
+        "select ?s ?o1 ?o2 ?o3 ?o4 ?o5 ?o6 " +
+        " { " +
+        " ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o ; " +
+        "    <http://purl.oclc.org/NET/ssnx/ssn/isProducedBy> ?o1 ; " +
+        "    <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o2 .  " +
+        " ?o2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o3 ; " +
+        "    <http://purl.oclc.org/NET/ssnx/ssn/startTime> ?o4 ; " +
+        "    <http://data.nasa.gov/qudt/owl/qudt/unit> ?o5 ; " +
+        "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o6 . " +
+        " filter((?o6 = \"0.22\"^^xsd:double)) " +
+        "} "
+
 
     case "test_1" =>
       "PREFIX val: <http://purl.oclc.org/NET/ssnx/ssn/> " +

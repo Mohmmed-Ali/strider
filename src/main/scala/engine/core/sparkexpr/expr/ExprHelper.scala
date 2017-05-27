@@ -1,7 +1,5 @@
 package engine.core.sparkexpr.expr
 
-import scala.util.matching.Regex
-
 /**
   * Created by xiangnanren on 24/05/2017.
   */
@@ -16,26 +14,27 @@ object ExprHelper {
   val decimalTypeSuffix = "decimal>"
   val doubleTypeSuffix = "double>"
   val integerTypeSuffix = "integer>"
-  val stringTypeSuffix = "integer>"
+  val stringTypeSuffix = "string>"
 
   val valueFieldPattern = "[^\"]+".r
-
 
   def isQuotedString(arg: String): Boolean = arg.startsWith("\"")
 
   def getArgValue(arg: String): Any = {
-    if (arg.endsWith(ExprHelper.doubleTypeSuffix)) {
-      valueFieldPattern.findFirstIn(arg).get.toDouble
+    if (arg.endsWith(ExprHelper.boolTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get.toBoolean
     }
     else if (arg.endsWith(ExprHelper.decimalTypeSuffix)) {
       BigDecimal(valueFieldPattern.findFirstIn(arg).get)
     }
-    else if (arg.endsWith(ExprHelper.boolTypeSuffix)) {
-      println(valueFieldPattern.findFirstIn(arg).get)
-      valueFieldPattern.findFirstIn(arg).get.toBoolean
+    else if (arg.endsWith(ExprHelper.doubleTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get.toDouble
     }
-    else if (arg.endsWith(ExprHelper.integerTypeURI)) {
+    else if (arg.endsWith(ExprHelper.integerTypeSuffix)) {
       BigInt(valueFieldPattern.findFirstIn(arg).get)
+    }
+    else if (arg.endsWith(ExprHelper.stringTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get
     }
 
   }

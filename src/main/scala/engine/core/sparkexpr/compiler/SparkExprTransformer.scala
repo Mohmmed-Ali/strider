@@ -92,8 +92,6 @@ class SparkExprTransformer extends ExprVisitor {
     exprID += 1
     log.debug(s"opID: $exprID, opDistinct: ${nv.asQuotedString}")
 
-    println("nv: " + nv.asQuotedString())
-    println("nv: " + nv.getDatatypeURI)
     stack.push(SparkNodeValue(nv))
   }
 
@@ -101,7 +99,6 @@ class SparkExprTransformer extends ExprVisitor {
   override def visit(exprVar: ExprVar): Unit = {
     exprID += 1
 
-    println("exprVar: " + exprVar.getVarName)
     stack.push(SparkExprVar(exprVar))
   }
 

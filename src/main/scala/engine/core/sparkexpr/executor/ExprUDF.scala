@@ -10,11 +10,10 @@ object ExprUDF {
 
   /**
     * UDF with boolean return-type
-    * @param expr
-    * @return
+    *
     */
   def UDFWithBoolean(expr: SparkExpr) = udf(
-    (arg: Any) => {
+    (arg: String) => {
       val res = SparkExprExecutor(arg).execute(expr)
       res match {
         case _res: Boolean => _res

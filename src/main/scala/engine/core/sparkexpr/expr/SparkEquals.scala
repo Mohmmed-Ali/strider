@@ -23,10 +23,6 @@ class SparkEquals(@transient val equals: E_Equals,
                        leftChild: Any,
                        rightChild: Any): Any = {
 
-    println("left: "+ leftChild)
-    println("right: " + rightChild)
-
-
     leftChild == rightChild
   }
 

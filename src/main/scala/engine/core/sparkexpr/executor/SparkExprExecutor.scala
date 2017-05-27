@@ -12,7 +12,7 @@ import engine.core.sparkexpr.expr._
   * @param arg: Argument of a given DataFrame.
   *             "arg" is used as the input for the user defined function.
   */
-class SparkExprExecutor(arg: Any) extends SparkExprVisitor {
+class SparkExprExecutor(arg: String) extends SparkExprVisitor {
   private[this] val stack = new scala.collection.mutable.Stack[Any]
 
   /**
@@ -24,23 +24,17 @@ class SparkExprExecutor(arg: Any) extends SparkExprVisitor {
   def execute(expr: SparkExpr): Any = {
     SparkExprWalker(this).walkBottomUp(expr)
 
-    println("stack pop " +  stack.isEmpty)
-
     stack.pop()
   }
 
   override def visit(sparkExprVar: SparkExprVar): Unit = {
-
-    println("SparkExprVar in " + arg)
 
     stack.push(sparkExprVar.execute(arg))
   }
 
   override def visit(sparkNodeValue: SparkNodeValue): Unit = {
 
-    println("SparkNodeValue in stack: " + sparkNodeValue.valueMapping)
-
-    stack.push(sparkNodeValue)
+    stack.push(sparkNodeValue.valueMapping)
   }
 
   override def visit(sparkEquals: SparkEquals): Unit = {
@@ -55,5 +49,5 @@ class SparkExprExecutor(arg: Any) extends SparkExprVisitor {
 
 
 object SparkExprExecutor {
-  def apply(arg: Any): SparkExprExecutor = new SparkExprExecutor(arg)
+  def apply(arg: String): SparkExprExecutor = new SparkExprExecutor(arg)
 }

@@ -23,6 +23,8 @@ class SqlContextResolver(sc: SparkContext) {
   sqlContext.setConf("spark.sql.inMemoryColumnarStorage.compressed", "true")
   sqlContext.setConf("spark.sql.autoBroadcastJoinThreshold", "170000000")
   sqlContext.setConf("spark.sql.tungsten.enabled", "true")
+  sqlContext.setConf("spark.sql.shuffle.partitions", "8")
+
   val wdf = sqlContext
     .createDataFrame(rowRDD, SqlContextResolver.schema)
 
