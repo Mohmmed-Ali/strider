@@ -21,10 +21,8 @@ class SparkEquals(@transient val equals: E_Equals,
 
   override def execute(exprName: String,
                        leftChild: Any,
-                       rightChild: Any): Any = {
+                       rightChild: Any): Boolean = leftChild == rightChild
 
-    leftChild == rightChild
-  }
 
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)

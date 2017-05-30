@@ -19,6 +19,4 @@ object ExprUDF {
         case _res: Boolean => _res
       }
     })
-
-
 }

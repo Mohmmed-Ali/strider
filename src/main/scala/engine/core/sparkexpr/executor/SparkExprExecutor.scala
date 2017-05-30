@@ -23,24 +23,20 @@ class SparkExprExecutor(arg: String) extends SparkExprVisitor {
     */
   def execute(expr: SparkExpr): Any = {
     SparkExprWalker(this).walkBottomUp(expr)
-
     stack.pop()
   }
 
   override def visit(sparkExprVar: SparkExprVar): Unit = {
-
     stack.push(sparkExprVar.execute(arg))
   }
 
   override def visit(sparkNodeValue: SparkNodeValue): Unit = {
-
     stack.push(sparkNodeValue.valueMapping)
   }
 
   override def visit(sparkEquals: SparkEquals): Unit = {
     val rightChild = stack.pop()
     val leftChild = stack.pop()
-
     stack.push(
       sparkEquals.
         execute(sparkEquals.exprName, leftChild, rightChild))
