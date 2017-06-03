@@ -86,9 +86,8 @@ object SparqlQueryInitializer extends QueryInitializer {
         "}"
 
 
-
     ////////////////////////
-    // Test Queries
+    // Test Queries group 1
     ////////////////////////
 //    case "test_0" =>
 //      "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> " +
@@ -109,7 +108,7 @@ object SparqlQueryInitializer extends QueryInitializer {
         "    <http://purl.oclc.org/NET/ssnx/ssn/startTime> ?o4 ; " +
         "    <http://data.nasa.gov/qudt/owl/qudt/unit> ?o5 ; " +
         "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o6 . " +
-        " filter((?o6 = \"0.22\"^^xsd:double)) " +
+        " filter(!bound(?o6)) " +
         "} "
 
 
@@ -249,17 +248,17 @@ object SparqlQueryInitializer extends QueryInitializer {
         " ?o3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.cuahsi.org/waterML/chlorine> . " +
         "} "
 
-    ////////////////////////
-    // Aggregation
-    ////////////////////////
+    /////////////////////////////////////
+    // Test Queries group 2 (Aggregation)
+    /////////////////////////////////////
     case "test_agg_1" =>
-      "select ?s (group_concat(?s; separator = \",\") as ?min_s) " +
+      "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> " +
+        "select (min(?o3) as ?minMeasurement ) (max(?o2) as ?maxMeasurement)" +
         " { " +
-        " ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o ; " +
-        "    <http://purl.oclc.org/NET/ssnx/ssn/isProducedBy> ?o1 ." +
-        "} " +
-        "GROUP BY ?s "
-
-
+        " ?s <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o1 .  " +
+        " ?o1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o2 ; " +
+        "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o3 . " +
+        "}" +
+        "group by ?s "
   }
 }

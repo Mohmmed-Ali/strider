@@ -21,9 +21,5 @@ class SparkExprVar(@transient val expr: ExprVar) extends SparkExpr {
 }
 
 object SparkExprVar {
-  def apply(expr: ExprVar): SparkExprVar = new SparkExprVar(expr)
-
-
-
-
+  def apply(@transient expr: ExprVar): SparkExprVar = new SparkExprVar(expr)
 }

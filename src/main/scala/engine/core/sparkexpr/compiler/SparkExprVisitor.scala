@@ -19,10 +19,18 @@ trait SparkExprVisitor {
 
   def visit(sparkGreaterThan: SparkGreaterThan): Unit = {}
 
+  def visit(sparkGreaterThanOrEqual: SparkGreaterThanOrEqual): Unit = {}
+
   def visit(sparkLessThan: SparkLessThan): Unit = {}
+
+  def visit(sparkLessThanOrEqual: SparkLessThanOrEqual): Unit = {}
 
   def visit(sparkNodeValue: SparkNodeValue): Unit = {}
 
   def visit(sparkNot: SparkNot): Unit = {}
+
+  def visit(sparkNotEquals: SparkNotEquals): Unit = {}
+
+  def visit(sparkOr: SparkOr): Unit = {}
 
 }

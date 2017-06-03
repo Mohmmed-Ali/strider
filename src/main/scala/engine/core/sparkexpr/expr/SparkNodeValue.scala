@@ -31,7 +31,7 @@ class SparkNodeValue(@transient val nv: NodeValue) extends SparkExpr {
 }
 
 object SparkNodeValue {
-  def apply(nv: NodeValue): SparkNodeValue = new SparkNodeValue(nv)
+  def apply(@transient nv: NodeValue): SparkNodeValue = new SparkNodeValue(nv)
 }
 
 

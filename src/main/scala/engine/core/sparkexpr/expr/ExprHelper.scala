@@ -20,22 +20,47 @@ object ExprHelper {
 
   def isQuotedString(arg: String): Boolean = arg.startsWith("\"")
 
-  def getArgValue(arg: String): Any = {
-    if (arg.endsWith(ExprHelper.boolTypeSuffix)) {
-      valueFieldPattern.findFirstIn(arg).get.toBoolean
-    }
-    else if (arg.endsWith(ExprHelper.decimalTypeSuffix)) {
-      BigDecimal(valueFieldPattern.findFirstIn(arg).get)
-    }
-    else if (arg.endsWith(ExprHelper.doubleTypeSuffix)) {
-      valueFieldPattern.findFirstIn(arg).get.toDouble
-    }
-    else if (arg.endsWith(ExprHelper.integerTypeSuffix)) {
-      BigInt(valueFieldPattern.findFirstIn(arg).get)
-    }
-    else if (arg.endsWith(ExprHelper.stringTypeSuffix)) {
+  def getUnquotedString(arg: String): String = {
+    if (arg.endsWith(boolTypeSuffix)) {
       valueFieldPattern.findFirstIn(arg).get
     }
-
+    else if (arg.endsWith(decimalTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get
+    }
+    else if (arg.endsWith(doubleTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get
+    }
+    else if (arg.endsWith(integerTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get
+    }
+    else if (arg.endsWith(stringTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get
+    }
+    else throw new UnsupportedLiteralException(
+      "The input literal is not supported yet " +
+        "for the computation of expression. ")
   }
+
+  def getArgValue(arg: String): Any = {
+    if (arg.endsWith(boolTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get.toBoolean
+    }
+    else if (arg.endsWith(decimalTypeSuffix)) {
+      BigDecimal(valueFieldPattern.findFirstIn(arg).get)
+    }
+    else if (arg.endsWith(doubleTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get.toDouble
+    }
+    else if (arg.endsWith(integerTypeSuffix)) {
+      BigInt(valueFieldPattern.findFirstIn(arg).get)
+    }
+    else if (arg.endsWith(stringTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get
+    }
+    else throw new UnsupportedLiteralException(
+      "The input literal is not supported yet " +
+        "for the computation of expression. ")
+  }
+
+
 }

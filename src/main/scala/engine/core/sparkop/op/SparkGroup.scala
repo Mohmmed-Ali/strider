@@ -18,6 +18,9 @@ class SparkGroup(val opGroup: OpGroup,
     toList.
     map(x => x.getVarName)
 
+  val agg = opGroup.getAggregators.toList
+  println("check " + agg.head.getExpr)
+
 
   def computeGroup(inputDF: DataFrame): DataFrame = {
     null

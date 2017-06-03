@@ -16,12 +16,14 @@ class SparkAdd(val add: E_Add,
     sparkExprVisitor.visit(this)
   }
 
-  override def execute(exprName: String, leftChild: Any, rightExpr: Any): Any = ???
+  override def execute(exprName: String,
+                       leftChild: Any,
+                       rightExpr: Any): Any = ???
 }
 
 
 object SparkAdd {
-  def apply(add: E_Add,
+  def apply(@transient add: E_Add,
             leftExpr: SparkExpr,
             rightExpr: SparkExpr): SparkAdd = new SparkAdd(add, leftExpr, rightExpr)
 }

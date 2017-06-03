@@ -23,7 +23,6 @@ class SparkEquals(@transient val equals: E_Equals,
                        leftChild: Any,
                        rightChild: Any): Boolean = leftChild == rightChild
 
-
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
   }

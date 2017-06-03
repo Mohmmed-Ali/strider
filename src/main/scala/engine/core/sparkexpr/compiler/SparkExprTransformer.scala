@@ -19,7 +19,6 @@ class SparkExprTransformer extends ExprVisitor {
   private var exprID = -1
 
   def transform(expr: Expr): SparkExpr = {
-
     OriginalExprWalker(this).walkBottomUp(expr)
     stack.pop()
   }
@@ -55,6 +54,7 @@ class SparkExprTransformer extends ExprVisitor {
       case f: E_LogicalNot => exprID += 1
         SparkNot(f, subExpr)
     }
+
     stack.push(tempExpr)
   }
 
@@ -64,20 +64,33 @@ class SparkExprTransformer extends ExprVisitor {
     exprID += 1
 
     val tempExpr = func match {
-      case f: E_Add => log.debug(s"opID: $exprID, E_Add: $f")
+      case f: E_Add => log.debug(s"exprID: $exprID, E_Add: $f")
         SparkAdd(f, leftExpr, rightExpr)
 
-      case f: E_Equals => log.debug(s"opID: $exprID, E_Equals: $f")
+      case f: E_Equals => log.debug(s"exprID: $exprID, E_Equals: $f")
         SparkEquals(f, leftExpr, rightExpr)
 
-      case f: E_GreaterThan => log.debug(s"opID: $exprID, E_GreaterThan: $f")
+      case f: E_GreaterThan => log.debug(s"exprID: $exprID, E_GreaterThan: $f")
         SparkGreaterThan(f, leftExpr, rightExpr)
 
-      case f: E_LogicalAnd => log.debug(s"opID: $exprID, E_LogicalAnd: $f")
+      case f: E_GreaterThanOrEqual => log.debug(s"exprID: $exprID, E_GreaterThanOrEqual: $f")
+        SparkGreaterThanOrEqual(f, leftExpr, rightExpr)
+
+      case f: E_LogicalAnd => log.debug(s"exprID: $exprID, E_LogicalAnd: $f")
         SparkAnd(f, leftExpr, rightExpr)
 
-      case f: E_LessThan => log.debug(s"opID: $exprID, E_LessThan: $f")
+      case f: E_LogicalOr => log.debug(s"exprID: $exprID, E_LogicalOr: $f")
+        SparkOr(f, leftExpr, rightExpr)
+
+      case f: E_LessThan => log.debug(s"exprID: $exprID, E_LessThan: $f")
         SparkLessThan(f, leftExpr, rightExpr)
+
+      case f: E_LessThanOrEqual => log.debug(s"exprID: $exprID, E_LessThanOrEqual: $f")
+        SparkLessThanOrEqual(f, leftExpr, rightExpr)
+
+      case f: E_NotEquals => log.debug(s"exprID: $exprID, E_NotEquals: $f")
+        SparkNotEquals(f, leftExpr, rightExpr)
+
     }
     stack.push(tempExpr)
   }
@@ -90,7 +103,7 @@ class SparkExprTransformer extends ExprVisitor {
 
   override def visit(nv: NodeValue): Unit = {
     exprID += 1
-    log.debug(s"opID: $exprID, opDistinct: ${nv.asQuotedString}")
+    log.debug(s"exprID: $exprID, nv: ${nv.asQuotedString}")
 
     stack.push(SparkNodeValue(nv))
   }
@@ -98,6 +111,7 @@ class SparkExprTransformer extends ExprVisitor {
 
   override def visit(exprVar: ExprVar): Unit = {
     exprID += 1
+    log.debug(s"exprID: $exprID, exprVar: ${exprVar.getVarName}")
 
     stack.push(SparkExprVar(exprVar))
   }

@@ -8,6 +8,6 @@ abstract class SparkExpr2[S, T <: SparkExpr](val leftExpr: S,
 
   def execute(exprName: String,
               leftChild: Any,
-              rightExpr: Any): Any
+              rightChild: Any): Any
 
 }
