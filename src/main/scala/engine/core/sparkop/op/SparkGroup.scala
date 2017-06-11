@@ -1,5 +1,7 @@
 package engine.core.sparkop.op
 
+import engine.core.sparkexpr.compiler.SparkExprTransformer
+import engine.core.sparkexpr.expr.NullExprException
 import engine.core.sparkop.compiler.SparkOpVisitor
 import org.apache.jena.sparql.algebra.op.OpGroup
 import org.apache.spark.sql.DataFrame
@@ -18,8 +20,15 @@ class SparkGroup(val opGroup: OpGroup,
     toList.
     map(x => x.getVarName)
 
-  val agg = opGroup.getAggregators.toList
-  println("check " + agg.head.getExpr)
+  val agg = opGroup.getAggregators.toList.iterator.next()
+  val transformedExpr = try {
+    (new SparkExprTransformer).transform(agg)
+  } catch {
+    case ex: Exception =>
+      throw NullExprException("The expression in" + this.opName + "is null")
+  }
+
+
 
 
   def computeGroup(inputDF: DataFrame): DataFrame = {

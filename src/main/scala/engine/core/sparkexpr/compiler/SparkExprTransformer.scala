@@ -116,7 +116,12 @@ class SparkExprTransformer extends ExprVisitor {
     stack.push(SparkExprVar(exprVar))
   }
 
-  override def visit(eAgg: ExprAggregator): Unit = {}
+  override def visit(eAgg: ExprAggregator): Unit = {
+    exprID += 1
+    log.debug(s"exprID: $exprID, eAgg: $eAgg")
+
+    println("visit: ")
+  }
 
   override def finishVisit(): Unit = {}
 

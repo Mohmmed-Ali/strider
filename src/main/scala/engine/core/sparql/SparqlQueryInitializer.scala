@@ -108,7 +108,7 @@ object SparqlQueryInitializer extends QueryInitializer {
         "    <http://purl.oclc.org/NET/ssnx/ssn/startTime> ?o4 ; " +
         "    <http://data.nasa.gov/qudt/owl/qudt/unit> ?o5 ; " +
         "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o6 . " +
-        " filter(!bound(?o6)) " +
+        " filter(bound(?o6)) " +
         "} "
 
 

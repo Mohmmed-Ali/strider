@@ -19,6 +19,8 @@ class SparkNodeValue(@transient val nv: NodeValue) extends SparkExpr {
 
       case ExprHelper.doubleTypeURI => nv.getDouble
 
+      case ExprHelper.floatTypeURI => nv.getFloat
+
       case ExprHelper.integerTypeURI => nv.getInteger
 
       case ExprHelper.stringTypeURI => nv.getString

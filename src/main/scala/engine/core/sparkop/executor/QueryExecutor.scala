@@ -1,4 +1,4 @@
-package engine.core.sparql.executor
+package engine.core.sparkop.executor
 
 import java.io.{File, PrintWriter}
 

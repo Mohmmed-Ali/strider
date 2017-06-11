@@ -1,4 +1,4 @@
-package engine.core.sparql.executor
+package engine.core.sparkop.executor
 
 import engine.core.sparkop.compiler.{SparkOpVisitorBase, SparkOpWalker}
 import engine.core.sparkop.op._

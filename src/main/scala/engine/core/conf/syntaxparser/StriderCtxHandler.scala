@@ -1,7 +1,7 @@
 package engine.core.conf.syntaxparser
 
 import engine.core.conf.StriderConfBase
-import engine.core.sparql.executor.QueryExecutor
+import engine.core.sparkop.executor.QueryExecutor
 import engine.core.sparql.{SparqlQuery, StriderQueryFactory}
 import org.apache.spark.streaming._
 
