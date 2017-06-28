@@ -30,11 +30,3 @@ case object MsgWavesEvent extends StriderTopic {
 case object MsgNTFile extends StriderTopic {
   val defaultTopic = "MsgNTFile"
 }
-
-/**
-  * The topics which are listed as below concern the essential
-  * meaning of topic, e.g. different types of sensor observation, etc.
-  */
-case object SensorObservation extends StriderTopic {
-  val key, defaultTopic = "ChlorineObservation"
-}

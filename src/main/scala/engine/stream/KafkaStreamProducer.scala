@@ -108,7 +108,7 @@ class KafkaStreamProducer(brokerAddr: String,
         if classTag[T] == classTag[RDFTriple] =>
         producer.send(_messages:_*)
 
-      case _messages: Seq[KeyedMessage[String, RDFTriple]@unchecked]
+      case _messages: Seq[KeyedMessage[String, RDFGraph]@unchecked]
         if classTag[T] == classTag[RDFGraph] =>
         producer.send(_messages:_*)
 
@@ -116,7 +116,14 @@ class KafkaStreamProducer(brokerAddr: String,
         if classTag[T] == classTag[WavesEvent] =>
         producer.send(_messages:_*)
     }
+  }
 
+  def sendMessages1[T: ClassTag](producer: Producer[String, T],
+                                messages: Seq[KeyedMessage[String, T]],
+                                numPartitions: Int): Unit = {
+    if (classTag[T] == classTag[RDFTriple]) producer.send(messages:_*)
+    else if (classTag[T] == classTag[RDFGraph]) producer.send(messages:_*)
+    else if (classTag[T] == classTag[WavesEvent]) producer.send(messages:_*)
 
   }
 
