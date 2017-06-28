@@ -15,6 +15,9 @@ object SparkOpLabels {
   val LEFT_JOIN_NAME = "LEFT_JOIN_"
   val UNION_NAME = "UNION_"
 
+  // Operator labels for reasoning
+  val LITEMAT_BGP_NAME = "LITEMAT_BGP_"
+
   val BGP_INNER_JOIN = "inner"
   val JOIN = "inner"
   val LEFT_JOIN = "left_outer"

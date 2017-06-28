@@ -15,11 +15,11 @@ import scala.collection.mutable
   */
 class SparkOpTransformer extends OpVisitorBase with Serializable {
   @transient
-  private[this] val log = LogManager.
+  protected val log = LogManager.
     getLogger(SparkOpTransformer.getClass)
 
-  private val stack = new mutable.Stack[SparkOp]
-  private var opID = -1
+  protected val stack = new mutable.Stack[SparkOp]
+  protected var opID = -1
 
   /** Transform the Jena algebra tree into
     * SPARK operators tree, and return its root.

@@ -6,5 +6,7 @@ package engine.core.sparkexpr.expr
 sealed abstract class SparkExprException extends Exception
 
 case class NullExprException(msg: String) extends Exception(msg)
+
 case class VarOutOfBoundException(msg: String) extends Exception(msg)
+
 case class UnsupportedLiteralException(msg: String) extends Exception(msg)

@@ -10,7 +10,7 @@ class SparkExprVar(@transient val expr: ExprVar) extends SparkExpr {
   val valueFieldPattern = "\".*?\"".r
 
   def execute(arg: String): Any = {
-    if(ExprHelper.isQuotedString(arg))
+    if (ExprHelper.isQuotedString(arg))
       ExprHelper.getArgValue(arg)
     else arg
   }

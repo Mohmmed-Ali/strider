@@ -5,8 +5,8 @@ package engine.core.optimizer.ucg
   */
 abstract class BGPGraph {
 
-  val heuristicWeight: Int
   var visited: Boolean
+  val heuristicWeight: Int
   var statisticWeight: Long
 
   def getInfo: String

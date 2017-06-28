@@ -5,7 +5,7 @@ import engine.core.sparkexpr.expr._
 /**
   * Created by xiangnanren on 24/05/2017.
   */
-abstract class SparkExprVisitorByType extends SparkExprVisitor{
+abstract class SparkExprVisitorByType extends SparkExprVisitor {
 
   override def visit(sparkAnd: SparkAnd): Unit = {
     visit2(sparkAnd)

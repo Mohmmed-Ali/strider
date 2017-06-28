@@ -5,8 +5,10 @@ package engine.stream
   * Created by xiangnanren on 17/11/2016.
   */
 sealed trait StriderTopic {
-  val key: String
-  val value: String
+  val defaultTopic: String
+  def distributeKey(partitionsNum: => Int): String = {
+    scala.util.Random.nextInt( partitionsNum + 1 ).toString
+  }
 }
 
 /**
@@ -14,19 +16,19 @@ sealed trait StriderTopic {
   * the reason why they are tagged as topics is just for preliminary test.
   */
 case object MsgRDFTriple extends StriderTopic {
-  val key, value = "MsgRDFTriple"
+  val defaultTopic = "MsgRDFTriple"
 }
 
 case object MsgRDFGraph extends StriderTopic {
-  val key, value = "MsgRDFGraph"
+  val defaultTopic = "MsgRDFGraph"
 }
 
 case object MsgWavesEvent extends StriderTopic {
-  val key, value = "MsgWavesEvent"
+  val defaultTopic = "MsgWavesEvent"
 }
 
 case object MsgNTFile extends StriderTopic {
-  val key, value = "MsgNTFile"
+  val defaultTopic = "MsgNTFile"
 }
 
 /**
@@ -34,5 +36,5 @@ case object MsgNTFile extends StriderTopic {
   * meaning of topic, e.g. different types of sensor observation, etc.
   */
 case object SensorObservation extends StriderTopic {
-  val key, value = "ChlorineObservation"
+  val key, defaultTopic = "ChlorineObservation"
 }

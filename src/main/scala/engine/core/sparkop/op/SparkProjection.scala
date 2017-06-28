@@ -14,8 +14,8 @@ import scala.collection.JavaConversions._
 class SparkProjection(val opProject: OpProject,
                       subOp: SparkOp) extends
   SparkOpModifier(subOp: SparkOp) {
-  val projects = opProject.getVars.toList
-  val selectVars = projects.map(x => x.getVarName)
+  val varList = opProject.getVars.toList
+  val schema = varList.map(x => x.getVarName)
 
   override def execute(opName: String,
                        child: SparkOpRes): SparkOpRes = {
@@ -23,9 +23,9 @@ class SparkProjection(val opProject: OpProject,
   }
 
   private def computeProject(inputDF: DataFrame): DataFrame =
-    selectVars.length match {
-      case 1 => inputDF.select(selectVars.head)
-      case _ => inputDF.select(selectVars.head, selectVars.tail: _*)
+    schema.length match {
+      case 1 => inputDF.select(schema.head)
+      case _ => inputDF.select(schema.head, schema.tail: _*)
     }
 
   override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {

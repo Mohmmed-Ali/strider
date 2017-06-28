@@ -1,6 +1,7 @@
 package engine.core.conf
 
 import com.esotericsoftware.kryo.Kryo
+import engine.core.reasoning.{Decoder, Encoder}
 import engine.stream.{RDFGraph, RDFTriple, WavesEvent}
 import org.apache.jena.rdf.model.Model
 import org.apache.spark.serializer.KryoRegistrator
@@ -21,6 +22,8 @@ class StriderKryoRegistrator extends KryoRegistrator {
     kryo.register(classOf[Array[String]])
     kryo.register(Class.forName("[[B"))
     kryo.register(classOf[RDFTriple])
+    kryo.register(classOf[Encoder])
+    kryo.register(classOf[Decoder])
     kryo.register(classOf[RDFGraph])
     kryo.register(classOf[WavesEvent])
     kryo.register(classOf[Model])
@@ -30,10 +33,13 @@ class StriderKryoRegistrator extends KryoRegistrator {
     kryo.register(classOf[org.apache.spark.sql.catalyst.expressions.GenericInternalRow])
     kryo.register(classOf[Array[org.apache.spark.sql.catalyst.expressions.UnsafeRow]])
     kryo.register(classOf[Array[org.apache.spark.sql.types.StructField]])
+    kryo.register(classOf[org.apache.spark.sql.types.StructType])
     kryo.register(classOf[Array[org.apache.spark.sql.Row]])
     kryo.register(classOf[org.apache.spark.sql.catalyst.expressions.GenericRow])
+    kryo.register(classOf[org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema])
     kryo.register(classOf[org.apache.spark.sql.types.Metadata])
     kryo.register(Class.forName("org.apache.spark.sql.execution.joins.UnsafeHashedRelation"))
     kryo.register(Class.forName("org.apache.spark.sql.execution.columnar.CachedBatch"))
+
   }
 }

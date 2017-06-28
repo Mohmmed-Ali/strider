@@ -14,10 +14,10 @@ class BGPNode(val triple: graph.Triple,
               var statisticWeight: Long)
   extends BGPGraph with BGPOptimizerHelper {
 
+  override var visited: Boolean = false
   override val heuristicWeight: Int = nodeHeuristicWeight(triple)
   val schema: Seq[String] = getSchema
   val starJoinUnbounded = new ArrayBuffer[BGPNode]()
-  override var visited: Boolean = false
 
   /**
     * Auxiliary constructor, the statistic weight will

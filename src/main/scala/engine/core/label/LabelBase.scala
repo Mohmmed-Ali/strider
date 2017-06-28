@@ -4,8 +4,12 @@ package engine.core.label
   * Created by xiangnanren on 08/07/16.
   */
 object LabelBase {
+//  val INPUT_FILE = "/Users/xiangnanren/IDEAWorkspace/" +
+//    "spark/rdf/data/chlorine_7TPE_28.nt"
+
   val INPUT_FILE = "/Users/xiangnanren/IDEAWorkspace/" +
-    "spark/rdf/data/chlorine_7TPE_28.nt"
+    "strider/data/lubm_test_data/univ_lubm2.nt" // Test Data for LiteMat
+
   val OUTPUT_FILE = "/Users/xiangnanren/" +
     "IDEAWorkspace/spark-rdf-1.0/data/output"
   val INPUT_DATAFRAME_NAME = "STRIDER"

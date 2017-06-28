@@ -11,7 +11,7 @@ import scala.collection.mutable
   */
 class SparkOpExecutor(inputDF: DataFrame) extends
   SparkOpVisitorBase {
-  private[this] val stack = new mutable.Stack[SparkOpRes]
+  protected val stack = new mutable.Stack[SparkOpRes]
 
   def execute(op: SparkOp): SparkOpRes = {
     SparkOpWalker(this).walkBottomUp(op)

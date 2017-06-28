@@ -8,6 +8,7 @@ import kafka.serializer.StringEncoder
 import org.apache.log4j.LogManager
 
 import scala.collection.mutable
+import scala.reflect.{ClassTag, classTag}
 
 /**
   * Created by xiangnanren on 16/11/2016.
@@ -31,6 +32,7 @@ class KafkaStreamProducer(brokerAddr: String,
   def getConfigProps: Properties = {
     val props = new Properties()
     props.put("metadata.broker.list", brokerAddr)
+    props.put("request.required.acks","0")
     props.put("key.serializer.class", classOf[StringEncoder].getName)
     props.put("serializer.class", classOf[KryoStreamSerializer[RDFTriple]].getName)
 
@@ -65,16 +67,15 @@ class KafkaStreamProducer(brokerAddr: String,
     * @param message  : Different types of messages (< RDFEvent)
     */
   def sendMessage[T <: RDFData](producer: Producer[String, T],
-                                message: T): Unit = {
-
+                                message: T,
+                                numPartitions: Int = 8): Unit = {
     message match {
-
       case _message: RDFTriple =>
         producer.asInstanceOf[Producer[String, RDFTriple]].
           send(
             new KeyedMessage[String, RDFTriple](
-              MsgRDFTriple.key,
-              MsgRDFTriple.value,
+              MsgRDFTriple.defaultTopic,
+              MsgRDFTriple.distributeKey(numPartitions),
               _message
             ))
 
@@ -82,8 +83,8 @@ class KafkaStreamProducer(brokerAddr: String,
         producer.asInstanceOf[Producer[String, RDFGraph]].
           send(
             new KeyedMessage[String, RDFGraph](
-              MsgRDFGraph.key,
-              MsgRDFGraph.value,
+              MsgRDFGraph.distributeKey(numPartitions),
+              MsgRDFGraph.defaultTopic,
               _message
             ))
 
@@ -91,13 +92,36 @@ class KafkaStreamProducer(brokerAddr: String,
         producer.asInstanceOf[Producer[String, WavesEvent]].
           send(
             new KeyedMessage[String, WavesEvent](
-              MsgWavesEvent.key,
-              MsgWavesEvent.value,
+              MsgWavesEvent.distributeKey(numPartitions),
+              MsgWavesEvent.defaultTopic,
               _message
             ))
-
     }
   }
+
+
+  def sendMessages[T: ClassTag](producer: Producer[String, T],
+                                messages: Seq[KeyedMessage[String, T]],
+                                numPartitions: Int): Unit = {
+    messages match {
+      case _messages: Seq[KeyedMessage[String, RDFTriple]@unchecked]
+        if classTag[T] == classTag[RDFTriple] =>
+        producer.send(_messages:_*)
+
+      case _messages: Seq[KeyedMessage[String, RDFTriple]@unchecked]
+        if classTag[T] == classTag[RDFGraph] =>
+        producer.send(_messages:_*)
+
+      case _messages: Seq[KeyedMessage[String, WavesEvent]@unchecked]
+        if classTag[T] == classTag[WavesEvent] =>
+        producer.send(_messages:_*)
+    }
+
+
+  }
+
+
+
 }
 
 object KafkaStreamProducer {

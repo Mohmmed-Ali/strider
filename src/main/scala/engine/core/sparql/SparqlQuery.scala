@@ -1,5 +1,6 @@
 package engine.core.sparql
 
+import engine.core.reasoning.LiteMatQueryRewriter
 import engine.core.sparkop.compiler.SparkOpTransformer
 import engine.core.sparkop.op.SparkOp
 import org.apache.jena.graph
@@ -23,7 +24,8 @@ import scala.collection.JavaConversions._
   * "ASK", and "DESCRIBE" clauses at the top of algebra tree.
   *
   */
-abstract class SparqlQuery(val query: Query, val id: String) extends java.io.Serializable {
+abstract class SparqlQuery(val query: Query,
+                           val id: String) extends java.io.Serializable {
   val opRoot: Op = Algebra.compile(query)
   val algebraTransformer: SparkOpTransformer = new SparkOpTransformer()
   val sparkOpRoot: SparkOp = algebraTransformer.transform(opRoot)
@@ -40,14 +42,32 @@ abstract class SparqlQuery(val query: Query, val id: String) extends java.io.Ser
   *
   * @param query : Input jena Query object
   */
-case class SelectQuery(override val query: Query,
-                       override val id: String) extends SparqlQuery(query, id) {
+class SelectQuery(override val query: Query,
+                  override val id: String) extends SparqlQuery(query, id) {
   def this(query: Query) = this(query, "")
 }
 
 object SelectQuery {
   def apply(query: Query) = new SelectQuery(query)
 }
+
+
+/**
+  * Select type query which is rewritten via LiteMat
+  */
+class LiteMatSelectQuery(override val query: Query,
+                         override val id: String) extends SelectQuery(query, id) {
+  val liteMatQueryRewriter: LiteMatQueryRewriter = new LiteMatQueryRewriter()
+  override val sparkOpRoot: SparkOp = liteMatQueryRewriter.transform(opRoot)
+
+  def this(query: Query) = this(query, "")
+}
+
+object LiteMatSelectQuery {
+  def apply(query: Query): LiteMatSelectQuery = new LiteMatSelectQuery(query)
+}
+
+
 
 
 /**
@@ -59,8 +79,8 @@ object SelectQuery {
   *
   * @param query : Input jena Query object
   */
-case class ConstructQuery(override val query: Query,
-                          override val id: String) extends SparqlQuery(query, id) {
+class ConstructQuery(override val query: Query,
+                     override val id: String) extends SparqlQuery(query, id) {
   val constructTemplate: List[graph.Triple] =
     query.getConstructTemplate.getTriples.toList
   val templateMapping = constructMapping(constructTemplate)
@@ -84,13 +104,10 @@ case class ConstructQuery(override val query: Query,
       val subjectNode = triple.getSubject match {
         case node if node.isVariable =>
           NodeMapping(true: Boolean, node.getName)
-
         case node if node.isURI =>
           NodeMapping(false: Boolean, "<" + node.getURI + ">")
-
         case node if node.isLiteral =>
           NodeMapping(false: Boolean, node.getLiteral.toString)
-
         case node if node.isBlank =>
           NodeMapping(false: Boolean, node.getBlankNodeLabel)
       }
@@ -98,13 +115,10 @@ case class ConstructQuery(override val query: Query,
       val predicateNode = triple.getPredicate match {
         case node if node.isVariable =>
           NodeMapping(true: Boolean, node.getName)
-
         case node if node.isURI =>
           NodeMapping(false: Boolean, "<" + node.getURI + ">")
-
         case node if node.isLiteral =>
           NodeMapping(false: Boolean, node.getLiteral.toString)
-
         case node if node.isBlank =>
           NodeMapping(false: Boolean, node.getBlankNodeLabel)
       }
@@ -112,13 +126,10 @@ case class ConstructQuery(override val query: Query,
       val objectNode = triple.getObject match {
         case node if node.isVariable =>
           NodeMapping(true: Boolean, node.getName)
-
         case node if node.isURI =>
           NodeMapping(false: Boolean, "<" + node.getURI + ">")
-
         case node if node.isLiteral =>
           NodeMapping(false: Boolean, node.getLiteral.toString)
-
         case node if node.isBlank =>
           NodeMapping(false: Boolean, node.getBlankNodeLabel)
       }
@@ -132,8 +143,26 @@ object ConstructQuery {
 }
 
 
-case class AskQuery(override val query: Query,
-                    override val id: String) extends SparqlQuery(query, id) {
+/**
+  * Construct query which is rewritten via LiteMat
+  */
+class LiteMatConstructQuery(override val query: Query,
+                            override val id: String) extends ConstructQuery(query, id) {
+    val liteMatQueryRewriter: LiteMatQueryRewriter = new LiteMatQueryRewriter()
+    override val sparkOpRoot: SparkOp = liteMatQueryRewriter.transform(opRoot)
+
+    def this(query: Query) = this(query, "")
+}
+
+object LiteMatConstructQuery {
+  def apply(query: Query,
+            id: String): LiteMatConstructQuery = new LiteMatConstructQuery(query, id)
+}
+
+
+
+class AskQuery(override val query: Query,
+               override val id: String) extends SparqlQuery(query, id) {
   def this(query: Query) = this(query, "")
 }
 
@@ -142,13 +171,19 @@ object AskQuery {
 }
 
 
-case class DescribeQuery(override val query: Query,
-                         override val id: String) extends SparqlQuery(query, id) {
+
+class LiteMatAskQuery(override val query: Query,
+                      override val id: String) extends AskQuery(query, id) {
+  val liteMatQueryRewriter: LiteMatQueryRewriter = new LiteMatQueryRewriter()
+  override val sparkOpRoot: SparkOp = liteMatQueryRewriter.transform(opRoot)
+
   def this(query: Query) = this(query, "")
 }
 
-object DescribeQuery {
-  def apply(query: Query) = new DescribeQuery(query)
+object LiteMatAskQuery {
+  def apply(query: Query,
+            id: String): LiteMatAskQuery = new LiteMatAskQuery(query,id)
 }
+
 
 

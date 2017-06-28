@@ -10,8 +10,8 @@ import org.apache.jena.graph
   */
 class BGPEdge(val node1: BGPNode,
               val node2: BGPNode) extends BGPGraph {
-  //  override val heuristicWeight: Int =
-  //    edgeHeuristicWeight(node1.triple, node2.triple)
+//  override val heuristicWeight: Int =
+//    edgeHeuristicWeight(node1.triple, node2.triple)
   override val heuristicWeight: Int = sumNodesWeight(node1, node2)
   val joinKey: Seq[String] = initJoinKey
   private val isUnboundedStarJoin: Boolean =

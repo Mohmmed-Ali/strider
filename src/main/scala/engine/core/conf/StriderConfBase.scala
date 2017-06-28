@@ -27,7 +27,7 @@ class StriderConfBase(backPressure: String = "true",
 
   val conf = new SparkConf().
     setAppName("Strider").
-    setMaster("local[3]").
+    setMaster("local[*]").
     set("spark.driver.host", "localhost").
     set("spark.ui.enabled", "true").
     set("spark.ui.showConsoleProgress", "false").

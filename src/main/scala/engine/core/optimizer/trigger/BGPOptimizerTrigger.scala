@@ -92,7 +92,7 @@ object TriggerRules {
     getDataSizeThreshold(AlgebraOptimizerConf.settings)
   val adapSwitchThreshold: Double =
     getAdapSwitchThreshold(AlgebraOptimizerConf.settings)
-  val f_trigger_test = true
+  val f_trigger_test = false
   val f_primitiveTrigger: (Int) => Boolean = {
     case _numBGPs if _numBGPs > 2 => true
     case _numBGPs if _numBGPs <= 2 => false
@@ -112,7 +112,7 @@ object TriggerRules {
         "taskTime (=" + taskTime +
           ")/batchSize (=" +
           batchSize + ") = " + r)
-      if (r >= 0.6) {
+      if (r >= 0.7) {
         log.info("Take forward adaptivity for the next execution")
         Forward
       }

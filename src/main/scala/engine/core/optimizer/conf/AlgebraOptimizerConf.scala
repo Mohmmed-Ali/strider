@@ -5,6 +5,7 @@ import scala.collection.mutable
 /**
   * Created by xiangnanren on 17/03/2017.
   */
+
 /**
   * The global configuration for algebra
   * optimizer configuration

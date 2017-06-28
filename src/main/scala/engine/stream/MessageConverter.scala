@@ -56,5 +56,4 @@ object MessageConverter {
     ).persist(StorageLevel.MEMORY_ONLY)
   }
 
-
 }

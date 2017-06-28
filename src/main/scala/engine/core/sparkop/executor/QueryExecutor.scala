@@ -2,10 +2,14 @@ package engine.core.sparkop.executor
 
 import java.io.{File, PrintWriter}
 
+import engine.core.reasoning.LiteMatOpExecutor
 import engine.core.sparkop.compiler.{SparkOpPrinter, SparkOpUpdater}
-import engine.core.sparkop.op.{SparkAskRes, SparkConstructRes, SparkOpRes, SparkRes}
+import engine.core.sparkop.op.{SparkAskRes, SparkConstructRes, SparkOpRes}
 import engine.core.sparql._
+import org.apache.spark.annotation.Experimental
 import org.apache.spark.sql.{DataFrame, Row}
+
+import scala.language.implicitConversions
 
 
 /**
@@ -19,27 +23,13 @@ import org.apache.spark.sql.{DataFrame, Row}
   * not serializable.
   *
   * @param query : input Sparql query
-  * @tparam T : upper bound of input query type
   */
-class QueryExecutor[T <: SparqlQuery](@transient val query: T) {
+class QueryExecutor(@transient val query: SparqlQuery) {
   @transient
-  private val sparkOpRoot = query.sparkOpRoot
+  protected val sparkOpRoot = query.sparkOpRoot
 
   def updateAlgebra(inputDF: DataFrame): Unit = {
     SparkOpUpdater(inputDF).update(sparkOpRoot)
-  }
-
-  def executeQuery(inputDF: DataFrame): SparkRes = {
-    query match {
-      case _query: SelectQuery =>
-        SelectExecutor(_query).executeSelect(inputDF)
-      case _query: ConstructQuery =>
-        ConstructExecutor(_query).executeConstruct(inputDF)
-      case _query: AskQuery =>
-        AskExecutor(_query).executeAsk(inputDF)
-      case _query: DescribeQuery =>
-        DescribeExecutor(_query).executeDescribe(inputDF)
-    }
   }
 
   def writeAlgebra(path: String): Unit = {
@@ -60,25 +50,43 @@ class QueryExecutor[T <: SparqlQuery](@transient val query: T) {
   protected def executeAlgebra(inputDF: DataFrame): SparkOpRes = {
     SparkOpExecutor(inputDF).execute(sparkOpRoot)
   }
+
+  protected def executeLiteMatAlgebra(inputDF: DataFrame): SparkOpRes = {
+    LiteMatOpExecutor(inputDF).execute(sparkOpRoot)
+  }
 }
 
 object QueryExecutor {
-  def apply[T <: SparqlQuery](@transient query: T):
-  QueryExecutor[T] = new QueryExecutor[T](query)
+  def apply(@transient query: SparqlQuery): QueryExecutor =
+    new QueryExecutor(query)
+
+  def apply(@transient query: SelectQuery): QueryExecutor =
+    new SelectExecutor(query)
+
+  def apply(@transient query: ConstructQuery): QueryExecutor =
+    new ConstructExecutor(query)
+
+  def apply(@transient query: AskQuery): QueryExecutor =
+    new AskExecutor(query)
+
 }
 
 
 case class SelectExecutor(@transient override val query: SelectQuery) extends
-  QueryExecutor[SelectQuery](query) {
+  QueryExecutor(query) {
 
   def executeSelect(inputDF: DataFrame): SparkOpRes = {
     executeAlgebra(inputDF)
+  }
+
+  def executeLiteMatSelect(inputDF: DataFrame): SparkOpRes = {
+    executeLiteMatAlgebra(inputDF)
   }
 }
 
 
 case class ConstructExecutor(@transient override val query: ConstructQuery) extends
-  QueryExecutor[ConstructQuery](query) {
+  QueryExecutor(query) {
   private val templateMapping = query.templateMapping
 
   /**
@@ -94,6 +102,18 @@ case class ConstructExecutor(@transient override val query: ConstructQuery) exte
 
     SparkConstructRes(resConstruct)
   }
+
+  @Experimental
+  def executeLiteMatConstruct(inputDF: DataFrame): SparkConstructRes = {
+
+    val res = executeLiteMatAlgebra(inputDF).result
+    val resConstruct = res.rdd.map(rddRow =>
+      constructByTemplate(rddRow, templateMapping)).
+      flatMap(rows => rows)
+
+    SparkConstructRes(resConstruct)
+  }
+
 
   /**
     * Transform original DataFrame to new RDD row by row with the
@@ -134,17 +154,16 @@ case class ConstructExecutor(@transient override val query: ConstructQuery) exte
 }
 
 case class AskExecutor(@transient override val query: AskQuery) extends
-  QueryExecutor[AskQuery](query) {
+  QueryExecutor(query) {
 
   def executeAsk(inputDF: DataFrame): SparkAskRes =
     SparkAskRes(
       executeAlgebra(inputDF).result.take(1).nonEmpty)
 
+  def executeLiteMatAsk(inputDF: DataFrame): SparkAskRes = {
+    SparkAskRes(
+      executeLiteMatAlgebra(inputDF).result.take(1).nonEmpty)
+  }
+
 }
 
-// To do
-case class DescribeExecutor(@transient override val query: DescribeQuery) extends
-  QueryExecutor[DescribeQuery](query) {
-
-  def executeDescribe(inputDF: DataFrame): SparkOpRes = ???
-}

@@ -17,51 +17,80 @@ import scala.language.implicitConversions
   * Created by xiangnanren on 07/07/16.
   */
 class SparkBGP(val opBGP: OpBGP,
-               val triples: List[graph.Triple]) extends SparkOp0
-  with SparkBGPUtils {
+               val triples: List[graph.Triple])
+  extends SparkOp0 with SparkBGPUtils {
   val ucg = UCGraph(initStaticEP(triples))
 
   @transient
-  private[this] val globalTrigger = TriggerRules.f_primitiveTrigger(triples.length)
-  private[this] val static_handler = StaticEPHandler
-  private[this] val adap_handler = AdaptiveEPHandler
+  private val globalTrigger = TriggerRules.f_primitiveTrigger(triples.length)
+  private val static_handler = StaticEPHandler
+  private val adap_handler = AdaptiveEPHandler
+
+
+  override def execute(opName: String,
+                       inputDF: DataFrame): SparkOpRes = {
+    SparkOpRes(
+      computeBGP(computeDFMap(triples, inputDF),inputDF))
+  }
+
+  override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {
+    sparkOpVisitor.visit(this)
+  }
 
   def update(opName: String,
              inputDF: DataFrame): Unit = ucg.edgeExistence match {
     case true =>
       log.info("Switch to backward adaptivity.")
       adap_handler.currentAdapPlan =
-        Option(getAdapPlan(computDFMap(triples, inputDF)))
+        Option(getAdapPlan(computeDFMap(triples, inputDF)))
     case false =>
   }
 
-  override def execute(opName: String,
-                       inputDF: DataFrame): SparkOpRes = {
-    SparkOpRes(computeBGP(inputDF))
-  }
-
-  private def computeBGP(inputDF: DataFrame): DataFrame = {
-    val dfMap = computDFMap(triples, inputDF)
-
+  protected def getCurrentEP(dfMap: Map[graph.Triple, DataFrame],
+                             inputDF: DataFrame): Seq[BGPGraph] = {
     if (globalTrigger) {
       //TriggerRules.f_trigger(SizeEstimator.estimate(inputDF))
       if (TriggerRules.f_trigger_test) {
         adap_handler.currentAdapPlan match {
-          case None =>
-            log.info("Switch to forward adaptivity.")
-            computeEP(getAdapPlan(dfMap), dfMap)
-          case Some(oldAdapPlan) =>
-            log.warn("\n \n Detailed Query plan info: \n" + getEPInfo(oldAdapPlan))
-            adap_handler.currentAdapPlan = None // Reinitialize adaptive plan
 
-            computeEP(oldAdapPlan, dfMap)
-        }
-      } else computeEP(getStaticPlan, dfMap)
-    }
-    else {
-      computeEP(getStaticPlan, dfMap)
-    }
+          case None => log.info("Switch to forward adaptivity.")
+            getAdapPlan(dfMap)
+
+          case Some(oldAdapPlan) => log.debug(
+            "\n \n Detailed Query plan info: " +
+            "\n" + getEPInfo(oldAdapPlan))
+            adap_handler.currentAdapPlan = None
+            oldAdapPlan }
+      } else getStaticPlan
+    } else { getStaticPlan }
   }
+
+  protected def computeBGP(dfMap: Map[graph.Triple, DataFrame],
+                           inputDF: DataFrame): DataFrame = {
+    computeEP(getCurrentEP(dfMap, inputDF), dfMap)
+  }
+
+//  protected def computeBGP(dfMap:  Map[graph.Triple, DataFrame],
+//                           inputDF: DataFrame): DataFrame = {
+//    if (globalTrigger) {
+//      //TriggerRules.f_trigger(SizeEstimator.estimate(inputDF))
+//      if (TriggerRules.f_trigger_test) {
+//        adap_handler.currentAdapPlan match {
+//          case None =>
+//            log.info("Switch to forward adaptivity.")
+//            computeEP(getAdapPlan(dfMap), dfMap)
+//          case Some(oldAdapPlan) =>
+//            log.debug("\n \n Detailed Query plan info: \n" + getEPInfo(oldAdapPlan))
+//            adap_handler.currentAdapPlan = None // Reinitialize adaptive plan
+//
+//            computeEP(oldAdapPlan, dfMap)
+//        }
+//      } else computeEP(getStaticPlan, dfMap)
+//    }
+//    else {
+//      computeEP(getStaticPlan, dfMap)
+//    }
+//  }
 
   private def getStaticPlan: List[BGPGraph] = {
     static_handler.statType match {
@@ -97,10 +126,6 @@ class SparkBGP(val opBGP: OpBGP,
     }
   }
 
-  override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {
-    sparkOpVisitor.visit(this)
-  }
-
   /**
     * Initialize the list of BGPNodes without the assignment of statistic weight
     *
@@ -116,8 +141,8 @@ class SparkBGP(val opBGP: OpBGP,
     * configuration for static execution plan.
     */
   @transient
-  private[this] object StaticEPHandler {
-    private[this] val staticTrigger = StaticTrigger(ucg)
+  private object StaticEPHandler {
+    private val staticTrigger = StaticTrigger(ucg)
     val statType = getStatType(opSettings)
     val staticGreedyEP = staticTrigger.triggerGreedyEP()
     val staticBushyEP = staticTrigger.triggerBushyEP()
@@ -140,7 +165,7 @@ class SparkBGP(val opBGP: OpBGP,
     * configuration for adaptive execution plan.
     */
   @transient
-  private[this] object AdaptiveEPHandler {
+  private object AdaptiveEPHandler {
     val adapType = getAdaptiveType(opSettings)
     // Global variable modifying incurred, maybe
     // another way to avoid this side effect.

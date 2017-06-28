@@ -9,8 +9,8 @@ import engine.core.sparkexpr.expr._
 
 /**
   *
-  * @param arg: Argument of a given DataFrame.
-  *             "arg" is used as the input for the user defined function.
+  * @param arg : Argument of a given DataFrame.
+  *            "arg" is used as the input for the user defined function.
   */
 class SparkExprExecutor(arg: String) extends SparkExprVisitor {
   private[this] val stack = new scala.collection.mutable.Stack[Any]
@@ -19,7 +19,7 @@ class SparkExprExecutor(arg: String) extends SparkExprVisitor {
     * This method is nested in the user defined function and
     * computes the result of a given expression.
     *
-    * @param expr: Root of the compiled expression tree
+    * @param expr : Root of the compiled expression tree
     */
   def execute(expr: SparkExpr): Any = {
     SparkExprWalker(this).walkBottomUp(expr)

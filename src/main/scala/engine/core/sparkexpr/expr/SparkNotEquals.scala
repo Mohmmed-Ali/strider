@@ -24,5 +24,5 @@ object SparkNotEquals {
   def apply(@transient notEquals: E_NotEquals,
             leftExpr: SparkExpr,
             rightExpr: SparkExpr): SparkNotEquals =
-     new SparkNotEquals(notEquals, leftExpr, rightExpr)
+    new SparkNotEquals(notEquals, leftExpr, rightExpr)
 }

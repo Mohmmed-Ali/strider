@@ -108,7 +108,7 @@ object SparqlQueryInitializer extends QueryInitializer {
         "    <http://purl.oclc.org/NET/ssnx/ssn/startTime> ?o4 ; " +
         "    <http://data.nasa.gov/qudt/owl/qudt/unit> ?o5 ; " +
         "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o6 . " +
-        " filter(bound(?o6)) " +
+        " filter((?o6 > 2 + \"32\"^^xsd:double)) " +
         "} "
 
 
@@ -260,5 +260,75 @@ object SparqlQueryInitializer extends QueryInitializer {
         "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o3 . " +
         "}" +
         "group by ?s "
+
+    /////////////////////////////////////
+    // Test Queries group 2 (Aggregation)
+    /////////////////////////////////////
+    case "test_litemat_1" =>
+      " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+        " PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+        " SELECT ?x " +
+        " WHERE { " +
+        " ?x rdf:type ub:Student " +
+        " }"
+
+    case "test_litemat_2" =>
+      " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+        " PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+        " SELECT ?x " +
+        " WHERE {" +
+        "?x rdf:type ub:Professor. " +
+        " }"
+
+    case "test_litemat_3" =>
+      " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+        " PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+        " SELECT ?x ?y " +
+        " WHERE { " +
+        "   ?x ub:worksFor ?y. " +
+        " } "
+
+    case "test_litemat_4" =>
+      " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+        " PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+        " SELECT ?x ?y " +
+        " WHERE {" +
+        " ?x rdf:type ub:Professor; " +
+        "    ub:worksFor ?y. " +
+        " }"
+
+    case "test_litemat_4_1" => "" +
+      " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+      " PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+      " SELECT ?x ?y " +
+      " WHERE { " +
+      "{ ?x rdf:type ub:AssistantProfessor ; " +
+      "     ub:headOf ?y . } UNION" +
+      "{ ?x rdf:type ub:AssociateProfessor ; " +
+      "     ub:headOf ?y . } UNION " +
+      "{ ?x rdf:type ub:Chair ; " +
+      "     ub:headOf ?y . } UNION " +
+      "{ ?x rdf:type ub:FullProfessor ; " +
+      "     ub:headOf ?y . } UNION" +
+      "{ ?x rdf:type ub:Dean ; " +
+      "     ub:headOf ?y . } UNION " +
+      "{ ?x rdf:type ub:VisitingProfessor; " +
+      "     ub:headOf ?y . } UNION " +
+      "{ ?x rdf:type ub:AssistantProfessor ; " +
+      "     ub:worksFor ?y . } UNION" +
+      "{ ?x rdf:type ub:AssociateProfessor ; " +
+      "     ub:worksFor ?y . } UNION " +
+      "{ ?x rdf:type ub:Chair ; " +
+      "     ub:worksFor ?y . } UNION " +
+      "{ ?x rdf:type ub:FullProfessor ; " +
+      "     ub:worksFor ?y . } UNION " +
+      "{ ?x rdf:type ub:Dean ; " +
+      "     ub:worksFor ?y . } UNION " +
+      "{ ?x rdf:type ub:VisitingProfessor ; " +
+      "     ub:worksFor ?y . } " +
+      "}"
+
+
+
   }
 }

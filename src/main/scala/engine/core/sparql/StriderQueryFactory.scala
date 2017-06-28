@@ -29,12 +29,6 @@ class StriderQueryFactory(queryStr: String) extends Serializable {
       throw InvalidQueryException("Invalid query, a ask type query is required.")
   }
 
-  def createDescribe(): DescribeQuery = {
-    if (query.isConstructType) DescribeQuery(query)
-    else
-      throw InvalidQueryException("Invalid query, a describe type query is required.")
-  }
-
 
   def createQuery: SparqlQuery = query match {
     case _query if _query.isSelectType => SelectQuery(_query)
@@ -42,8 +36,6 @@ class StriderQueryFactory(queryStr: String) extends Serializable {
     case _query if _query.isConstructType => ConstructQuery(_query)
 
     case _query if _query.isAskType => AskQuery(_query)
-
-    case _query if _query.isDescribeType => DescribeQuery(_query)
 
     case _ => throw InvalidQueryException("" +
       "Invalid query, input query should be one of the following types: " +

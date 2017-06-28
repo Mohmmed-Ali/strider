@@ -15,14 +15,12 @@ case class RDFTriple(s: String,
 
 }
 
-case class RDFGraph(model: Option[Model] = None,
-                    triples: Option[Array[String]] = None) extends RDFData {}
-
+case class RDFGraph(graph: Array[(String, String, String)]) extends RDFData
 object RDFGraph {
-  def apply(model: Model): RDFGraph = new RDFGraph(Some(model))
-
-  def apply(triples: Array[String]): RDFGraph = new RDFGraph(triples = Some(triples))
+  def apply(graph: Array[RDFTriple]): RDFGraph = new RDFGraph(graph.map(x => (x.s, x.p, x.o)))
 }
+
+
 
 case class WavesEvent(streamId: String,
                       eventId: String,

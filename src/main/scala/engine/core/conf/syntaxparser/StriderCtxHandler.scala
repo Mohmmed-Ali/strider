@@ -31,7 +31,7 @@ class StriderCtxHandler(striderConfig: ParsedStriderQuery)
   }
 
 
-  def initQueryExecutorPool: ParArray[(SparqlQuery, QueryExecutor[SparqlQuery])] = {
+  def initQueryExecutorPool: ParArray[(SparqlQuery, QueryExecutor)] = {
     val taskNum = registerConfig.size
 
     val pool = registerConfig.get.map { m =>

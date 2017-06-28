@@ -55,7 +55,7 @@ class KafkaStreamConsumer(brokerAddr: String,
   def setTopics[T <: StriderTopic](topics: T*): Option[Set[String]] = {
     try {
       val topicsSet = mutable.Set[String]()
-      topics.foreach(topic => topicsSet.add(topic.value))
+      topics.foreach(topic => topicsSet.add(topic.defaultTopic))
       Some(topicsSet.toSet)
     } catch {
       case e: Exception => e.printStackTrace(); None;

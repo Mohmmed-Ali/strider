@@ -14,7 +14,6 @@ class SparkOpUpdater(inputDF: DataFrame) extends SparkOpVisitor {
   override def visit(sparkBGP: SparkBGP): Unit = {
     sparkBGP.update(sparkBGP.opName, inputDF)
   }
-
 }
 
 object SparkOpUpdater {

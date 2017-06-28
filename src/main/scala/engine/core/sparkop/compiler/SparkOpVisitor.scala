@@ -1,6 +1,7 @@
 package engine.core.sparkop.compiler
 
 import engine.core.sparkop.op._
+import engine.core.sparkop.op.litematop.LiteMatBGP
 
 /**
   * Created by xiangnanren on 07/07/16.
