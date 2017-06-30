@@ -31,7 +31,7 @@ class StriderCxt(val batch: Duration,
     spark.sqlContext.setConf("spark.sql.inMemoryColumnarStorage.compressed", "true")
     spark.sqlContext.setConf("spark.sql.autoBroadcastJoinThreshold", threshold)
     spark.sqlContext.setConf("spark.sql.tungsten.enabled", "true")
-    spark.sqlContext.setConf("spark.sql.shuffle.partitions", "4")
+    spark.sqlContext.setConf("spark.sql.shuffle.partitions", "8")
 
     spark
   }
