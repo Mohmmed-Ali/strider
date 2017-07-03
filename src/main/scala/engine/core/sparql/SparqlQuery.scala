@@ -26,8 +26,8 @@ import scala.collection.JavaConversions._
   */
 abstract class SparqlQuery(val query: Query,
                            val id: String) extends java.io.Serializable {
-  val opRoot: Op = Algebra.compile(query)
-  val algebraTransformer: SparkOpTransformer = new SparkOpTransformer()
+  private val algebraTransformer: SparkOpTransformer = new SparkOpTransformer()
+  protected val opRoot: Op = Algebra.compile(query)
   val sparkOpRoot: SparkOp = algebraTransformer.transform(opRoot)
 
   override def toString: String = query.toString
@@ -47,10 +47,6 @@ class SelectQuery(override val query: Query,
   def this(query: Query) = this(query, "")
 }
 
-object SelectQuery {
-  def apply(query: Query) = new SelectQuery(query)
-}
-
 
 /**
   * Select type query which is rewritten via LiteMat
@@ -62,12 +58,6 @@ class LiteMatSelectQuery(override val query: Query,
 
   def this(query: Query) = this(query, "")
 }
-
-object LiteMatSelectQuery {
-  def apply(query: Query): LiteMatSelectQuery = new LiteMatSelectQuery(query)
-}
-
-
 
 
 /**
@@ -138,9 +128,6 @@ class ConstructQuery(override val query: Query,
   }
 }
 
-object ConstructQuery {
-  def apply(query: Query) = new ConstructQuery(query)
-}
 
 
 /**
@@ -148,15 +135,10 @@ object ConstructQuery {
   */
 class LiteMatConstructQuery(override val query: Query,
                             override val id: String) extends ConstructQuery(query, id) {
-    val liteMatQueryRewriter: LiteMatQueryRewriter = new LiteMatQueryRewriter()
-    override val sparkOpRoot: SparkOp = liteMatQueryRewriter.transform(opRoot)
+  val liteMatQueryRewriter: LiteMatQueryRewriter = new LiteMatQueryRewriter()
+  override val sparkOpRoot: SparkOp = liteMatQueryRewriter.transform(opRoot)
 
     def this(query: Query) = this(query, "")
-}
-
-object LiteMatConstructQuery {
-  def apply(query: Query,
-            id: String): LiteMatConstructQuery = new LiteMatConstructQuery(query, id)
 }
 
 
@@ -166,11 +148,6 @@ class AskQuery(override val query: Query,
   def this(query: Query) = this(query, "")
 }
 
-object AskQuery {
-  def apply(query: Query) = new AskQuery(query)
-}
-
-
 
 class LiteMatAskQuery(override val query: Query,
                       override val id: String) extends AskQuery(query, id) {
@@ -178,11 +155,6 @@ class LiteMatAskQuery(override val query: Query,
   override val sparkOpRoot: SparkOp = liteMatQueryRewriter.transform(opRoot)
 
   def this(query: Query) = this(query, "")
-}
-
-object LiteMatAskQuery {
-  def apply(query: Query,
-            id: String): LiteMatAskQuery = new LiteMatAskQuery(query,id)
 }
 
 

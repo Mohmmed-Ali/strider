@@ -2,6 +2,7 @@ package engine.core.conf
 
 import com.esotericsoftware.kryo.Kryo
 import engine.core.reasoning.{Decoder, Encoder}
+import engine.core.sparkop.executor.{ConstructExecutor, LiteMatConstructExecutor}
 import engine.stream.{RDFGraph, RDFTriple, WavesEvent}
 import org.apache.jena.rdf.model.Model
 import org.apache.spark.serializer.KryoRegistrator
@@ -23,6 +24,8 @@ class StriderKryoRegistrator extends KryoRegistrator {
     kryo.register(Class.forName("[[B"))
     kryo.register(classOf[Encoder])
     kryo.register(classOf[Decoder])
+    kryo.register(classOf[ConstructExecutor])
+    kryo.register(classOf[LiteMatConstructExecutor])
     kryo.register(classOf[RDFTriple])
     kryo.register(classOf[RDFGraph])
     kryo.register(classOf[WavesEvent])

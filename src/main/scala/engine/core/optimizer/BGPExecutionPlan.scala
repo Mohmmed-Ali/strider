@@ -1,7 +1,7 @@
 package engine.core.optimizer
 
 import engine.core.optimizer.ucg.{BGPGraph, BGPNode}
-import engine.core.sparkop.op.SparkRes
+import engine.core.sparkop.op.SparkOpRes
 
 import scala.collection.mutable
 
@@ -17,7 +17,7 @@ case class StaticEP(ep: Seq[BGPNode]) extends BGPExecutionPlan {
 }
 
 case class DynamicEP(ep: Seq[BGPGraph]) extends BGPExecutionPlan {
-  val stack = new mutable.Stack[SparkRes]
+  val stack = new mutable.Stack[SparkOpRes]
 
   override def show(): Unit = ep.foreach(node => node.show())
 }

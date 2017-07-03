@@ -9,15 +9,8 @@ import org.apache.spark.sql.{DataFrame, Row}
   * Created by xiangnanren on 11/07/16.
   */
 
-abstract class SparkRes {
-
-  def saveAsFile(path: String): Unit
-
-  def showResult(): Unit
-}
-
-case class SparkOpRes(result: DataFrame) extends SparkRes {
-  override def saveAsFile(path: String): Unit = {
+class SparkOpRes(val result: DataFrame) {
+  def saveAsFile(path: String): Unit = {
     result.rdd.map(x =>
       x(0) +
         " " + x(1) +
@@ -26,41 +19,18 @@ case class SparkOpRes(result: DataFrame) extends SparkRes {
       saveAsTextFile(path)
   }
 
-  override def showResult(): Unit = {
+  def showResult(): Unit = {
     result.show(20, false: Boolean)
   }
 }
 
-case class SparkConstructRes(result: RDD[Row]) extends SparkRes {
-  override def saveAsFile(path: String): Unit = {
-    result.map(x =>
-      x(0) +
-        " " + x(1) +
-        " " + x(2) +
-        " .\n").
-      saveAsTextFile(path)
-  }
-
-  override def showResult(): Unit = {
-    result.take(20).foreach(println(_))
-  }
+object SparkOpRes {
+  def apply(result: DataFrame): SparkOpRes = new SparkOpRes(result)
 }
 
-case class SparkAskRes(result: Boolean) extends SparkRes {
-  override def saveAsFile(path: String): Unit = {
-    val writer = new PrintWriter(new File(path))
-    writer.write(result.toString)
-
-    writer.close()
-  }
-
+case class SparkAskRes(override val result: DataFrame)
+  extends SparkOpRes(result) {
   override def showResult(): Unit = {
-    println(result)
+    println(result.take(1).nonEmpty)
   }
-}
-
-case class SparkDescribeRes(result: AnyRef) extends SparkRes {
-  override def saveAsFile(path: String): Unit = ???
-
-  override def showResult(): Unit = ???
 }

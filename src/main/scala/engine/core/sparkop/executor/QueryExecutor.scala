@@ -2,14 +2,15 @@ package engine.core.sparkop.executor
 
 import java.io.{File, PrintWriter}
 
+import engine.core.label.LabelBase
 import engine.core.reasoning.LiteMatOpExecutor
 import engine.core.sparkop.compiler.{SparkOpPrinter, SparkOpUpdater}
-import engine.core.sparkop.op.{SparkAskRes, SparkConstructRes, SparkOpRes}
+import engine.core.sparkop.op.{SparkAskRes, SparkOpRes}
 import engine.core.sparql._
-import org.apache.spark.annotation.Experimental
+import org.apache.spark.sql.catalyst.encoders.RowEncoder
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row}
 
-import scala.language.implicitConversions
 
 
 /**
@@ -24,7 +25,7 @@ import scala.language.implicitConversions
   *
   * @param query : input Sparql query
   */
-class QueryExecutor(@transient val query: SparqlQuery) {
+sealed class QueryExecutor(@transient val query: SparqlQuery) extends Serializable{
   @transient
   protected val sparkOpRoot = query.sparkOpRoot
 
@@ -47,6 +48,23 @@ class QueryExecutor(@transient val query: SparqlQuery) {
     logWriter.close()
   }
 
+  def execute(inputDF: DataFrame): SparkOpRes = {
+    query match {
+      case _query: SelectQuery if _query.getClass == classOf[SelectQuery] =>
+        new SelectExecutor(_query).execute(inputDF)
+      case _query: LiteMatSelectQuery if _query.getClass == classOf[LiteMatSelectQuery] =>
+        new LiteMatSelectExecutor(_query).execute(inputDF)
+      case _query: ConstructQuery  if _query.getClass == classOf[ConstructQuery] =>
+        new ConstructExecutor(_query).execute(inputDF)
+      case _query: LiteMatConstructQuery if _query.getClass == classOf[LiteMatConstructQuery] =>
+        new LiteMatConstructExecutor(_query).execute(inputDF)
+      case _query: AskQuery if _query.getClass == classOf[AskQuery] =>
+        new AskExecutor(_query).execute(inputDF)
+      case _query: LiteMatAskQuery if _query.getClass == classOf[LiteMatAskQuery] =>
+        new LiteMatAskExecutor(_query).execute(inputDF)
+    }
+  }
+
   protected def executeAlgebra(inputDF: DataFrame): SparkOpRes = {
     SparkOpExecutor(inputDF).execute(sparkOpRoot)
   }
@@ -57,66 +75,103 @@ class QueryExecutor(@transient val query: SparqlQuery) {
 }
 
 object QueryExecutor {
-  def apply(@transient query: SparqlQuery): QueryExecutor =
-    new QueryExecutor(query)
 
-  def apply(@transient query: SelectQuery): QueryExecutor =
-    new SelectExecutor(query)
-
-  def apply(@transient query: ConstructQuery): QueryExecutor =
-    new ConstructExecutor(query)
-
-  def apply(@transient query: AskQuery): QueryExecutor =
-    new AskExecutor(query)
-
+  def apply(@transient query: SparqlQuery): QueryExecutor = query match {
+    case _query: SparqlQuery
+      if query.getClass == classOf[SparqlQuery] =>
+      new QueryExecutor(_query)
+  }
+  def apply(@transient query: SelectQuery): SelectExecutor = query match {
+    case _query: SelectQuery
+      if query.getClass == classOf[SelectQuery] =>
+      new SelectExecutor(_query)
+  }
+  def apply(@transient query: LiteMatSelectQuery): LiteMatSelectExecutor = query match {
+    case _query: LiteMatSelectQuery
+      if query.getClass == classOf[LiteMatSelectQuery] =>
+      new LiteMatSelectExecutor(_query)
+  }
+  def apply(@transient query: ConstructQuery): ConstructExecutor = query match {
+    case _query: ConstructQuery
+      if query.getClass == classOf[ConstructQuery] =>
+      new ConstructExecutor(_query)
+  }
+  def apply(@transient query: LiteMatConstructQuery): LiteMatConstructExecutor = query match {
+    case _query: LiteMatConstructQuery
+      if query.getClass == classOf[LiteMatConstructQuery] =>
+      new LiteMatConstructExecutor(_query)
+  }
+  def apply(@transient query: AskQuery): AskExecutor = query match {
+    case _query: AskQuery
+      if query.getClass == classOf[AskQuery] =>
+      new AskExecutor(_query)
+  }
+  def apply(@transient query: LiteMatAskQuery): LiteMatAskExecutor = query match {
+    case _query: LiteMatAskQuery
+      if query.getClass == classOf[LiteMatAskQuery] =>
+      new LiteMatAskExecutor(_query)
+  }
 }
 
 
-case class SelectExecutor(@transient override val query: SelectQuery) extends
+/**
+  * Executor for select-type query
+  *
+  * @param query : input Sparql query
+  */
+class SelectExecutor(@transient override val query: SelectQuery) extends
   QueryExecutor(query) {
-
-  def executeSelect(inputDF: DataFrame): SparkOpRes = {
+  override def execute(inputDF: DataFrame): SparkOpRes = {
     executeAlgebra(inputDF)
   }
+}
 
-  def executeLiteMatSelect(inputDF: DataFrame): SparkOpRes = {
+
+/**
+  * Executor for select-type query with applying LiteMat reasoning
+  *
+  * @param query : input Sparql query
+  */
+class LiteMatSelectExecutor(@transient override val query: LiteMatSelectQuery)
+  extends SelectExecutor(query) {
+  override def execute(inputDF: DataFrame): SparkOpRes = {
     executeLiteMatAlgebra(inputDF)
   }
 }
 
 
-case class ConstructExecutor(@transient override val query: ConstructQuery) extends
+/**
+  * Executor for construct-type query
+  *
+  * @param query : input Sparql query
+  */
+class ConstructExecutor(@transient override val query: ConstructQuery) extends
   QueryExecutor(query) {
-  private val templateMapping = query.templateMapping
+  private val fields = Array(s"${LabelBase.SUBJECT_COLUMN_NAME}",
+    s"${LabelBase.PREDICATE_COLUMN_NAME}",
+    s"${LabelBase.OBJECT_COLUMN_NAME}").
+    map(fieldName =>
+      StructField(fieldName, StringType, nullable = true))
+  private val schema = StructType(fields)
+  final protected val encoder = RowEncoder(schema)
+  final protected val templateMapping = query.templateMapping
 
   /**
     * Method to trigger the execution of construct clause,
     * it returns the result as a new RDD of row.
     */
-  def executeConstruct(inputDF: DataFrame): SparkConstructRes = {
+  override def execute(inputDF: DataFrame): SparkOpRes = {
 
     val res = executeAlgebra(inputDF).result
-    val resConstruct = res.rdd.map(rddRow =>
-      constructByTemplate(rddRow, templateMapping)).
-      flatMap(rows => rows)
-
-    SparkConstructRes(resConstruct)
+    val resConstruct = res.mapPartitions( iter =>
+      (for (i <- iter)
+        yield constructByTemplate(i, templateMapping)).
+        flatMap(rs => rs))(this.encoder)
+    SparkOpRes(resConstruct)
   }
-
-  @Experimental
-  def executeLiteMatConstruct(inputDF: DataFrame): SparkConstructRes = {
-
-    val res = executeLiteMatAlgebra(inputDF).result
-    val resConstruct = res.rdd.map(rddRow =>
-      constructByTemplate(rddRow, templateMapping)).
-      flatMap(rows => rows)
-
-    SparkConstructRes(resConstruct)
-  }
-
 
   /**
-    * Transform original DataFrame to new RDD row by row with the
+    * Transform original DataFrame to new DataFrame row by row with the
     * respect to the definition of the given construct clause
     * E.g.:
     *
@@ -127,8 +182,8 @@ case class ConstructExecutor(@transient override val query: ConstructQuery) exte
     * @param row      : the row of algebra-part DataFrame
     * @param template : construct template
     */
-  private def constructByTemplate(row: Row,
-                                  template: List[TripleMapping]): List[Row] = {
+  protected def constructByTemplate(row: Row,
+                                    template: List[TripleMapping]): List[Row] = {
     template.map(triple =>
       Row(lookup(row, triple.subjectNode),
         lookup(row, triple.predicateNode),
@@ -153,17 +208,48 @@ case class ConstructExecutor(@transient override val query: ConstructQuery) exte
   }
 }
 
-case class AskExecutor(@transient override val query: AskQuery) extends
-  QueryExecutor(query) {
 
-  def executeAsk(inputDF: DataFrame): SparkAskRes =
-    SparkAskRes(
-      executeAlgebra(inputDF).result.take(1).nonEmpty)
+/**
+  * Executor for construct-type query with applying LiteMat reasoning
+  *
+  * @param query : input Sparql query
+  */
+class LiteMatConstructExecutor(@transient override val query: LiteMatConstructQuery)
+  extends ConstructExecutor(query) {
 
-  def executeLiteMatAsk(inputDF: DataFrame): SparkAskRes = {
-    SparkAskRes(
-      executeLiteMatAlgebra(inputDF).result.take(1).nonEmpty)
+  override def execute(inputDF: DataFrame): SparkOpRes = {
+    val res = executeLiteMatAlgebra(inputDF).result
+    val resConstruct = res.mapPartitions( iter =>
+      (for (i <- iter)
+        yield constructByTemplate(i, templateMapping)).
+        flatMap(rs => rs))(this.encoder)
+    SparkOpRes(resConstruct)
   }
-
 }
 
+
+/**
+  * Executor for ask-type query
+  *
+  * @param query : input Sparql query
+  */
+class AskExecutor(@transient override val query: AskQuery) extends
+  QueryExecutor(query) {
+
+  override def execute(inputDF: DataFrame): SparkAskRes =
+    SparkAskRes(
+      executeAlgebra(inputDF).result)
+}
+
+
+/**
+  * Executor for ask-type query with applying LiteMat Reasoning
+  *
+  */
+class LiteMatAskExecutor(@transient override val query: LiteMatAskQuery)
+  extends AskExecutor(query) {
+  override def execute(inputDF: DataFrame): SparkAskRes = {
+    SparkAskRes(
+      executeLiteMatAlgebra(inputDF).result)
+  }
+}
