@@ -59,6 +59,8 @@ class StriderQueryFactory(queryStr: String,
 
 
 object StriderQueryFactory {
+  def apply(queryStr: String,
+            reasoningEnabled: Boolean = false): StriderQueryFactory = new StriderQueryFactory(queryStr, reasoningEnabled)
   def apply(queryStr: String): StriderQueryFactory = new StriderQueryFactory(queryStr)
 }
 
