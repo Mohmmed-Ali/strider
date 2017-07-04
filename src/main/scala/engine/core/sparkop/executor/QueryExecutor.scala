@@ -3,7 +3,7 @@ package engine.core.sparkop.executor
 import java.io.{File, PrintWriter}
 
 import engine.core.label.LabelBase
-import engine.core.reasoning.LiteMatOpExecutor
+import engine.core.sparql.reasoning.LiteMatOpExecutor
 import engine.core.sparkop.compiler.{SparkOpPrinter, SparkOpUpdater}
 import engine.core.sparkop.op.{SparkAskRes, SparkOpRes}
 import engine.core.sparql._

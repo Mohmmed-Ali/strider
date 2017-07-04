@@ -1,7 +1,7 @@
 package engine.core.conf
 
 import com.esotericsoftware.kryo.Kryo
-import engine.core.reasoning.{Decoder, Encoder}
+import engine.core.sparql.reasoning.{Decoder, Encoder}
 import engine.core.sparkop.executor.{ConstructExecutor, LiteMatConstructExecutor}
 import engine.stream.{RDFGraph, RDFTriple, WavesEvent}
 import org.apache.jena.rdf.model.Model

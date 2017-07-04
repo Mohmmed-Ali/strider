@@ -1,5 +1,6 @@
 package engine.core.sparql
 
+import engine.core.sparql.reasoning.LiteMatCtxBuilder
 import org.apache.jena.query.{Query, QueryFactory}
 import org.apache.log4j.LogManager
 
@@ -7,37 +8,44 @@ import org.apache.log4j.LogManager
   * Created by xiangnanren on 25/11/2016.
   */
 class StriderQueryFactory(queryStr: String,
-                          reasoningEnabled: Boolean = false) extends Serializable {
+                          reasoningEnabled: Boolean = false)
+  extends LiteMatCtxBuilder with Serializable  {
   @transient
   lazy val log = LogManager.getLogger(this.getClass)
   val query: Query = QueryFactory.create(queryStr)
 
-  def createSelect(): SelectQuery = {
+  def setLiteMatArgs(key: String,
+                     value: String): this.type = {
+    set(key, value)
+    this
+  }
+
+  def createSelect: SelectQuery = {
     if (query.isSelectType && !this.reasoningEnabled) new SelectQuery(query)
     else throw InvalidQueryException("Invalid query, a select type query is required.")
   }
 
-  def createLiteMatSelect(): LiteMatSelectQuery = {
+  def createLiteMatSelect: LiteMatSelectQuery = {
     if (query.isSelectType && this.reasoningEnabled) new LiteMatSelectQuery(query)
     else throw InvalidQueryException("Invalid query, a LiteMat-Select type query is required.")
   }
 
-  def createConstruct(): ConstructQuery = {
+  def createConstruct: ConstructQuery = {
     if (query.isConstructType && !this.reasoningEnabled) new ConstructQuery(query)
     else throw InvalidQueryException("Invalid query, a construct type query is required.")
   }
 
-  def createLiteMatConstruct(): LiteMatConstructQuery = {
+  def createLiteMatConstruct: LiteMatConstructQuery = {
     if (query.isConstructType && this.reasoningEnabled) new LiteMatConstructQuery(query)
     else throw InvalidQueryException("Invalid query, a LiteMat-Construct type query is required.")
   }
 
-  def createAsk(): AskQuery = {
+  def createAsk: AskQuery = {
     if (query.isConstructType && !this.reasoningEnabled) new AskQuery(query)
     else throw InvalidQueryException("Invalid query, a ask type query is required.")
   }
 
-  def createLiteMatAsk(): LiteMatAskQuery = {
+  def createLiteMatAsk: LiteMatAskQuery = {
     if (query.isAskType && this.reasoningEnabled) new LiteMatAskQuery(query)
     else throw InvalidQueryException("Invalid query, a LiteMat-Ask type query is required.")
   }
@@ -60,8 +68,10 @@ class StriderQueryFactory(queryStr: String,
 
 object StriderQueryFactory {
   def apply(queryStr: String,
-            reasoningEnabled: Boolean = false): StriderQueryFactory = new StriderQueryFactory(queryStr, reasoningEnabled)
-  def apply(queryStr: String): StriderQueryFactory = new StriderQueryFactory(queryStr)
+            reasoningEnabled: Boolean = false): StriderQueryFactory =
+    new StriderQueryFactory(queryStr, reasoningEnabled)
+  def apply(queryStr: String): StriderQueryFactory =
+    new StriderQueryFactory(queryStr)
 }
 
 

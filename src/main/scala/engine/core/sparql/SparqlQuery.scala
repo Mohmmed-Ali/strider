@@ -1,6 +1,6 @@
 package engine.core.sparql
 
-import engine.core.reasoning.LiteMatQueryRewriter
+import engine.core.sparql.reasoning.LiteMatQueryRewriter
 import engine.core.sparkop.compiler.SparkOpTransformer
 import engine.core.sparkop.op.SparkOp
 import org.apache.jena.graph
@@ -52,7 +52,8 @@ class SelectQuery(override val query: Query,
   * Select type query which is rewritten via LiteMat
   */
 class LiteMatSelectQuery(override val query: Query,
-                         override val id: String) extends SelectQuery(query, id) {
+                         override val id: String)
+  extends SelectQuery(query, id) {
   val liteMatQueryRewriter: LiteMatQueryRewriter = new LiteMatQueryRewriter()
   override val sparkOpRoot: SparkOp = liteMatQueryRewriter.transform(opRoot)
 
@@ -134,11 +135,12 @@ class ConstructQuery(override val query: Query,
   * Construct query which is rewritten via LiteMat
   */
 class LiteMatConstructQuery(override val query: Query,
-                            override val id: String) extends ConstructQuery(query, id) {
+                            override val id: String)
+  extends ConstructQuery(query, id) {
   val liteMatQueryRewriter: LiteMatQueryRewriter = new LiteMatQueryRewriter()
   override val sparkOpRoot: SparkOp = liteMatQueryRewriter.transform(opRoot)
 
-    def this(query: Query) = this(query, "")
+  def this(query: Query) = this(query, "")
 }
 
 
@@ -150,7 +152,8 @@ class AskQuery(override val query: Query,
 
 
 class LiteMatAskQuery(override val query: Query,
-                      override val id: String) extends AskQuery(query, id) {
+                      override val id: String)
+  extends AskQuery(query, id) {
   val liteMatQueryRewriter: LiteMatQueryRewriter = new LiteMatQueryRewriter()
   override val sparkOpRoot: SparkOp = liteMatQueryRewriter.transform(opRoot)
 
