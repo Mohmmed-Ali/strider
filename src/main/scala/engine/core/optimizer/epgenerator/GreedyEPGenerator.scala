@@ -75,7 +75,7 @@ object GreedyEPGenerator {
     case AdaptiveGreedy => new GreedyEPGenerator(AdaptiveGreedy)
 
     case _ => throw InvalidEPException("Invalid execution plan type, " +
-      "the type should be either HeuByNode or StatByNode, " +
+      "the type should be either Greedy or Bush, " +
       "execution plan generator initialize failed")
   }
 }

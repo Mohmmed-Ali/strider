@@ -1,5 +1,9 @@
 package engine.core.sparql
 
+import org.apache.spark.sql._
+
+import scala.io.Source
+
 /**
   * Created by xiangnanren on 07/07/16.
   */
@@ -7,20 +11,161 @@ trait QueryInitializer {
   def initializeQueryStr(queryId: String): String
 }
 
+class QueryReader extends QueryInitializer{
+
+  override def initializeQueryStr(path: String): String = {
+    val in = classOf[QueryInitializer].getResourceAsStream(path)
+    val queryStr = Source.fromInputStream(in, "utf-8").getLines().mkString
+    queryStr
+  }
+}
+
+
+object NonLiteMatQueryProcessor {
+  def process(queryId: String, rawDataFrame: DataFrame): DataFrame = {
+    queryId match {
+      case "nonLiteMat_q_1" =>
+        val res1 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#name>")
+        val res2 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#AssistantProfessor>").
+          withColumnRenamed("oDefault","professor").join(res1, Seq("sDefault"))
+        val res3 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#AssociateProfessor>").
+          withColumnRenamed("oDefault","professor").join(res1, Seq("sDefault"))
+        val res4 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#FullProfessor>").
+          withColumnRenamed("oDefault","professor").join(res1, Seq("sDefault"))
+        res2.union(res3).union(res4)
+
+      case "nonLiteMat_q_2" =>
+        val advs = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#advisor>")
+        val nmst = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#name>").withColumnRenamed("oDefault","ns")
+        val nmpr = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#name>").withColumnRenamed("oDefault","nx")
+        val assiP = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#AssistantProfessor>").withColumnRenamed("oDefault","professor")
+        val assoP = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#AssociateProfessor>").withColumnRenamed("oDefault","professor")
+        val fullP = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#FullProfessor>").withColumnRenamed("oDefault","professor")
+        val undeS = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#UndergraduateStudent>")
+        val gradS = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#GraduateStudent>")
+
+        val res1 = assiP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(undeS, Seq("sDefault")).select("ns","nx")
+        val res2 = assoP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(undeS, Seq("sDefault")).select("ns","nx")
+        val res3 = fullP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(undeS, Seq("sDefault")).select("ns","nx")
+        val res4 = assiP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(gradS, Seq("sDefault")).select("ns","nx")
+        val res5 = assoP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(gradS, Seq("sDefault")).select("ns","nx")
+        val res6 = fullP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(gradS, Seq("sDefault")).select("ns","nx")
+        res1.union(res2).union(res3).union(res4).union(res5).union(res6)
+
+      case "nonLiteMat_q_3" =>
+        rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#memberOf>").
+          union(rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor>")).
+          union(rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#headOf>"))
+          .select("sDefault", "oDefault")
+
+      case "nonLiteMat_q_4" =>
+        val name = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#name>").withColumnRenamed("oDefault","n")
+        val res1 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#AssistantProfessor>").withColumnRenamed("oDefault", "professor").
+          join(rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#memberOf>"), Seq("sDefault")).
+          join(name, Seq("sDefault")).select("oDefault", "n")
+        val res2 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#AssociateProfessor>").withColumnRenamed("oDefault", "professor").
+          join(rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#memberOf>"), Seq("sDefault")).
+          join(name, Seq("sDefault")).select("oDefault", "n")
+        val res3 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#FullProfessor>").withColumnRenamed("oDefault", "professor").
+          join(rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#memberOf>"), Seq("sDefault")).
+          join(name, Seq("sDefault")).select("oDefault", "n")
+        val res4 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#AssistantProfessor>").withColumnRenamed("oDefault", "professor").
+          join(rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor>"), Seq("sDefault")).
+          join(name, Seq("sDefault")).select("oDefault", "n")
+        val res5 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#AssociateProfessor>").withColumnRenamed("oDefault", "professor").
+          join(rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor>"), Seq("sDefault")).
+          join(name, Seq("sDefault")).select("oDefault", "n")
+        val res6 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#FullProfessor>").withColumnRenamed("oDefault", "professor").
+          join(rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor>"), Seq("sDefault")).
+          join(name, Seq("sDefault")).select("oDefault", "n")
+        val res7 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#AssistantProfessor>").withColumnRenamed("oDefault", "professor").
+          join(rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#headOf>"), Seq("sDefault")).
+          join(name, Seq("sDefault")).select("oDefault", "n")
+        val res8 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#AssociateProfessor>").withColumnRenamed("oDefault", "professor").
+          join(rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#headOf>"), Seq("sDefault")).
+          join(name, Seq("sDefault")).select("oDefault", "n")
+        val res9 = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#FullProfessor>").withColumnRenamed("oDefault", "professor").
+          join(rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#headOf>"), Seq("sDefault")).
+          join(name, Seq("sDefault")).select("oDefault", "n")
+        res1.union(res2).union(res3).union(res4).union(res5).union(res6).union(res7).union(res8).union(res9)
+
+      case "nonLiteMat_q_5" =>
+        val advs = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#advisor>")
+        val nmst = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#name>").withColumnRenamed("oDefault","ns")
+        val nmpr = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#name>").withColumnRenamed("oDefault","nx")
+        val assiP = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#AssistantProfessor>").withColumnRenamed("oDefault","professor")
+        val assoP = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#AssociateProfessor>").withColumnRenamed("oDefault","professor")
+        val fullP = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#FullProfessor>").withColumnRenamed("oDefault","professor")
+        val undeS = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#UndergraduateStudent>")
+        val gradS = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" &&
+          rawDataFrame("oDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#GraduateStudent>")
+        val mbof = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#memberOf>").withColumnRenamed("oDefault", "memberOf")
+        val mkfr = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor>").withColumnRenamed("oDefault", "memberOf")
+        val hdof = rawDataFrame.where(rawDataFrame("pDefault") <=> "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#headOf>").withColumnRenamed("oDefault", "memberOf")
+
+        val res1 = assiP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(undeS, Seq("sDefault")).join(mbof, Seq("sDefault")).select("ns","nx","memberOf")
+        val res2 = assoP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(undeS, Seq("sDefault")).join(mbof, Seq("sDefault")).select("ns","nx","memberOf")
+        val res3 = fullP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(undeS, Seq("sDefault")).join(mbof, Seq("sDefault")).select("ns","nx","memberOf")
+        val res4 = assiP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(gradS, Seq("sDefault")).join(mbof, Seq("sDefault")).select("ns","nx","memberOf")
+        val res5 = assoP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(gradS, Seq("sDefault")).join(mbof, Seq("sDefault")).select("ns","nx","memberOf")
+        val res6 = fullP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(gradS, Seq("sDefault")).join(mbof, Seq("sDefault")).select("ns","nx","memberOf")
+
+        val res7 = assiP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(undeS, Seq("sDefault")).join(mkfr, Seq("sDefault")).select("ns","nx","memberOf")
+        val res8 = assoP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(undeS, Seq("sDefault")).join(mkfr, Seq("sDefault")).select("ns","nx","memberOf")
+        val res9 = fullP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(undeS, Seq("sDefault")).join(mkfr, Seq("sDefault")).select("ns","nx","memberOf")
+        val res10 = assiP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(gradS, Seq("sDefault")).join(mkfr, Seq("sDefault")).select("ns","nx","memberOf")
+        val res11 = assoP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(gradS, Seq("sDefault")).join(mkfr, Seq("sDefault")).select("ns","nx","memberOf")
+        val res12 = fullP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(gradS, Seq("sDefault")).join(mkfr, Seq("sDefault")).select("ns","nx","memberOf")
+
+        val res13 = assiP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(undeS, Seq("sDefault")).join(hdof, Seq("sDefault")).select("ns","nx","memberOf")
+        val res14 = assoP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(undeS, Seq("sDefault")).join(hdof, Seq("sDefault")).select("ns","nx","memberOf")
+        val res15 = fullP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(undeS, Seq("sDefault")).join(hdof, Seq("sDefault")).select("ns","nx","memberOf")
+        val res16 = assiP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(gradS, Seq("sDefault")).join(hdof, Seq("sDefault")).select("ns","nx","memberOf")
+        val res17 = assoP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(gradS, Seq("sDefault")).join(hdof, Seq("sDefault")).select("ns","nx","memberOf")
+        val res18 = fullP.join(nmpr, Seq("sDefault")).withColumnRenamed("sDefault","oDefault").join(advs, Seq("oDefault")).join(nmst, Seq("sDefault")).join(gradS, Seq("sDefault")).join(hdof, Seq("sDefault")).select("ns","nx","memberOf")
+        res1.union(res2).union(res3).union(res4).union(res5).union(res6).
+          union(res7).union(res8).union(res9).union(res10).union(res11).union(res12).
+          union(res13).union(res14).union(res15).union(res16).union(res17).union(res18)
+    }
+  }
+}
+
+
 
 object SparqlQueryInitializer extends QueryInitializer {
 
-  override def initializeQueryStr(queryId: String = "test_0"): String = queryId match {
+  override def initializeQueryStr(queryId: String = "eval_0"): String = queryId match {
 
     ////////////////////////
     // Eval Queries
     ////////////////////////
 
     case "eval_0" =>
-      "select ?s ?o " +
+      "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> " +
+      "select ?s " +
         " { " +
-        " ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o ; " +
-//        "    <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o2 ." +
+        " ?s <http://data.nasa.gov/qudt/owl/qudt/numericValue> \"0.32\"^^xsd:double . " +
         "} "
 
     case "eval_1" =>
@@ -261,9 +406,9 @@ object SparqlQueryInitializer extends QueryInitializer {
         "}" +
         "group by ?s "
 
-    /////////////////////////////////////
-    // Test Queries group 2 (Aggregation)
-    /////////////////////////////////////
+    //////////////////////////////////////////////////
+    // Test Queries group 3 LiteMat_Concept_Properties
+    //////////////////////////////////////////////////
     case "test_litemat_1" =>
       " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
         " PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
@@ -327,6 +472,94 @@ object SparqlQueryInitializer extends QueryInitializer {
       "{ ?x rdf:type ub:VisitingProfessor ; " +
       "     ub:worksFor ?y . } " +
       "}"
+
+    //////////////////////////////////////
+    // Test Queries: group 4 LiteMat_sameAS
+    //////////////////////////////////////
+    case "group_4_q_1" =>
+     " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+       " PREFIX lubm: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+       " SELECT ?n " +
+       " WHERE { " +
+       " ?x rdf:type lubm:Professor; " +
+       "    lubm:name ?n . " +
+       " } "
+
+    case "group_4_q_2" =>
+      " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+        " PREFIX lubm: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+        " SELECT ?ns ?nx " +
+        " WHERE { " +
+        " ?x rdf:type lubm:Professor ;" +
+        "    lubm:name ?nx ." +
+        " ?s lubm:advisor ?x ;" +
+        "    rdf:type lubm:Student ;" +
+        "    lubm:name ?ns . " +
+        "}"
+
+    case "group_4_q_3" =>
+      " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +
+        " PREFIX lubm: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+        " SELECT ?x ?o " +
+        " WHERE { " +
+        " ?x lubm:memberOf ?o ." +
+        "}"
+
+    case "group_4_q_4" =>
+      " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+        " PREFIX lubm: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+        " SELECT ?o ?n " +
+        " WHERE { " +
+        " ?x rdf:type lubm:Professor ;" +
+        "    lubm:memberOf ?o ; " +
+        "    lubm:name ?n ." +
+        "}"
+
+    case "group_4_q_5" =>
+      " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+        " PREFIX lubm: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+        " SELECT ?ns ?nx ?o " +
+        " WHERE { " +
+        " { ?x rdf:type lubm:Professor ; " +
+        "    lubm:name ?nx ;" +
+        "    lubm:memberOf ?o . }" +
+        " { ?s lubm:advisor ?x ; " +
+        "      rdf:type lubm:Student ;" +
+        "      lubm:name ?ns . } " +
+        "}"
+
+    case "group_4_q_6" =>
+      " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+        " PREFIX lubm: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+        " SELECT ?n ?e " +
+        " WHERE {  " +
+        " ?x rdf:type lubm:PostDoc ;  " +
+        "    lubm:name ?n ; " +
+        "    lubm:email ?e ." +
+        "} "
+
+    case "group_4_q_7" =>
+      " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+        " PREFIX lubm: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+        " SELECT ?o ?n " +
+        " WHERE {  " +
+        " ?x rdf:type lubm:Faculty ;  " +
+        "    lubm:memberOf ?o ;" +
+        "    lubm:name ?n ." +
+        "}"
+
+    case "group_4_q_8" =>
+      " PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+        " PREFIX lubm: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +
+        " SELECT ?ns ?nx ?o " +
+        " WHERE {  " +
+        " { ?x rdf:type lubm:Faculty ;  " +
+        "      lubm:name ?nx ; " +
+        "      lubm:memberOf ?o . } " +
+        " { ?s  lubm:advisor ?x ;  " +
+        "      rdf:type lubm:Student ;  " +
+        "      lubm:name ?ns .  } " +
+        "}"
 
 
 

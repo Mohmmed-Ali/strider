@@ -2,6 +2,7 @@ package engine.stream.kryo
 
 import com.esotericsoftware.kryo.io.Input
 import engine.core.conf.StriderDeserializerConf
+import engine.stream.RDFTriple
 import kafka.serializer.Decoder
 import kafka.utils.VerifiableProperties
 
@@ -16,6 +17,7 @@ class KryoStreamDeserializer[T](props: VerifiableProperties = null) extends Deco
     val input = new Input()
     input.setBuffer(messageBytes)
 
+//    val message = StriderDeserializerConf.kryos.get().readObject(input, classOf[RDFTriple])
     val message = StriderDeserializerConf.kryos.get().readClassAndObject(input)
     message.asInstanceOf[T]
   }

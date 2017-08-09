@@ -244,7 +244,7 @@ trait BGPOptimizerHelper {
       case AdaptiveGreedy => minAdapAccum(inits, accum)
 
       case _ => throw InvalidEPException("Invalid execution plan type, " +
-        "the type should be either HeuByNode or StatByNode.")
+        "the type should be either Greedy or Bushy.")
     }
   }
 

@@ -1,27 +1,13 @@
 package engine.core.conf
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.streaming.{Duration, Milliseconds, StreamingContext}
 
 /**
   * Created by xiangnanren on 07/12/2016.
   */
-abstract class CxtResolver
-
-class StriderCxt(val batch: Duration,
-                 val slide: Duration = Milliseconds(0L),
-                 val window: Duration = Milliseconds(0L)) extends CxtResolver {
-  val updateFrequency =
-    if (slide.isZero) batch.milliseconds
-    else slide.milliseconds
-
-  def getStreamingCtx(striderConf: StriderConfBase): StreamingContext = {
-    new StreamingContext(
-      new StriderConfBase().conf, batch)
-  }
-
+trait StriderCxtResolver {
   def getSparkSession(confBase: StriderConfBase,
-                      threshold: String = "100000000"): SparkSession = {
+                      threshold: String = "-1"): SparkSession = {
     val spark = SparkSession.
       builder.
       config(confBase.conf).
@@ -36,4 +22,3 @@ class StriderCxt(val batch: Duration,
     spark
   }
 }
-

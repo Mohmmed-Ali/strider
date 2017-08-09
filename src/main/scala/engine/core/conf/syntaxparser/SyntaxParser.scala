@@ -15,6 +15,9 @@ trait SyntaxParser extends JavaTokenParsers {
   protected val WINDOW = SyntaxToken("WINDOW")
   protected val SLIDE = SyntaxToken("SLIDE")
   protected val BATCH = SyntaxToken("BATCH")
+  protected val REASONING = SyntaxToken("REASONING")
+  protected val REASONING_ENABLED = SyntaxToken("TRUE")
+  protected val REASONING_DISABLED = SyntaxToken("FALSE")
   protected val MILLISECONDS = SyntaxToken("MILLISECONDS")
   protected val SECONDS = SyntaxToken("SECONDS")
   protected val MINUTES = SyntaxToken("MINUTES")
@@ -52,20 +55,26 @@ trait SyntaxParser extends JavaTokenParsers {
     * @return Map[]
     */
   private[this] def streamingClause: Parser[Map[String, (Long, String)]] =
-    STREAMING.pattern ~! "{" ~> initS2ROp <~ "}"
+    STREAMING.pattern ~! "{" ~> (initSlidingWindow | initTumblingWindow) <~ "}"
 
-  private[this] def initS2ROp: Parser[Map[String, (Long, String)]] = S2ROpOrder ^^ {
-    case op1 ~ op2 ~ op3 =>
-      Seq(op1, op2, op3).map(op => op._1 -> op._2).toMap
+  private[this] def initSlidingWindow: Parser[Map[String, (Long, String)]] = slidingWindow ^^ {
+    case op1 ~ op2 ~ op3 => Seq(op1, op2, op3).map(op => op._1 -> op._2).toMap
   }
 
-  private[this] def S2ROpOrder =
+  private[this] def initTumblingWindow: Parser[Map[String, (Long, String)]] = tumblingWindow ^^ {
+    case op => Seq(op).map(op => op._1 -> op._2).toMap
+  }
+
+
+  private[this] def slidingWindow =
     (window ~ slide ~ batch) |
       (window ~ batch ~ slide) |
       (slide ~ window ~ batch) |
       (batch ~ window ~ slide) |
       (batch ~ slide ~ window) |
       (slide ~ batch ~ window)
+
+  private[this] def tumblingWindow = batch
 
   private[this] def streamingArgs: Parser[(Long, String)] =
     num ~ durationType ^^ {
@@ -114,17 +123,42 @@ trait SyntaxParser extends JavaTokenParsers {
     * @return A list of multi parsed queries.
     */
   private[this] def registerClause: Parser[Map[String, String]] =
-    REGISTER.pattern ~ "{" ~> rep(registerOp) <~ "}" ^^ {
+    REGISTER.pattern ~ "{" ~> initRegisterOp <~ "}" ^^ {
       case op => Map() ++ op
     }
 
-  private[this] def registerOp: Parser[(String, String)] =
-    queryId | sparql
+  private[this] def initRegisterOp: Parser[Map[String, String]] =
+    registerOpOrder ^^ {
+      case op1 ~ op2 ~ op3 =>
+        Seq(op1, op2, op3).map(op => op._1 -> op._2).toMap
+    }
+
+  private[this] def registerOpOrder =
+    (queryId ~ reasoning ~ sparql) |
+      (queryId ~ sparql ~ reasoning) |
+      (reasoning ~ queryId ~ sparql) |
+      (reasoning ~ sparql ~ queryId) |
+      (sparql ~ reasoning ~ queryId) |
+      (sparql ~ queryId ~ reasoning)
 
   private[this] def queryId: Parser[(String, String)] =
     QUERYID.pattern ~ "[".? ~> ANYCHAR.pattern <~ "]" ^^ {
       v => (QUERYID.normalized, v)
     }
+
+  private[this] def reasoning: Parser[(String, String)] =
+    REASONING.pattern ~ "[".? ~> reasoningArg <~ "]" ^^ {
+      case _reasoningArg => (REASONING.normalized, _reasoningArg)
+    }
+
+  private[this] def reasoningArg: Parser[String] =
+    reasoningEnabled | reasoningDisabled
+
+  private[this] def reasoningEnabled: Parser[String] =
+    REASONING_ENABLED.pattern ^^ { d => REASONING_ENABLED.normalized }
+
+  private[this] def reasoningDisabled: Parser[String] =
+    REASONING_DISABLED.pattern ^^ { d => REASONING_DISABLED.normalized }
 
   private[this] def sparql: Parser[(String, String)] =
     SPARQL.pattern ~ "[".? ~> ANYCHAR.pattern <~ "]" ^^ {
@@ -141,7 +175,6 @@ trait SyntaxParser extends JavaTokenParsers {
     val pattern = s"(?i)$keyword".r
     val normalized = keyword.toUpperCase
   }
-
 
   protected object SyntaxToken {
     def apply(keyword: String): SyntaxToken = new SyntaxToken(keyword)

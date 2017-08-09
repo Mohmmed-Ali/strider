@@ -1,6 +1,6 @@
-package engine.core.conf.syntaxparser
+package engine.core.conf
 
-import engine.core.conf.StriderConfBase
+import engine.core.conf.syntaxparser.{ParsedStriderQuery, SyntaxParser}
 import engine.core.sparkop.executor.QueryExecutor
 import engine.core.sparql.{SparqlQuery, StriderQueryFactory}
 import org.apache.spark.streaming._
@@ -12,11 +12,11 @@ import scala.collection.parallel.mutable.ParArray
   * Created by xiangnanren on 21/02/2017.
   */
 class StriderCtxHandler(striderConfig: ParsedStriderQuery)
-  extends SyntaxParser {
+  extends SyntaxParser with StriderCxtResolver {
   private[this] val streamingConfig = striderConfig.parsedStreamingConfig
   private[this] val registerConfig = striderConfig.parsedRegisterConfig
 
-  def initStreamingCtx(striderConf: StriderConfBase): StreamingContext = {
+  def initStriderCtx: StriderStreamingCxt = {
     def initDuration(num: Long, durationType: String): Duration =
       durationType match {
         case MILLISECONDS.normalized => Milliseconds(num)
@@ -25,18 +25,26 @@ class StriderCtxHandler(striderConfig: ParsedStriderQuery)
       }
 
     val batch = streamingConfig.get(BATCH.normalized)
-    val duration = initDuration(batch._1, batch._2)
+    val batchDuration = initDuration(batch._1, batch._2)
+    val windowDuration = streamingConfig.get.get(WINDOW.normalized)
+    val slideDuration = streamingConfig.get.get(SLIDE.normalized)
 
-    new StreamingContext(striderConf.conf, duration)
+    if (windowDuration.nonEmpty && slideDuration.nonEmpty)
+      new StriderStreamingCxt(batchDuration,
+        initDuration(windowDuration.get._1, windowDuration.get._2),
+        initDuration(slideDuration.get._1, slideDuration.get._2))
+    else new StriderStreamingCxt(batchDuration)
   }
-
 
   def initQueryExecutorPool: ParArray[(SparqlQuery, QueryExecutor)] = {
     val taskNum = registerConfig.size
 
     val pool = registerConfig.get.map { m =>
-      val sparqlQuery =
-        StriderQueryFactory(m(SPARQL.normalized)).createQuery
+      val sparqlQuery = StriderQueryFactory(
+        m(SPARQL.normalized),
+        m(REASONING.normalized).toBoolean).
+        createQuery
+
       sparqlQuery -> new QueryExecutor(sparqlQuery)
     }.toParArray
 

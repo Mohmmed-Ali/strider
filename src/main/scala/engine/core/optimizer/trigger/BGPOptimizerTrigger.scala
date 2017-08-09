@@ -27,7 +27,7 @@ case class StaticTrigger(ucg: UCGraph)
     * @return :
     */
   def triggerGreedyEP(): List[BGPGraph] = {
-    log.info("Optimizer of HeuByNode is created. ")
+    log.info("Optimizer of Greedy is created. ")
     if (ucg.edgeExistence) GreedyEPGenerator(StaticGreedy).generate(ucg)
     else ucg.ucgNodes
   }

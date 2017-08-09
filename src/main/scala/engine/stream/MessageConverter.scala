@@ -34,26 +34,38 @@ object MessageConverter {
                            rdd: RDD[(String, T)]): DataFrame = {
     import sparkSession.implicits._
 
-    rdd.map(x => x._2) match {
+    rdd.mapPartitions(x => for (i <- x) yield i._2) match {
       case _rdd: RDD[RDFTriple@unchecked]
         if classTag[T] == classTag[RDFTriple] =>
-        _rdd.toDF(
+        _rdd.toDF (
           LabelBase.SUBJECT_COLUMN_NAME,
           LabelBase.PREDICATE_COLUMN_NAME,
           LabelBase.OBJECT_COLUMN_NAME
-        ).persist(StorageLevel.MEMORY_ONLY)
+        ).persist (StorageLevel.MEMORY_ONLY)
     }
   }
+
 
   def RDFTripleToDF(sparkSession: SparkSession,
                     rdd: RDD[(String, RDFTriple)]): DataFrame = {
     import sparkSession.implicits._
 
-    rdd.map(x => x._2).toDF(
+    rdd.mapPartitions(x => for (i <- x) yield i._2).
+      toDF(
+        LabelBase.SUBJECT_COLUMN_NAME,
+        LabelBase.PREDICATE_COLUMN_NAME,
+        LabelBase.OBJECT_COLUMN_NAME
+      ).persist(StorageLevel.MEMORY_ONLY)
+  }
+
+  def RDFTriplePairToDF(sparkSession: SparkSession,
+                    rdd: RDD[RDFTriple]): DataFrame = {
+    import sparkSession.implicits._
+
+    rdd.toDF(
       LabelBase.SUBJECT_COLUMN_NAME,
       LabelBase.PREDICATE_COLUMN_NAME,
       LabelBase.OBJECT_COLUMN_NAME
     ).persist(StorageLevel.MEMORY_ONLY)
   }
-
 }

@@ -50,7 +50,6 @@ class StriderQueryFactory(queryStr: String,
     else throw InvalidQueryException("Invalid query, a LiteMat-Ask type query is required.")
   }
 
-
   def createQuery: SparqlQuery = query match {
     case _query if _query.isSelectType && !this.reasoningEnabled => new SelectQuery(_query)
     case _query if _query.isConstructType && !this.reasoningEnabled => new ConstructQuery(_query)
@@ -70,8 +69,10 @@ object StriderQueryFactory {
   def apply(queryStr: String,
             reasoningEnabled: Boolean = false): StriderQueryFactory =
     new StriderQueryFactory(queryStr, reasoningEnabled)
+
   def apply(queryStr: String): StriderQueryFactory =
     new StriderQueryFactory(queryStr)
+
 }
 
 

@@ -26,7 +26,6 @@ class SparkBGP(val opBGP: OpBGP,
   private val static_handler = StaticEPHandler
   private val adap_handler = AdaptiveEPHandler
 
-
   override def execute(opName: String,
                        inputDF: DataFrame): SparkOpRes = {
     SparkOpRes(
@@ -69,28 +68,6 @@ class SparkBGP(val opBGP: OpBGP,
                            inputDF: DataFrame): DataFrame = {
     computeEP(getCurrentEP(dfMap, inputDF), dfMap)
   }
-
-//  protected def computeBGP(dfMap:  Map[graph.Triple, DataFrame],
-//                           inputDF: DataFrame): DataFrame = {
-//    if (globalTrigger) {
-//      //TriggerRules.f_trigger(SizeEstimator.estimate(inputDF))
-//      if (TriggerRules.f_trigger_test) {
-//        adap_handler.currentAdapPlan match {
-//          case None =>
-//            log.info("Switch to forward adaptivity.")
-//            computeEP(getAdapPlan(dfMap), dfMap)
-//          case Some(oldAdapPlan) =>
-//            log.debug("\n \n Detailed Query plan info: \n" + getEPInfo(oldAdapPlan))
-//            adap_handler.currentAdapPlan = None // Reinitialize adaptive plan
-//
-//            computeEP(oldAdapPlan, dfMap)
-//        }
-//      } else computeEP(getStaticPlan, dfMap)
-//    }
-//    else {
-//      computeEP(getStaticPlan, dfMap)
-//    }
-//  }
 
   private def getStaticPlan: List[BGPGraph] = {
     static_handler.statType match {
