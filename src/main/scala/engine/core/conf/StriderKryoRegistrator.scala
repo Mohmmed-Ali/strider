@@ -27,6 +27,7 @@ class StriderKryoRegistrator extends KryoRegistrator {
     kryo.register(classOf[ConstructExecutor])
     kryo.register(classOf[LiteMatConstructExecutor])
     kryo.register(classOf[RDFTriple])
+    kryo.register(classOf[Array[RDFTriple]])
     kryo.register(classOf[RDFGraph])
     kryo.register(classOf[WavesEvent])
     kryo.register(classOf[Model])
