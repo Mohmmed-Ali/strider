@@ -1,5 +1,4 @@
 # Strider
-![Logo](https://github.com/renxiangnan/ISWC_2017_Reference/blob/master/docs/figures/Image1.png)
 
 Strider is a distributed RDF stream processing engine, which supports basic continuous SPARQL query processing, **RDFS+** and **OWL:sameAS** reasoning. The project is a part of French national environmental project [WAVES FUI #17](http://www.waves-rsp.org).
 
