@@ -14,8 +14,14 @@ libraryDependencies ++= Seq(
   "org.apache.jena" % "jena-arq" % "3.0.1"
 )
 
-
 val meta = """META.INF(.)*""".r
+
+mainClass in assembly := some("engine.launcher.StriderUiLocalLauncher")
+test in assembly := {}
+assemblyJarName := "strider-docker.jar"
+unmanagedResourceDirectories in Compile <++= baseDirectory { base =>
+  Seq( base / "src/main/resources" )
+}
 
 assemblyMergeStrategy in assembly := {
   case x if x.endsWith(".class") => MergeStrategy.last
@@ -34,7 +40,5 @@ assemblyMergeStrategy in assembly := {
 
 assemblyExcludedJars in assembly := {
   val cp = (fullClasspath in assembly).value
-  cp filter {
-    _.data.getName == "avro-ipc-1.7.7-tests.jar"
-  }
+  cp filter {_.data.getName == "avro-ipc-1.7.7-tests.jar"}
 }

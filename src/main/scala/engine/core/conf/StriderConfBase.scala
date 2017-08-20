@@ -22,7 +22,8 @@ sealed abstract class StriderConf {
   val conf: SparkConf
 }
 
-class StriderConfBase(backPressure: String = "true",
+class StriderConfBase(concurrentJobs: String = "1",
+                      backPressure: String = "false",
                       schedulerMode: String = "FAIR") extends StriderConf {
 
   val conf = new SparkConf().
@@ -34,6 +35,7 @@ class StriderConfBase(backPressure: String = "true",
     set("spark.executor.extraJavaOptions", "-XX:+UseConcMarkSweepGC").
     set("spark.driver.extraJavaOptions", "-XX:+UseConcMarkSweepGC").
     set("spark.locality.wait", "1s").
+    set("concurrentJobs", concurrentJobs).
     set("spark.streaming.backpressure.enabled", backPressure).
     set("spark.kryo.registrationRequired", "true").
     set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").

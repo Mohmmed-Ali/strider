@@ -17,8 +17,9 @@ class KryoStreamDeserializer[T](props: VerifiableProperties = null) extends Deco
     val input = new Input()
     input.setBuffer(messageBytes)
 
-//    val message = StriderDeserializerConf.kryos.get().readObject(input, classOf[RDFTriple])
-    val message = StriderDeserializerConf.kryos.get().readClassAndObject(input)
+//    val message = StriderDeserializerConf.kryos.get().readClassAndObject(input)
+    val message = StriderDeserializerConf.kryos.get().readObject(input, classOf[RDFTriple])
+
     message.asInstanceOf[T]
   }
 }

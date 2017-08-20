@@ -7,6 +7,7 @@ import org.apache.spark.sql.SparkSession
   */
 trait StriderCxtResolver {
   def getSparkSession(confBase: StriderConfBase,
+                      shuffledPartitions: String = "8",
                       threshold: String = "-1"): SparkSession = {
     val spark = SparkSession.
       builder.
@@ -15,9 +16,9 @@ trait StriderCxtResolver {
 
     spark.sqlContext.setConf("spark.sql.codegen", "false")
     spark.sqlContext.setConf("spark.sql.inMemoryColumnarStorage.compressed", "true")
-    spark.sqlContext.setConf("spark.sql.autoBroadcastJoinThreshold", threshold)
     spark.sqlContext.setConf("spark.sql.tungsten.enabled", "true")
-    spark.sqlContext.setConf("spark.sql.shuffle.partitions", "8")
+    spark.sqlContext.setConf("spark.sql.shuffle.partitions", shuffledPartitions)
+    spark.sqlContext.setConf("spark.sql.autoBroadcastJoinThreshold", threshold)
 
     spark
   }

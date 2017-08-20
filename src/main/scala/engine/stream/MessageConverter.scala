@@ -45,8 +45,18 @@ object MessageConverter {
     }
   }
 
-
   def RDFTripleToDF(sparkSession: SparkSession,
+                    rdd: RDD[RDFTriple]): DataFrame = {
+    import sparkSession.implicits._
+
+    rdd.toDF(
+      LabelBase.SUBJECT_COLUMN_NAME,
+      LabelBase.PREDICATE_COLUMN_NAME,
+      LabelBase.OBJECT_COLUMN_NAME
+    ).persist(StorageLevel.MEMORY_ONLY)
+  }
+
+  def RDFTriplePairToDF(sparkSession: SparkSession,
                     rdd: RDD[(String, RDFTriple)]): DataFrame = {
     import sparkSession.implicits._
 
@@ -56,16 +66,5 @@ object MessageConverter {
         LabelBase.PREDICATE_COLUMN_NAME,
         LabelBase.OBJECT_COLUMN_NAME
       ).persist(StorageLevel.MEMORY_ONLY)
-  }
-
-  def RDFTriplePairToDF(sparkSession: SparkSession,
-                    rdd: RDD[RDFTriple]): DataFrame = {
-    import sparkSession.implicits._
-
-    rdd.toDF(
-      LabelBase.SUBJECT_COLUMN_NAME,
-      LabelBase.PREDICATE_COLUMN_NAME,
-      LabelBase.OBJECT_COLUMN_NAME
-    ).persist(StorageLevel.MEMORY_ONLY)
   }
 }

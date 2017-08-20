@@ -1,5 +1,6 @@
 package engine.core.sparql
 
+import engine.core.label.LiteMatConfLabels
 import engine.core.sparql.reasoning.LiteMatCtxBuilder
 import org.apache.jena.query.{Query, QueryFactory}
 import org.apache.log4j.LogManager
@@ -67,11 +68,20 @@ class StriderQueryFactory(queryStr: String,
 
 object StriderQueryFactory {
   def apply(queryStr: String,
-            reasoningEnabled: Boolean = false): StriderQueryFactory =
-    new StriderQueryFactory(queryStr, reasoningEnabled)
+            reasoningEnabled: Boolean = false): StriderQueryFactory = {
 
-  def apply(queryStr: String): StriderQueryFactory =
+    if (reasoningEnabled) {
+      new StriderQueryFactory(queryStr, reasoningEnabled).
+        setLiteMatArgs("litemat.dct.concepts", LiteMatConfLabels.CPT_DCT_PATH).
+        setLiteMatArgs("litemat.dct.properties", LiteMatConfLabels.PROP_DCT_PATH).
+        setLiteMatArgs("litemat.dct.individuals", LiteMatConfLabels.IND_DCT_PATH)
+    }
+    else new StriderQueryFactory(queryStr, reasoningEnabled)
+  }
+
+  def apply(queryStr: String): StriderQueryFactory = {
     new StriderQueryFactory(queryStr)
+  }
 
 }
 

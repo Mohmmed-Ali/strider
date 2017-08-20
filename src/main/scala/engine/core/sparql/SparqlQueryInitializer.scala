@@ -8,16 +8,18 @@ import scala.io.Source
   * Created by xiangnanren on 07/07/16.
   */
 trait QueryInitializer {
-  def initializeQueryStr(queryId: String): String
+  def readQueryString(queryStr: String): String
 }
 
 class QueryReader extends QueryInitializer{
 
-  override def initializeQueryStr(path: String): String = {
+  def readQueryViaFile(path: String): String = {
     val in = classOf[QueryInitializer].getResourceAsStream(path)
     val queryStr = Source.fromInputStream(in, "utf-8").getLines().mkString
     queryStr
   }
+
+  override def readQueryString(queryStr: String): String = queryStr
 }
 
 
@@ -155,7 +157,7 @@ object NonLiteMatQueryProcessor {
 
 object SparqlQueryInitializer extends QueryInitializer {
 
-  override def initializeQueryStr(queryId: String = "eval_0"): String = queryId match {
+  override def readQueryString(queryId: String = "eval_0"): String = queryId match {
 
     ////////////////////////
     // Eval Queries
@@ -307,7 +309,6 @@ object SparqlQueryInitializer extends QueryInitializer {
         " ?c4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/wordnet_region>;" +
         "     <http://test/locatedIn> ?z. " +
         " } "
-
 
     case "test_5" =>
       "select ?a " +
@@ -560,8 +561,6 @@ object SparqlQueryInitializer extends QueryInitializer {
         "      rdf:type lubm:Student ;  " +
         "      lubm:name ?ns .  } " +
         "}"
-
-
 
   }
 }
