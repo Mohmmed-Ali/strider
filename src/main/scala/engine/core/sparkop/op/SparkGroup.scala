@@ -20,9 +20,9 @@ class SparkGroup(val opGroup: OpGroup,
     toList.
     map(x => x.getVarName)
 
-  val agg = opGroup.getAggregators.toList.iterator.next()
-  val transformedExpr = try {
-    (new SparkExprTransformer).transform(agg)
+  val aggs = opGroup.getAggregators.toList
+  val transformedAggs = try {
+    aggs.map(agg => (new SparkExprTransformer).transform(agg))
   } catch {
     case ex: Exception =>
       throw NullExprException("The expression in " + this.opName + " is null")

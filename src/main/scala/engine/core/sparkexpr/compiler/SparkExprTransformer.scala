@@ -1,6 +1,7 @@
 package engine.core.sparkexpr.compiler
 
 import engine.core.sparkexpr.expr._
+import engine.core.sparkexpr.expr.aggregator.SparkExprAggregator
 import engine.core.sparkop.compiler.SparkOpTransformer
 import org.apache.jena.sparql.expr._
 import org.apache.log4j.LogManager
@@ -23,22 +24,14 @@ class SparkExprTransformer extends ExprVisitor {
     stack.pop()
   }
 
-  def visit(func: ExprFunction): Unit = {
-    func match {
-      case f: ExprFunction0 => visit(f)
-
-      case f: ExprFunction1 => visit(f)
-
-      case f: ExprFunction2 => visit(f)
-
-      case f: ExprFunction3 => visit(f)
-
-      case f: ExprFunctionN => visit(f)
-
-      case f: ExprFunctionOp => visit(f)
+  def visit(func: ExprFunction): Unit = func match {
+    case f: ExprFunction0 => visit(f)
+    case f: ExprFunction1 => visit(f)
+    case f: ExprFunction2 => visit(f)
+    case f: ExprFunction3 => visit(f)
+    case f: ExprFunctionN => visit(f)
+    case f: ExprFunctionOp => visit(f)
     }
-  }
-
 
   override def visit(func: ExprFunction0): Unit = {
     throw new UnsupportedOperationException("ExprFunction0 not supported yet.")
@@ -120,6 +113,8 @@ class SparkExprTransformer extends ExprVisitor {
     log.debug(s"exprID: $exprID, eAgg: $eAgg")
 
     println("visit: " + eAgg)
+
+    stack.push(SparkExprAggregator(eAgg))
   }
 
   override def finishVisit(): Unit = {}

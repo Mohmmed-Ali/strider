@@ -1,6 +1,7 @@
 package engine.core.sparkexpr.compiler
 
 import engine.core.sparkexpr.expr._
+import engine.core.sparkexpr.expr.aggregator.SparkExprAggregator
 
 /**
   * Created by xiangnanren on 03/05/2017.
@@ -8,6 +9,8 @@ import engine.core.sparkexpr.expr._
 trait SparkExprVisitor {
 
   def visit(sparkAdd: SparkAdd): Unit = {}
+
+  def visit(sparkExprAggregator: SparkExprAggregator): Unit = {}
 
   def visit(sparkAnd: SparkAnd): Unit = {}
 

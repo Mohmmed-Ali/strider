@@ -1,6 +1,7 @@
 package engine.core.sparkexpr.compiler
 
 import engine.core.sparkexpr.expr._
+import engine.core.sparkexpr.expr.aggregator.SparkExprAggregator
 
 /**
   * Created by xiangnanren on 24/05/2017.
@@ -21,6 +22,10 @@ class SparkExprWalker(val visitor: SparkExprVisitor)
     if (Option(expr.leftExpr).nonEmpty) expr.leftExpr.visit(this)
     if (Option(expr.rightExpr).nonEmpty) expr.rightExpr.visit(this)
 
+    expr.visit(visitor)
+  }
+
+  override def visit(expr: SparkExprAggregator): Unit = {
     expr.visit(visitor)
   }
 

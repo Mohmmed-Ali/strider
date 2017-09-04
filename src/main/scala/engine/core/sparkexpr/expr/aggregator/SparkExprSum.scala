@@ -18,7 +18,8 @@ import org.apache.spark.sql.types._
   * Note that the chosen initial value for Max aggregator is 0.0
   */
 object SparkExprSum extends UserDefinedAggregateFunction {
-  override def inputSchema: StructType = StructType(StructField("inputColumn", StringType) :: Nil)
+  override def inputSchema: StructType =
+    StructType(StructField("inputColumn", StringType) :: Nil)
 
   override def bufferSchema: StructType = {
     StructType(StructField("spark-agg-sum", DoubleType) :: Nil)

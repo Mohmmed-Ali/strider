@@ -10,7 +10,8 @@ class SparkExtend(val opExtend: OpExtend,
                   subOp: SparkOp) extends SparkOp1(subOp: SparkOp) {
   override def execute(opName: String, child: SparkOpRes): SparkOpRes = ???
 
-  override def visit(sparkOpVisitor: SparkOpVisitor): Unit = ???
+  override def visit(sparkOpVisitor: SparkOpVisitor): Unit = sparkOpVisitor.visit(this)
+
 }
 
 object SparkExtend {

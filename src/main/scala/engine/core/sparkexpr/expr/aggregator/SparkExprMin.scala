@@ -21,7 +21,8 @@ import org.apache.spark.sql.types._
   *
   */
 object SparkExprMin extends UserDefinedAggregateFunction {
-  override def inputSchema: StructType = StructType(StructField("inputColumn", StringType) :: Nil)
+  override def inputSchema: StructType =
+    StructType(StructField("inputColumn", StringType) :: Nil)
 
   override def bufferSchema: StructType = {
     StructType(StructField("spark-agg-min", DoubleType) :: Nil)

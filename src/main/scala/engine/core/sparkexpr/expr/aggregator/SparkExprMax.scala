@@ -19,7 +19,8 @@ import org.apache.spark.sql.types._
   * Double.MinValue, i.e., negative infinity (-1.7976931348623157E308)
   */
 object SparkExprMax extends UserDefinedAggregateFunction {
-  override def inputSchema: StructType = StructType(StructField("inputColumn", StringType) :: Nil)
+  override def inputSchema: StructType =
+    StructType(StructField("inputColumn", StringType) :: Nil)
 
   override def bufferSchema: StructType = {
     StructType(StructField("spark-agg-max", DoubleType) :: Nil)

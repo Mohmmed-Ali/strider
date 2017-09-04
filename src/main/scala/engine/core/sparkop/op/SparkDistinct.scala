@@ -23,9 +23,8 @@ class SparkDistinct(val opDistinct: OpDistinct,
     SparkOpRes(child.result.distinct())
   }
 
-  override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {
-    sparkOpVisitor.visit(this)
-  }
+  override def visit(sparkOpVisitor: SparkOpVisitor): Unit = sparkOpVisitor.visit(this)
+
 }
 
 object SparkDistinct {

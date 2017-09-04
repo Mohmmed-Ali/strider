@@ -1,6 +1,7 @@
 package engine.core.sparkexpr.compiler
 
 import engine.core.sparkexpr.expr._
+import engine.core.sparkexpr.expr.aggregator.SparkExprAggregator
 
 /**
   * Created by xiangnanren on 24/05/2017.
@@ -9,6 +10,10 @@ abstract class SparkExprVisitorByType extends SparkExprVisitor {
 
   override def visit(sparkAnd: SparkAnd): Unit = {
     visit2(sparkAnd)
+  }
+
+  override def visit(sparkExprAggregator: SparkExprAggregator): Unit = {
+    visit(sparkExprAggregator)
   }
 
   override def visit(sparkBound: SparkBound): Unit = {
