@@ -69,4 +69,28 @@ object ExprHelper {
       "The input literal is not supported yet " +
         "for the computation of expression. ")
   }
+
+
+  def getNumValueAsString(arg: String): String = {
+    if (arg.endsWith(decimalTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get
+    }
+    else if (arg.endsWith(doubleTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get
+    }
+    else if (arg.endsWith(floatTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get
+    }
+    else if (arg.endsWith(integerTypeSuffix)) {
+      valueFieldPattern.findFirstIn(arg).get
+    }
+    else arg
+  }
+
+  def isNumValue(arg: String): Boolean =
+    arg.endsWith(decimalTypeSuffix) ||
+      arg.endsWith(doubleTypeSuffix) ||
+      arg.endsWith(floatTypeSuffix) ||
+      arg.endsWith(integerTypeSuffix) ||
+      arg.forall(c => c.isDigit)
 }

@@ -108,7 +108,6 @@ class SparkExprTransformer extends ExprVisitor {
     stack.push(SparkNodeValue(nv))
   }
 
-
   override def visit(exprVar: ExprVar): Unit = {
     exprID += 1
     log.debug(s"exprID: $exprID, exprVar: ${exprVar.getVarName}")
@@ -120,7 +119,7 @@ class SparkExprTransformer extends ExprVisitor {
     exprID += 1
     log.debug(s"exprID: $exprID, eAgg: $eAgg")
 
-    println("visit: ")
+    println("visit: " + eAgg)
   }
 
   override def finishVisit(): Unit = {}

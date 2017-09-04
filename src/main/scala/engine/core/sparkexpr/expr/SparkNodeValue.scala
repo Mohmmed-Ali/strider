@@ -14,15 +14,10 @@ class SparkNodeValue(@transient val nv: NodeValue) extends SparkExpr {
   def getValueMapping: Any = {
     dataTypeURI match {
       case ExprHelper.boolTypeURI => nv.isBoolean
-
       case ExprHelper.decimalTypeURI => nv.getDecimal
-
       case ExprHelper.doubleTypeURI => nv.getDouble
-
       case ExprHelper.floatTypeURI => nv.getFloat
-
       case ExprHelper.integerTypeURI => nv.getInteger
-
       case ExprHelper.stringTypeURI => nv.getString
     }
   }
