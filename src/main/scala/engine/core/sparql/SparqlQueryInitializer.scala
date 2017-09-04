@@ -407,6 +407,13 @@ object SparqlQueryInitializer extends QueryInitializer {
         "}" +
         "group by ?s "
 
+    case "test_agg_2" =>
+        "select ((?o1 - ?o2) as ?measurement ) " +
+        " { " +
+        " ?s <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o1 ;  " +
+        "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o2 . " +
+        "}"
+
     //////////////////////////////////////////////////
     // Test Queries group 3 LiteMat_Concept_Properties
     //////////////////////////////////////////////////

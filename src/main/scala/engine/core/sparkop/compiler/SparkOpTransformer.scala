@@ -54,6 +54,17 @@ class SparkOpTransformer extends OpVisitorBase with Serializable {
     stack.push(sparkDistinct)
   }
 
+  override def visit(opExtend: OpExtend): Unit = {
+  val subOp: SparkOp = stack.pop()
+
+  opID += 1
+  log.debug(s"opID: $opID, opExtend: $opExtend")
+
+  val sparkExtend = SparkExtend(opExtend, subOp)
+  sparkExtend.opName = SparkOpLabels.EXTEND_NAME + opID
+  stack.push(sparkExtend)
+  }
+
   override def visit(opFilter: OpFilter): Unit = {
     val subOp: SparkOp = stack.pop()
 

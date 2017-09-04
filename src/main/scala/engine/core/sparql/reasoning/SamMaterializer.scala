@@ -9,6 +9,10 @@ import scala.io.Source
 /**
   * Created by xiangnanren on 19/08/2017.
   */
+
+/**
+  * The objet contains the utils for
+  */
 object SamMaterializer {
 
   def materializeRDDPair(matDct: Map[String, Array[String]] ,

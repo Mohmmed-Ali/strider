@@ -56,9 +56,8 @@ case class LiteMatBGPNode(bgpNode: BGPNode) extends LiteMatBGPGraph {
                                   boundConceptDct: Map[String, (String, String)],
                                   boundIndividualDct: Map[String, String] =
                                   Map.empty[String, String]): Boolean = {
-    !bgpNode.triple.getSubject.isVariable && (
-      boundConceptDct.get(quoteString(bgpNode.triple.getSubject.toString)).nonEmpty ||
-        boundIndividualDct.get(quoteString(bgpNode.triple.getSubject.toString)).nonEmpty)
+    !bgpNode.triple.getSubject.isVariable &&
+      boundIndividualDct.get(quoteString(bgpNode.triple.getSubject.toString)).nonEmpty
   }
 
   /**
@@ -215,12 +214,9 @@ case class LiteMatBGPNode(bgpNode: BGPNode) extends LiteMatBGPGraph {
 
     /**
       * Construct the equivalent filter function on Subject
+      * Note that subject can not be neither concept nor property .
       */
     if (epMapping.head._1 != LiteMatBGPNode.NOT_REWRITABLE) {
-      if (epMapping.head._1 == LiteMatBGPNode.CONCEPTS_TYPE)
-        filters.append((
-          LabelBase.SUBJECT_COLUMN_NAME,
-          conceptsLMUdf(epMapping.head._2, epMapping.head._3)))
       if (epMapping.head._1 == LiteMatBGPNode.INDIVIDUALS_TYPE)
         filters.append((
           LabelBase.SUBJECT_COLUMN_NAME,

@@ -9,6 +9,7 @@ object SparkOpLabels {
   val TRIPLE_NAME = "TRIPLE_"
   val BGP_NAME = "BGP_"
   val DISTINCT_NAME = "DISTINCT_"
+  val EXTEND_NAME = "EXTEND_"
   val FILTER_NAME = "FILTER_"
   val GROUP_NAME = "GROUP_"
   val JOIN_NAME = "JOIN_"

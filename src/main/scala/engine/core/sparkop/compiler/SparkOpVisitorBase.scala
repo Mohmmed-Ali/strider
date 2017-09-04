@@ -25,6 +25,12 @@ class SparkOpVisitorBase extends SparkOpVisitor with Serializable {
   }
 
   @throws(classOf[UnsupportedOperationException])
+  override def visit(sparkExtend: SparkExtend): Unit = {
+    log.error("EXTEND is not supported")
+    throw new UnsupportedOperationException("EXTEND is not supported.")
+  }
+
+  @throws(classOf[UnsupportedOperationException])
   override def visit(sparkFilter: SparkFilter): Unit = {
     log.error("FILTER is not supported.")
     throw new UnsupportedOperationException("FILTER is not supported.")
@@ -55,16 +61,17 @@ class SparkOpVisitorBase extends SparkOpVisitor with Serializable {
   }
 
   @throws(classOf[UnsupportedOperationException])
+  override def visit(sqlProject: SparkProjection): Unit = {
+    log.error("PROJECT is not supported.")
+    throw new UnsupportedOperationException("PROJECT is not supported.")
+  }
+
+  @throws(classOf[UnsupportedOperationException])
   override def visit(sparkUnion: SparkUnion): Unit = {
     log.error("UNION is not supported yet")
     throw new UnsupportedOperationException("UNION is not supported.")
   }
 
-  @throws(classOf[UnsupportedOperationException])
-  override def visit(sqlProject: SparkProjection): Unit = {
-    log.error("PROJECT is not supported.")
-    throw new UnsupportedOperationException("PROJECT is not supported.")
-  }
 }
 
 object SparkOpVisitorBase {

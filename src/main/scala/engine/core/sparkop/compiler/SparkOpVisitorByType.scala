@@ -19,6 +19,10 @@ abstract class SparkOpVisitorByType extends SparkOpVisitor {
     visit1(sparkDistinct)
   }
 
+  override final def visit(sparkExtend: SparkExtend): Unit = {
+    visit1(sparkExtend)
+  }
+
   override final def visit(sparkFilter: SparkFilter): Unit = {
     visit1(sparkFilter)
   }

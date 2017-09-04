@@ -9,6 +9,7 @@ import org.apache.log4j.LogManager
   * Created by xiangnanren on 25/11/2016.
   */
 class StriderQueryFactory(queryStr: String,
+                          queryId: String = "",
                           reasoningEnabled: Boolean = false)
   extends LiteMatCtxBuilder with Serializable  {
   @transient
@@ -52,12 +53,18 @@ class StriderQueryFactory(queryStr: String,
   }
 
   def createQuery: SparqlQuery = query match {
-    case _query if _query.isSelectType && !this.reasoningEnabled => new SelectQuery(_query)
-    case _query if _query.isConstructType && !this.reasoningEnabled => new ConstructQuery(_query)
-    case _query if _query.isAskType && !this.reasoningEnabled => new AskQuery(_query)
-    case _query if _query.isSelectType && this.reasoningEnabled => new LiteMatSelectQuery(_query)
-    case _query if _query.isConstructType && this.reasoningEnabled => new LiteMatConstructQuery(_query)
-    case _query if _query.isAskType && this.reasoningEnabled => new LiteMatAskQuery(_query)
+    case _query if _query.isSelectType && !this.reasoningEnabled =>
+      new SelectQuery(_query, queryId)
+    case _query if _query.isConstructType && !this.reasoningEnabled =>
+      new ConstructQuery(_query, queryId)
+    case _query if _query.isAskType && !this.reasoningEnabled =>
+      new AskQuery(_query, queryId)
+    case _query if _query.isSelectType && this.reasoningEnabled =>
+      new LiteMatSelectQuery(_query, queryId)
+    case _query if _query.isConstructType && this.reasoningEnabled =>
+      new LiteMatConstructQuery(_query, queryId)
+    case _query if _query.isAskType && this.reasoningEnabled =>
+      new LiteMatAskQuery(_query)
     case _ => throw InvalidQueryException("" +
       "Invalid query, input query should be one of the following types: " +
       "select, construct, or ask.")
@@ -68,15 +75,16 @@ class StriderQueryFactory(queryStr: String,
 
 object StriderQueryFactory {
   def apply(queryStr: String,
+            queryId: String = "",
             reasoningEnabled: Boolean = false): StriderQueryFactory = {
 
     if (reasoningEnabled) {
-      new StriderQueryFactory(queryStr, reasoningEnabled).
+      new StriderQueryFactory(queryStr, queryId, reasoningEnabled).
         setLiteMatArgs("litemat.dct.concepts", LiteMatConfLabels.CPT_DCT_PATH).
         setLiteMatArgs("litemat.dct.properties", LiteMatConfLabels.PROP_DCT_PATH).
         setLiteMatArgs("litemat.dct.individuals", LiteMatConfLabels.IND_DCT_PATH)
     }
-    else new StriderQueryFactory(queryStr, reasoningEnabled)
+    else new StriderQueryFactory(queryStr, queryId, reasoningEnabled)
   }
 
   def apply(queryStr: String): StriderQueryFactory = {

@@ -12,6 +12,8 @@ trait SparkOpVisitor {
 
   def visit(sparkFilter: SparkFilter): Unit = {}
 
+  def visit(sparkExtend: SparkExtend): Unit = {}
+
   def visit(sparkGroup: SparkGroup): Unit = {}
 
   def visit(sparkJoin: SparkJoin): Unit = {}

@@ -40,10 +40,12 @@ class StriderCtxHandler(striderConfig: ParsedStriderQuery)
     val taskNum = registerConfig.size
 
     val pool = registerConfig.get.map { m =>
-      val sparqlQuery = StriderQueryFactory(
-        m(SPARQL.normalized),
-        m(REASONING.normalized).toBoolean).
-        createQuery
+      val sparqlQuery =
+        StriderQueryFactory(
+          m(SPARQL.normalized),
+          m(QUERYID.normalized),
+          m(REASONING.normalized).toBoolean).
+          createQuery
 
       sparqlQuery -> new QueryExecutor(sparqlQuery)
     }.toParArray

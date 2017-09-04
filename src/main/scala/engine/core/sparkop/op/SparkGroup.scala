@@ -25,9 +25,8 @@ class SparkGroup(val opGroup: OpGroup,
     (new SparkExprTransformer).transform(agg)
   } catch {
     case ex: Exception =>
-      throw NullExprException("The expression in" + this.opName + "is null")
+      throw NullExprException("The expression in " + this.opName + " is null")
   }
-
 
 
 

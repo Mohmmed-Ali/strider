@@ -17,6 +17,7 @@ class LiteMatBGP(opBGP: OpBGP,
   def computeLiteMatBGP(inputDF: DataFrame): DataFrame = {
     val dfMap = computeDFMapViaLiteMat(
       liteMatEPHandler.liteMatBGPNodeMapping, inputDF)
+
     computeBGP(dfMap, inputDF)
   }
 

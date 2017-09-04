@@ -1,6 +1,8 @@
 package engine.stream
 
 import engine.core.label.LabelBase
+import engine.core.sparql.SparqlQuery
+import engine.core.sparql.reasoning.LiteMatEncoder
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.storage.StorageLevel
@@ -49,22 +51,59 @@ object MessageConverter {
                     rdd: RDD[RDFTriple]): DataFrame = {
     import sparkSession.implicits._
 
-    rdd.toDF(
+    val df = rdd.toDF(
       LabelBase.SUBJECT_COLUMN_NAME,
       LabelBase.PREDICATE_COLUMN_NAME,
       LabelBase.OBJECT_COLUMN_NAME
     ).persist(StorageLevel.MEMORY_ONLY)
+
+    df.take(1)
+    df
   }
 
-  def RDFTriplePairToDF(sparkSession: SparkSession,
-                    rdd: RDD[(String, RDFTriple)]): DataFrame = {
+  def RDFTripleToDF(sparkSession: SparkSession,
+                    rdd: RDD[(String, RDFTriple)],
+                    sparqlQuery: SparqlQuery,
+                    liteMatEncoder: LiteMatEncoder
+                    ): DataFrame = {
     import sparkSession.implicits._
 
-    rdd.mapPartitions(x => for (i <- x) yield i._2).
+    val df = if (sparqlQuery.reasoningEnabled) {
+      liteMatEncoder.encodeRDFTripleRDDPair(rdd).
+        toDF(
+          LabelBase.SUBJECT_COLUMN_NAME,
+          LabelBase.PREDICATE_COLUMN_NAME,
+          LabelBase.OBJECT_COLUMN_NAME
+        ).persist(StorageLevel.MEMORY_ONLY)
+    }
+    else rdd.mapPartitions(x => for (i <- x) yield i._2).
       toDF(
         LabelBase.SUBJECT_COLUMN_NAME,
         LabelBase.PREDICATE_COLUMN_NAME,
         LabelBase.OBJECT_COLUMN_NAME
       ).persist(StorageLevel.MEMORY_ONLY)
+
+//    df.take(1)
+    df
   }
+
+
+
+  def RDFTriplePairToDF(sparkSession: SparkSession,
+                    rdd: RDD[(String, RDFTriple)]): DataFrame = {
+    import sparkSession.implicits._
+
+    val df = rdd.mapPartitions(x => for (i <- x) yield i._2).
+      toDF(
+        LabelBase.SUBJECT_COLUMN_NAME,
+        LabelBase.PREDICATE_COLUMN_NAME,
+        LabelBase.OBJECT_COLUMN_NAME
+      ).persist(StorageLevel.MEMORY_ONLY)
+
+//    df.take(1)
+    df
+  }
+
+
+
 }
