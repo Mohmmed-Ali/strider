@@ -6,7 +6,7 @@ import engine.core.sparkexpr.expr.aggregator.SparkExprAggregator
 /**
   * Created by xiangnanren on 24/05/2017.
   */
-class SparkExprWalker(val visitor: SparkExprVisitor)
+private[compiler] class SparkExprWalker(val visitor: SparkExprVisitor)
   extends SparkExprVisitorByType {
 
   def walkBottomUp(expr: SparkExpr): Unit = {
@@ -39,7 +39,7 @@ class SparkExprWalker(val visitor: SparkExprVisitor)
 }
 
 
-object SparkExprWalker {
+private[compiler] object SparkExprWalker {
   def apply(visitor: SparkExprVisitor): SparkExprWalker =
     new SparkExprWalker(visitor)
 }

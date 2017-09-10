@@ -19,8 +19,8 @@ class BushyEPGenerator[T <: ExecutionPlanType](epType: T)
     * This method will be meaningful if and only if the number
     * of triple patterns in the BGP is >= 2.
     *
-    * The execution plan is basically a binary tree, every leaf nodes
-    * present an unary operator, i.e. the projection on the triple pattern,
+    * The execution plan is basically a binary tree, every leaf node
+    * presents an unary operator, i.e. the projection on the triple pattern,
     * the intermediate nodes present the binary operator, i.e. join between
     * two triple patterns (or group of triple patterns).
     *

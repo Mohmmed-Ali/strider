@@ -13,7 +13,7 @@ import scala.collection.mutable
 /**
   * Created by xiangnanren on 07/07/16.
   */
-class SparkOpTransformer extends OpVisitorBase with Serializable {
+class SparkOpTransformer extends OpVisitorBase {
   @transient
   protected val log = LogManager.
     getLogger(SparkOpTransformer.getClass)

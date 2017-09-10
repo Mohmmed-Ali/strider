@@ -6,10 +6,11 @@ import org.apache.jena.sparql.expr.E_LogicalOr
 /**
   * Created by xiangnanren on 31/05/2017.
   */
-class SparkOr(@transient val or: E_LogicalOr,
-              leftExpr: SparkExpr,
-              rightExpr: SparkExpr) extends
-  SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
+private[sparkexpr] class SparkOr
+(@transient val or: E_LogicalOr,
+ leftExpr: SparkExpr,
+ rightExpr: SparkExpr)
+  extends SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
   override def execute(exprName: String,
                        leftChild: Any,
                        rightChild: Any): Boolean =
@@ -23,7 +24,7 @@ class SparkOr(@transient val or: E_LogicalOr,
   }
 }
 
-object SparkOr {
+private[sparkexpr] object SparkOr {
   def apply(@transient or: E_LogicalOr,
             leftExpr: SparkExpr,
             rightExpr: SparkExpr): SparkOr = new SparkOr(or, leftExpr, rightExpr)

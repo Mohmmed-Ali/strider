@@ -25,7 +25,7 @@ import scala.collection.JavaConversions._
   *
   */
 abstract class SparqlQuery(val query: Query,
-                           val id: String) extends java.io.Serializable {
+                           val id: String) {
   private val algebraTransformer: SparkOpTransformer = new SparkOpTransformer()
   protected val opRoot: Op = Algebra.compile(query)
   val sparkOpRoot: SparkOp = algebraTransformer.transform(opRoot)

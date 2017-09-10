@@ -8,8 +8,10 @@ import org.apache.spark.sql.types.{DoubleType, LongType, _}
 /**
   * Created by xiangnanren on 04/09/2017.
   */
-object SparkExprAvg extends UserDefinedAggregateFunction {
-  override def inputSchema: StructType = StructType(StructField("inputColumn", StringType) :: Nil)
+private[sparkexpr] object SparkExprAvg
+  extends UserDefinedAggregateFunction {
+  override def inputSchema: StructType =
+    StructType(StructField("inputColumn", StringType) :: Nil)
 
   override def bufferSchema: StructType = {
     StructType(

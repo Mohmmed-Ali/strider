@@ -12,7 +12,7 @@ import scala.collection.JavaConversions._
   * 07/16.
   */
 class OriginalOpWalker(val visitor: OpVisitor)
-  extends OpVisitorByType with Serializable {
+  extends OpVisitorByType {
   @transient
   private[this] lazy val log = LogManager.
     getLogger(OriginalOpWalker.getClass)

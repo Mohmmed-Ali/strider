@@ -20,7 +20,8 @@ import org.apache.spark.sql.types._
   *
   *
   */
-object SparkExprMin extends UserDefinedAggregateFunction {
+private[sparkexpr] object SparkExprMin
+  extends UserDefinedAggregateFunction {
   override def inputSchema: StructType =
     StructType(StructField("inputColumn", StringType) :: Nil)
 

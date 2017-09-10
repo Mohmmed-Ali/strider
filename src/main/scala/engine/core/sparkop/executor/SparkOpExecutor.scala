@@ -30,6 +30,13 @@ class SparkOpExecutor(inputDF: DataFrame) extends
       stack.pop()))
   }
 
+  override def visit(sparkExtend: SparkExtend): Unit = {
+    stack.push(sparkExtend.execute(
+      sparkExtend.opName, stack.pop()
+    )
+    )
+  }
+
   override def visit(sparkFilter: SparkFilter): Unit = {
     stack.push(sparkFilter.execute(
       sparkFilter.opName,

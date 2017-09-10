@@ -14,13 +14,20 @@ import scala.collection.JavaConversions._
   */
 class SparkGroup(val opGroup: OpGroup,
                  subOp: SparkOp) extends SparkOp1(subOp: SparkOp) {
-  val groupVars = opGroup.
-    getGroupVars.
-    getVars.
-    toList.
-    map(x => x.getVarName)
+  /*
+     The key variables for group operator
+   */
+  val groupVars = opGroup.getGroupVars.getVars.map(x => x.getVarName)
 
+  /*
+     The list of aggregators contained in current group operator
+   */
   val aggs = opGroup.getAggregators.toList
+  println(s"check in group  ${aggs(0).getExpr}")
+
+  /*
+     Transformed expressions of aggregation
+   */
   val transformedAggs = try {
     aggs.map(agg => (new SparkExprTransformer).transform(agg))
   } catch {
@@ -31,6 +38,12 @@ class SparkGroup(val opGroup: OpGroup,
 
 
   def computeGroup(inputDF: DataFrame): DataFrame = {
+    val groupedDF = if (groupVars.length == 1)
+      inputDF.groupBy(groupVars.head)
+    else inputDF.groupBy(groupVars.head, groupVars.tail:_*)
+
+//    df.agg(MyMax(df.col("age")).as("max_age")).show(20,false:Boolean)
+
     null
   }
 

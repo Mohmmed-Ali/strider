@@ -12,7 +12,8 @@ import org.apache.spark.sql.types._
   * The Count aggregator bases on the type Long for computation
   *
   */
-object SparkExprCount extends UserDefinedAggregateFunction {
+private[sparkexpr] object SparkExprCount
+  extends UserDefinedAggregateFunction {
   override def inputSchema: StructType = StructType(StructField("inputColumn", StringType) :: Nil)
 
   override def bufferSchema: StructType = {

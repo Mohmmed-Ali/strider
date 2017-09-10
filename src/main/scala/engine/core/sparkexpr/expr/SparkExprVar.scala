@@ -6,7 +6,9 @@ import org.apache.jena.sparql.expr.ExprVar
 /**
   * Created by xiangnanren on 05/05/2017.
   */
-class SparkExprVar(@transient val expr: ExprVar) extends SparkExpr {
+private[sparkexpr] class SparkExprVar(@transient val expr: ExprVar)
+  extends SparkExpr {
+  val varName = expr.getVarName
   val valueFieldPattern = "\".*?\"".r
 
   def execute(arg: String): Any = {
@@ -20,6 +22,6 @@ class SparkExprVar(@transient val expr: ExprVar) extends SparkExpr {
   }
 }
 
-object SparkExprVar {
+private[sparkexpr] object SparkExprVar {
   def apply(@transient expr: ExprVar): SparkExprVar = new SparkExprVar(expr)
 }

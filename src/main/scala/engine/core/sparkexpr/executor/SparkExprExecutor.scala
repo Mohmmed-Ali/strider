@@ -2,6 +2,7 @@ package engine.core.sparkexpr.executor
 
 import engine.core.sparkexpr.compiler.{SparkExprVisitor, SparkExprWalker}
 import engine.core.sparkexpr.expr._
+import engine.core.sparkexpr.expr.aggregator.SparkExprAggregator
 
 /**
   * Created by xiangnanren on 19/05/2017.
@@ -9,11 +10,14 @@ import engine.core.sparkexpr.expr._
 
 /**
   *
-  * @param arg : Argument of a given DataFrame.
-  *            "arg" is used as the input for the user defined function.
+  * @param args : Argument of a given DataFrame.
+  *            "args" is used as the input for the user defined function.
   */
-class SparkExprExecutor(arg: String) extends SparkExprVisitor {
+class SparkExprExecutor(orderedColumnNames: Vector[String],
+                        args: String*) extends SparkExprVisitor {
   private[this] val stack = new scala.collection.mutable.Stack[Any]
+
+  def this(args: String*) = this(Vector.empty[String], args:_*)
 
   /**
     * This method is nested in the user defined function and
@@ -24,6 +28,19 @@ class SparkExprExecutor(arg: String) extends SparkExprVisitor {
   def execute(expr: SparkExpr): Any = {
     SparkExprWalker(this).walkBottomUp(expr)
     stack.pop()
+  }
+
+  override def visit(sparkAdd: SparkAdd): Unit = {
+    val rightChild = stack.pop()
+    val leftChild = stack.pop()
+
+    stack.push(
+      sparkAdd.
+        execute(sparkAdd.exprName, leftChild, rightChild))
+  }
+
+  override def visit(sparkExprAggregator: SparkExprAggregator): Unit = {
+    ???
   }
 
   override def visit(sparkAnd: SparkAnd): Unit = {
@@ -52,7 +69,10 @@ class SparkExprExecutor(arg: String) extends SparkExprVisitor {
   }
 
   override def visit(sparkExprVar: SparkExprVar): Unit = {
-    stack.push(sparkExprVar.execute(arg))
+
+    val index = orderedColumnNames.indexOf(sparkExprVar.varName)
+    //    println("visit(sparkExprVar: SparkExprVar): " + index)
+    stack.push(sparkExprVar.execute(args(index)))
   }
 
   override def visit(sparkNodeValue: SparkNodeValue): Unit = {
@@ -124,9 +144,20 @@ class SparkExprExecutor(arg: String) extends SparkExprVisitor {
     )
   }
 
+  override def visit(sparkSubtract: SparkSubtract): Unit = {
+    val rightChild = stack.pop()
+    val leftChild = stack.pop()
+
+    stack.push(
+      sparkSubtract.
+        execute(sparkSubtract.exprName, leftChild, rightChild))
+  }
+
 }
 
-
 object SparkExprExecutor {
-  def apply(arg: String): SparkExprExecutor = new SparkExprExecutor(arg)
+  def apply(orderedColumnNames: Vector[String],
+            args: String*): SparkExprExecutor =
+    new SparkExprExecutor(orderedColumnNames, args:_*)
+
 }

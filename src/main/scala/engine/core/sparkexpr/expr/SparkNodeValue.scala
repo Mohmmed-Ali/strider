@@ -6,10 +6,13 @@ import org.apache.jena.sparql.expr.NodeValue
 /**
   * Created by xiangnanren on 05/05/2017.
   */
-class SparkNodeValue(@transient val nv: NodeValue) extends SparkExpr {
+private[sparkexpr] class SparkNodeValue
+(@transient val nv: NodeValue) extends SparkExpr {
   val quotedValue: String = nv.asQuotedString()
   val dataTypeURI: String = nv.getDatatypeURI
   val valueMapping: Any = getValueMapping
+
+  println("NodeValue: " + dataTypeURI)
 
   def getValueMapping: Any = {
     dataTypeURI match {
@@ -27,7 +30,7 @@ class SparkNodeValue(@transient val nv: NodeValue) extends SparkExpr {
   }
 }
 
-object SparkNodeValue {
+private[sparkexpr] object SparkNodeValue {
   def apply(@transient nv: NodeValue): SparkNodeValue = new SparkNodeValue(nv)
 }
 

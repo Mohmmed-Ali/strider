@@ -6,20 +6,26 @@ import org.apache.jena.sparql.expr.E_Add
 /**
   * Created by xiangnanren on 03/05/2017.
   */
-class SparkAdd(val add: E_Add,
-               leftExpr: SparkExpr,
-               rightExpr: SparkExpr) extends
+private[sparkexpr] class SparkAdd(@transient val add: E_Add,
+                                 leftExpr: SparkExpr,
+                                 rightExpr: SparkExpr) extends
   SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
 
 
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
-    println("check")
     sparkExprVisitor.visit(this)
   }
 
+  /**
+    * The computation of addition bases on double type
+    */
   override def execute(exprName: String,
                        leftChild: Any,
-                       rightExpr: Any): Any = ???
+                       rightExpr: Any): Double = {
+    (leftChild, rightExpr) match {
+      case (l: Number, r: Number) => l.doubleValue() + r.doubleValue()
+    }
+  }
 }
 
 

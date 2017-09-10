@@ -6,15 +6,15 @@ import org.apache.jena.sparql.expr.E_GreaterThan
 /**
   * Created by xiangnanren on 03/05/2017.
   */
-class SparkGreaterThan(@transient val expr: E_GreaterThan,
-                       leftExpr: SparkExpr,
-                       rightExpr: SparkExpr) extends
+private[sparkexpr] class SparkGreaterThan(@transient val expr: E_GreaterThan,
+                                          leftExpr: SparkExpr,
+                                          rightExpr: SparkExpr) extends
   SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
 
   override def execute(exprName: String, leftChild: Any, rightExpr: Any): Boolean = {
 
     (leftChild, rightExpr) match {
-      case (l: Number, r: Number) => BigDecimal(l.toString).>(BigDecimal(r.toString))
+      case (l: Number, r: Number) => l.toString.toDouble > r.toString.toDouble
     }
   }
 

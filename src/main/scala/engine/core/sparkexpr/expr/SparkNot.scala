@@ -6,8 +6,9 @@ import org.apache.jena.sparql.expr.E_LogicalNot
 /**
   * Created by xiangnanren on 03/05/2017.
   */
-class SparkNot(@transient val expr: E_LogicalNot,
-               subExpr: SparkExpr) extends SparkExpr1[SparkExpr](subExpr) {
+private[sparkexpr] class SparkNot
+(@transient val expr: E_LogicalNot,
+ subExpr: SparkExpr) extends SparkExpr1[SparkExpr](subExpr) {
 
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
     sparkExprVisitor.visit(this)
@@ -19,7 +20,7 @@ class SparkNot(@transient val expr: E_LogicalNot,
     }
 }
 
-object SparkNot {
+private[sparkexpr] object SparkNot {
   def apply(@transient expr: E_LogicalNot,
             subExpr: SparkExpr): SparkNot = new SparkNot(expr, subExpr)
 }

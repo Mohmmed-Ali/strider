@@ -7,7 +7,7 @@ import org.apache.log4j.LogManager
 /**
   * Created by xiangnanren on 07/07/16.
   */
-class SparkOpVisitorBase extends SparkOpVisitor with Serializable {
+class SparkOpVisitorBase extends SparkOpVisitor {
 
   @transient
   lazy val log = LogManager.getLogger(SparkOpVisitorBase.getClass)

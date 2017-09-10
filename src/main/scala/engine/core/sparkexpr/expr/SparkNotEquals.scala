@@ -6,10 +6,11 @@ import org.apache.jena.sparql.expr.E_NotEquals
 /**
   * Created by xiangnanren on 31/05/2017.
   */
-class SparkNotEquals(@transient val notEquals: E_NotEquals,
-                     leftExpr: SparkExpr,
-                     rightExpr: SparkExpr) extends
-  SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
+private[sparkexpr] class SparkNotEquals
+(@transient val notEquals: E_NotEquals,
+ leftExpr: SparkExpr,
+ rightExpr: SparkExpr)
+  extends SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
 
   override def execute(exprName: String,
                        leftChild: Any,

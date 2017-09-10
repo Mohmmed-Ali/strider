@@ -11,6 +11,7 @@ trait SyntaxParser extends JavaTokenParsers {
   @transient
   protected lazy val log = LogManager.
     getLogger(this.getClass)
+
   protected val STREAMING = SyntaxToken("STREAMING")
   protected val WINDOW = SyntaxToken("WINDOW")
   protected val SLIDE = SyntaxToken("SLIDE")

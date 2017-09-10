@@ -6,7 +6,11 @@ import engine.core.sparkexpr.expr.aggregator.SparkExprAggregator
 /**
   * Created by xiangnanren on 24/05/2017.
   */
-abstract class SparkExprVisitorByType extends SparkExprVisitor {
+private[compiler] abstract class SparkExprVisitorByType extends SparkExprVisitor {
+
+  override def visit(sparkAdd: SparkAdd): Unit = {
+    visit2(sparkAdd)
+  }
 
   override def visit(sparkAnd: SparkAnd): Unit = {
     visit2(sparkAnd)
@@ -60,6 +64,9 @@ abstract class SparkExprVisitorByType extends SparkExprVisitor {
     visit2(sparkOr)
   }
 
+  override def visit(sparkSubtract: SparkSubtract): Unit = {
+    visit2(sparkSubtract)
+  }
 
   def visit1(sparkExpr1: SparkExpr1[SparkExpr])
 

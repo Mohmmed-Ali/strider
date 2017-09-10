@@ -6,9 +6,9 @@ import org.apache.jena.sparql.expr.E_LogicalAnd
 /**
   * Created by xiangnanren on 18/05/2017.
   */
-class SparkAnd(@transient val expr: E_LogicalAnd,
-               leftExpr: SparkExpr,
-               rightExpr: SparkExpr)
+private[sparkexpr] class SparkAnd(@transient val expr: E_LogicalAnd,
+                                  leftExpr: SparkExpr,
+                                  rightExpr: SparkExpr)
   extends SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
 
   override def execute(exprName: String,
@@ -24,7 +24,7 @@ class SparkAnd(@transient val expr: E_LogicalAnd,
 }
 
 
-object SparkAnd {
+private[sparkexpr] object SparkAnd {
   def apply(@transient expr: E_LogicalAnd,
             leftExpr: SparkExpr,
             rightExpr: SparkExpr): SparkAnd = new SparkAnd(expr, leftExpr, rightExpr)

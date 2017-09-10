@@ -7,18 +7,17 @@ import org.apache.jena.sparql.expr.ExprAggregator
 /**
   * Created by xiangnanren on 04/09/2017.
   */
-class SparkExprAggregator(@transient val expr: ExprAggregator) extends SparkExpr {
+private[sparkexpr] class SparkExprAggregator(@transient val expr: ExprAggregator)
+  extends SparkExpr {
 
 
 
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit =  {
     sparkExprVisitor.visit(this)
   }
-
-
 }
 
-object SparkExprAggregator {
+private[sparkexpr] object SparkExprAggregator {
   def apply(@transient expr: ExprAggregator): SparkExprAggregator =
     new SparkExprAggregator(expr)
 }

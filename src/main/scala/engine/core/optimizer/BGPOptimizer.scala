@@ -6,6 +6,5 @@ package engine.core.optimizer
 
 abstract class BGPOptimizer extends AlgebraOptimizer
   with BGPOptimizerHelper
-  with Serializable
 
 

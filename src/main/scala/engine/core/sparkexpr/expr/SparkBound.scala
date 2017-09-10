@@ -6,8 +6,9 @@ import org.apache.jena.sparql.expr.E_Bound
 /**
   * Created by xiangnanren on 04/05/2017.
   */
-class SparkBound(@transient val expr: E_Bound,
-                 subExpr: SparkExpr) extends SparkExpr1[SparkExpr](subExpr) {
+private[sparkexpr] class SparkBound(@transient val expr: E_Bound,
+                                    subExpr: SparkExpr)
+  extends SparkExpr1[SparkExpr](subExpr) {
 
   override def execute(exprName: String,
                        child: Any): Boolean = {

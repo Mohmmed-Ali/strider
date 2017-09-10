@@ -3,7 +3,7 @@ package engine.core.sparkexpr.expr
 /**
   * Created by xiangnanren on 24/05/2017.
   */
-object ExprHelper {
+private[sparkexpr] object ExprHelper {
   val boolTypeURI = "http://www.w3.org/2001/XMLSchema#boolean"
   val decimalTypeURI = "http://www.w3.org/2001/XMLSchema#decimal"
   val doubleTypeURI = "http://www.w3.org/2001/XMLSchema#double"
@@ -46,12 +46,18 @@ object ExprHelper {
         "for the computation of expression. ")
   }
 
+  /**
+    * Get the value of attribute in DataFrame.
+    * For the performance issue, the BigDecimal and BigInt-typed value
+    * are represented by Double and Int, respectively.
+    */
   def getArgValue(arg: String): Any = {
     if (arg.endsWith(boolTypeSuffix)) {
       valueFieldPattern.findFirstIn(arg).get.toBoolean
     }
     else if (arg.endsWith(decimalTypeSuffix)) {
-      BigDecimal(valueFieldPattern.findFirstIn(arg).get)
+//      BigDecimal(valueFieldPattern.findFirstIn(arg).get)
+      valueFieldPattern.findFirstIn(arg).get.toDouble
     }
     else if (arg.endsWith(doubleTypeSuffix)) {
       valueFieldPattern.findFirstIn(arg).get.toDouble
@@ -60,7 +66,8 @@ object ExprHelper {
       valueFieldPattern.findFirstIn(arg).get.toFloat
     }
     else if (arg.endsWith(integerTypeSuffix)) {
-      BigInt(valueFieldPattern.findFirstIn(arg).get)
+//      BigInt(valueFieldPattern.findFirstIn(arg).get)
+      valueFieldPattern.findFirstIn(arg).get.toInt
     }
     else if (arg.endsWith(stringTypeSuffix)) {
       valueFieldPattern.findFirstIn(arg).get

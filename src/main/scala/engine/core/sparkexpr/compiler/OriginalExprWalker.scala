@@ -5,7 +5,7 @@ import org.apache.jena.sparql.expr.{ExprAggregator, ExprVar, NodeValue, _}
 /**
   * Created by xiangnanren on 06/10/16.
   */
-class OriginalExprWalker(private val exprVisitor: ExprVisitor)
+private[compiler] class OriginalExprWalker(private val exprVisitor: ExprVisitor)
   extends ExprVisitorFunction {
 
   def walkBottomUp(expr: Expr) = {
@@ -47,7 +47,7 @@ class OriginalExprWalker(private val exprVisitor: ExprVisitor)
 }
 
 
-object OriginalExprWalker {
+private[compiler] object OriginalExprWalker {
   def apply(exprVisitor: ExprVisitor): OriginalExprWalker =
     new OriginalExprWalker(exprVisitor)
 }

@@ -25,7 +25,7 @@ import org.apache.spark.sql.{DataFrame, Row}
   *
   * @param query : input Sparql query
   */
-sealed class QueryExecutor(@transient val query: SparqlQuery) extends Serializable{
+sealed class QueryExecutor(@transient val query: SparqlQuery) {
   @transient
   protected val sparkOpRoot = query.sparkOpRoot
 

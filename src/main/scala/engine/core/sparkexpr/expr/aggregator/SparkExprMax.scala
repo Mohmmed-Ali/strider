@@ -18,7 +18,8 @@ import org.apache.spark.sql.types._
   * Note that the chosen initial value for Max aggregator is
   * Double.MinValue, i.e., negative infinity (-1.7976931348623157E308)
   */
-object SparkExprMax extends UserDefinedAggregateFunction {
+private[sparkexpr] object SparkExprMax
+  extends UserDefinedAggregateFunction {
   override def inputSchema: StructType =
     StructType(StructField("inputColumn", StringType) :: Nil)
 

@@ -1,6 +1,7 @@
 package engine.core.conf
 
 import com.esotericsoftware.kryo.Kryo
+import engine.core.sparkexpr.expr.{SparkExpr, SparkExpr1}
 import engine.core.sparql.reasoning.{Decoder, Encoder}
 import engine.core.sparkop.executor.{ConstructExecutor, LiteMatConstructExecutor}
 import engine.stream.{RDFGraph, RDFTriple, WavesEvent}
@@ -26,6 +27,7 @@ class StriderKryoRegistrator extends KryoRegistrator {
     kryo.register(classOf[Decoder])
     kryo.register(classOf[ConstructExecutor])
     kryo.register(classOf[LiteMatConstructExecutor])
+    kryo.register(classOf[SparkExpr])
     kryo.register(classOf[RDFTriple])
     kryo.register(classOf[Array[RDFTriple]])
     kryo.register(classOf[RDFGraph])

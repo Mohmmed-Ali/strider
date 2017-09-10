@@ -84,6 +84,10 @@ class SparkExprTransformer extends ExprVisitor {
       case f: E_NotEquals => log.debug(s"exprID: $exprID, E_NotEquals: $f")
         SparkNotEquals(f, leftExpr, rightExpr)
 
+      case f: E_Subtract => log.debug(s"exprID: $exprID, E_Subtract: $f")
+        println("substract visited: ")
+        SparkSubtract(f, leftExpr, rightExpr)
+
     }
     stack.push(tempExpr)
   }
@@ -97,22 +101,19 @@ class SparkExprTransformer extends ExprVisitor {
   override def visit(nv: NodeValue): Unit = {
     exprID += 1
     log.debug(s"exprID: $exprID, nv: ${nv.asQuotedString}")
-
     stack.push(SparkNodeValue(nv))
   }
 
   override def visit(exprVar: ExprVar): Unit = {
     exprID += 1
     log.debug(s"exprID: $exprID, exprVar: ${exprVar.getVarName}")
-
     stack.push(SparkExprVar(exprVar))
   }
 
   override def visit(eAgg: ExprAggregator): Unit = {
     exprID += 1
     log.debug(s"exprID: $exprID, eAgg: $eAgg")
-
-    println("visit: " + eAgg)
+//    println("visit in ExprAggregator: " + eAgg)
 
     stack.push(SparkExprAggregator(eAgg))
   }
