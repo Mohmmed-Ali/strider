@@ -57,11 +57,7 @@ class SparkExtend(val opExtend: OpExtend,
   private val funcVarNames = SparkExtend.getFuncVarNames(exrpTuple._1)
   private val transformedExpr = SparkExtend.transformExpr(exrpTuple._1, this.opName)
   private val extendUDF = SparkExtend.setUDF(existsAllocVar, funcVarNames, transformedExpr)
-
-    println("****** bindingVarTuple " + bindingVarTuple._1 + "    " + bindingVarTuple._2)
-    println("****** exrpTuple " + exrpTuple._1 + "    " + exrpTuple._2)
-    println("****** funcVarNames " + funcVarNames)
-
+  
   override def execute(opName: String, child: SparkOpRes): SparkOpRes = {
     if (existsAllocVar) {
       val res = child.result.
