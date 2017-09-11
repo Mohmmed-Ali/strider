@@ -2,12 +2,13 @@ package engine.core.sparkop.op
 
 import engine.core.sparkexpr.compiler.SparkExprTransformer
 import engine.core.sparkexpr.executor.ExprUDF
-import engine.core.sparkexpr.expr.{NullExprException, VarOutOfBoundException}
+import engine.core.sparkexpr.expr.{NullExprException, SparkExpr, VarOutOfBoundException}
 import engine.core.sparkop.compiler.SparkOpVisitor
 import org.apache.jena.sparql.algebra.op.OpExtend
-import org.apache.spark.sql.DataFrame
+import org.apache.jena.sparql.core.Var
+import org.apache.jena.sparql.expr.Expr
+import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-
 
 import scala.collection.JavaConversions._
 
@@ -21,18 +22,15 @@ class SparkExtend(val opExtend: OpExtend,
   /**
     * The meaning of the attributes in Extend operator:
     *
-    * - [[bindingVar]]:
+    * - [[bindingVarTuple]]: (variable, variableName)
     *   The number of binding variables in each Extend operator is supposed to 1.
     *   E.g.,
     *         ( ?o1 - ?o2 ) AS ?measurement, ?measurement is the binding variable
-    *         of expression ( ?o1 - ?o2 ) }}}
+    *         of expression ( ?o1 - ?o2 ).
     *
-    * - [[bindingVarName]]:
-    *   bindingVarName refers to the name of bindingVar, e.g.,
-    *   ?measurement: bindingVar => measurement: bindingVarName
-    *
-    * - [[expr]]:
-    *   The expression of Extend operator
+    * - [[exrpTuple]]:
+    *   The expression of the Extend operator and its variable name.
+    *   If the expression involves allocated variable, returns null
     *
     * - [[existsAllocVar]]:
     *   Whether the expression contains the allocated/temporary variable or not.
@@ -42,86 +40,122 @@ class SparkExtend(val opExtend: OpExtend,
     *        ?.1 is the allocated/temporary variable,
     *        its binding variable should be ?maxMeasurement
     *
-    * - [[exprVarNames]]:
-    *   The name of variables in a given expression
+    * - [[funcVarNames]]:
+    *   The name of variables in the used function of the expression.
+    *   E.g., (?o1 + ?o2), returns Vector(o1, o2)
+    *         (?o1 + ?o1), returns Vector(o1, o1)
     *
     * - [[transformedExpr]]:
     *   The transformed Spark-compatible expression from original Jena expression
     *
-    * - [[]]
+    * - [[extendUDF]]:
+    *    Get udf of the Extend operator.
     */
-  private val bindingVar = opExtend.getVarExprList.
-    getVars.toList.length match {
-    case l if l > 1 => throw VarOutOfBoundException(
-      "The number of binding variable in an Extend" +
-        " operator should be not exceeded 1")
-    case l if l == 1 =>  opExtend.getVarExprList.getVars.toList.head
-  }
-  private val bindingVarName = bindingVar.getVarName
-  private val expr = opExtend.getVarExprList.getExprs.get(bindingVar)
-  private val existsAllocVar= expr.getVarsMentioned match {
-    case v if v.size() == 1 && v.iterator().next().isAllocVar => true
-    case _ => false
-  }
+  private val bindingVarTuple = SparkExtend.getBindVar(opExtend)
+  private val exrpTuple = SparkExtend.getExprTuple(opExtend, bindingVarTuple._1)
+  private val existsAllocVar= SparkExtend.existAllocVar(exrpTuple._1)
+  private val funcVarNames = SparkExtend.getFuncVarNames(exrpTuple._1)
+  private val transformedExpr = SparkExtend.transformExpr(exrpTuple._1, this.opName)
+  private val extendUDF = SparkExtend.setUDF(existsAllocVar, funcVarNames, transformedExpr)
 
-  private val exprVarNames = expr.getFunction.getArgs.
-    collect {
-      case _expr if _expr.isVariable => _expr.getVarName
-    }.toVector
-
-  private val transformedExpr = try {
-    (new SparkExprTransformer).transform(expr)
-  } catch {
-    case ex: Exception =>
-      throw NullExprException("The expression in" + this.opName + "is null")
-  }
-  private val extendUDF = exprVarNames.length match {
-    case 1 if !existsAllocVar =>
-      Option(ExprUDF.doubleTypeUDF_1(exprVarNames, transformedExpr))
-    case 2 if !existsAllocVar =>
-      Option(ExprUDF.doubleTypeUDF_2(exprVarNames, transformedExpr))
-    case 3 if !existsAllocVar =>
-      Option(ExprUDF.doubleTypeUDF_3(exprVarNames, transformedExpr))
-    case _ => None
-  }
-  private val extendUDF_1 = ExprUDF.doubleTypeUDF_1(exprVarNames, transformedExpr)
-
+    println("****** bindingVarTuple " + bindingVarTuple._1 + "    " + bindingVarTuple._2)
+    println("****** exrpTuple " + exrpTuple._1 + "    " + exrpTuple._2)
+    println("****** funcVarNames " + funcVarNames)
 
   override def execute(opName: String, child: SparkOpRes): SparkOpRes = {
     if (existsAllocVar) {
       val res = child.result.
-        withColumnRenamed(exprVarNames.head, bindingVarName)
+        withColumnRenamed(exrpTuple._2, bindingVarTuple._2)
       SparkOpRes(res)
     }
     else {
       val df = child.result
-      exprVarNames.length match {
+      funcVarNames.length match {
         case 1 =>
-          SparkOpRes(df.withColumn(bindingVarName, extendUDF_1(col(s"${exprVarNames(0)}"))))
+          SparkOpRes(df.withColumn(
+            bindingVarTuple._2,
+            extendUDF.get(col(s"${funcVarNames(0)}"))))
         case 2 => SparkOpRes(df.withColumn(
-          bindingVarName,
+          bindingVarTuple._2,
           extendUDF.get(
-            df(s"${exprVarNames(0)}"),
-            df(s"${exprVarNames(1)}"))))
+            df(s"${funcVarNames(0)}"),
+            df(s"${funcVarNames(1)}"))))
         case 3 => SparkOpRes(df.withColumn(
-          bindingVarName,
+          bindingVarTuple._2,
           extendUDF.get(
-            df(s"${exprVarNames(0)}"),
-            df(s"${exprVarNames(1)}"),
-            df(s"${exprVarNames(2)}"))))
+            df(s"${funcVarNames(0)}"),
+            df(s"${funcVarNames(1)}"),
+            df(s"${funcVarNames(2)}"))))
       }
     }
   }
 
-  override def visit(sparkOpVisitor: SparkOpVisitor): Unit = sparkOpVisitor.visit(this)
-
-
-
-
+  override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {
+    sparkOpVisitor.visit(this)
+  }
 }
 
 object SparkExtend {
   def apply(opExtend: OpExtend,
             subOp: SparkOp): SparkExtend = new SparkExtend(opExtend, subOp)
+
+  private def getBindVar(opExtend: OpExtend): (Var, String) = {
+    opExtend.getVarExprList.
+      getVars.toList.length match {
+      case l if l > 1 => throw VarOutOfBoundException(
+        "The number of binding variable in an Extend" +
+          " operator should be not exceeded 1")
+      case l if l == 1 =>
+        val variable = opExtend.getVarExprList.getVars.toList.head
+        (variable, variable.getVarName)
+    }
+  }
+
+  private def getExprTuple(opExtend: OpExtend,
+                           variable: Var): (Expr, String) = {
+    val expr = opExtend.getVarExprList.getExprs.get(variable)
+    (expr, expr.getVarName)
+  }
+
+  private def existAllocVar(expr: Expr): Boolean = {
+    expr.getVarsMentioned match {
+      case v if v.size() == 1 && v.iterator().next().isAllocVar => true
+      case _ => false
+    }
+  }
+
+  private def getFuncVarNames(expr: Expr): Vector[String] =
+    expr.getFunction match {
+      case f if f != null =>
+        f.getArgs.collect {
+          case _expr if _expr.isVariable => _expr.getVarName
+        }.toVector
+      case _ => Vector.empty[String]
+  }
+
+  private def transformExpr(expr: Expr,
+                        opName: String): SparkExpr = {
+    try {
+      (new SparkExprTransformer).
+        transform(expr)
+    } catch {
+      case ex: Exception =>
+        throw NullExprException("The expression in" + opName + "is null")
+    }
+  }
+
+  private def setUDF(existsAllocVar: Boolean,
+                     funcVarNames: Vector[String],
+                     transformedExpr: SparkExpr): Option[UserDefinedFunction] = {
+    funcVarNames.length match {
+      case 1 if !existsAllocVar =>
+        Option(ExprUDF.doubleTypeUDF_1(funcVarNames, transformedExpr))
+      case 2 if !existsAllocVar =>
+        Option(ExprUDF.doubleTypeUDF_2(funcVarNames, transformedExpr))
+      case 3 if !existsAllocVar =>
+        Option(ExprUDF.doubleTypeUDF_3(funcVarNames, transformedExpr))
+      case _ => None
+    }
+  }
 }
 

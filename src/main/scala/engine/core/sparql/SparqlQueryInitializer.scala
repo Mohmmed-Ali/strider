@@ -408,7 +408,7 @@ object SparqlQueryInitializer extends QueryInitializer {
         "group by ?s "
 
     case "test_agg_2" =>
-        "select ((?o2 + 1) as ?measurement ) " +
+        "select ((?o2 + ?o2) as ?measurement ) " +
         " { " +
         " ?s <http://data.nasa.gov/qudt/owl/qudt/unit> ?o1 ;  " +
         "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o2 . " +

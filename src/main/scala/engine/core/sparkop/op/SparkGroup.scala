@@ -14,20 +14,18 @@ import scala.collection.JavaConversions._
   */
 class SparkGroup(val opGroup: OpGroup,
                  subOp: SparkOp) extends SparkOp1(subOp: SparkOp) {
-  /*
-     The key variables for group operator
-   */
+  /**
+    * [[groupVars]] The key variables for group operator
+    *
+    * [[aggs]] The list of aggregators contained in current group operator
+    *
+    * [[transformedAggs]] Transformed expressions of aggregation
+    *
+    */
   val groupVars = opGroup.getGroupVars.getVars.map(x => x.getVarName)
-
-  /*
-     The list of aggregators contained in current group operator
-   */
   val aggs = opGroup.getAggregators.toList
   println(s"check in group  ${aggs(0).getExpr}")
 
-  /*
-     Transformed expressions of aggregation
-   */
   val transformedAggs = try {
     aggs.map(agg => (new SparkExprTransformer).transform(agg))
   } catch {
