@@ -1,5 +1,7 @@
 package engine.core.sparkexpr.expr
 
+import scala.util.Try
+
 /**
   * Created by xiangnanren on 24/05/2017.
   */
@@ -15,7 +17,7 @@ private[sparkexpr] object ExprHelper {
   val decimalTypeSuffix = "decimal>"
   val doubleTypeSuffix = "double>"
   val floatTypeSuffix = "float>"
-  val integerTypeSuffix = "integer>"
+  val integerTypeSuffix = "Integer>"
   val stringTypeSuffix = "string>"
 
   val valueFieldPattern = "[^\"]+".r
@@ -79,25 +81,20 @@ private[sparkexpr] object ExprHelper {
 
 
   def getNumValueAsString(arg: String): String = {
-    if (arg.endsWith(decimalTypeSuffix)) {
+    try {
       valueFieldPattern.findFirstIn(arg).get
+    } catch {
+      case e: Exception => throw UnsupportedLiteralException(
+        "The input numeric type is not supported")
     }
-    else if (arg.endsWith(doubleTypeSuffix)) {
-      valueFieldPattern.findFirstIn(arg).get
-    }
-    else if (arg.endsWith(floatTypeSuffix)) {
-      valueFieldPattern.findFirstIn(arg).get
-    }
-    else if (arg.endsWith(integerTypeSuffix)) {
-      valueFieldPattern.findFirstIn(arg).get
-    }
-    else arg
   }
 
-  def isNumValue(arg: String): Boolean =
-    arg.endsWith(decimalTypeSuffix) ||
-      arg.endsWith(doubleTypeSuffix) ||
-      arg.endsWith(floatTypeSuffix) ||
-      arg.endsWith(integerTypeSuffix) ||
-      arg.forall(c => c.isDigit)
+  def isNumValue(arg: String): Boolean = {
+    if (Try(arg.toDouble).isSuccess) true
+    else if (arg.endsWith(decimalTypeSuffix)) true
+    else if (arg.endsWith(doubleTypeSuffix)) true
+    else if (arg.endsWith(floatTypeSuffix)) true
+    else if (arg.endsWith(integerTypeSuffix)) true
+    else false
+  }
 }

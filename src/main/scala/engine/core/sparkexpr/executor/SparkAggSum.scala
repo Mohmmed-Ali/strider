@@ -1,4 +1,4 @@
-package engine.core.sparkexpr.expr.aggregator
+package engine.core.sparkexpr.executor
 
 import engine.core.sparkexpr.expr.ExprHelper
 import org.apache.spark.sql.Row
@@ -17,7 +17,7 @@ import org.apache.spark.sql.types._
   *
   * Note that the chosen initial value for Max aggregator is 0.0
   */
-object SparkExprSum extends UserDefinedAggregateFunction {
+object SparkAggSum extends UserDefinedAggregateFunction {
   override def inputSchema: StructType =
     StructType(StructField("inputColumn", StringType) :: Nil)
 
@@ -34,11 +34,12 @@ object SparkExprSum extends UserDefinedAggregateFunction {
   }
 
   override def update(buffer: MutableAggregationBuffer, input: Row): Unit = {
-    if (!input.isNullAt(0)) {
-      ExprHelper.isNumValue(input.getString(0)) match {
+    val arg = input.getString(0)
+    if (arg != null) {
+      ExprHelper.isNumValue(arg) match {
         case true =>
-          val num = ExprHelper.getNumValueAsString(input.getString(0))(1).toDouble
-          buffer(0) = buffer.getDouble(0) + num
+          val numArg = ExprHelper.getNumValueAsString(arg).toDouble
+          buffer(0) = buffer.getDouble(0) + numArg
         case false =>
       }
     }

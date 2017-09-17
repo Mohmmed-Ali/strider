@@ -10,7 +10,7 @@ import scala.collection.mutable
 /**
   * Created by xiangnanren on 09/11/2016.
   */
-trait SparkBGPUtils extends BGPUtils{
+trait SparkBGPUtils extends BGPUtils {
 
   protected def computeDFMap(triples: List[graph.Triple],
                              inputDF: DataFrame):

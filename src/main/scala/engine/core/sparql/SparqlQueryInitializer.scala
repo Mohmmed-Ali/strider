@@ -397,22 +397,34 @@ object SparqlQueryInitializer extends QueryInitializer {
     /////////////////////////////////////
     // Test Queries group 2 (Aggregation)
     /////////////////////////////////////
+    case "test_agg_0" =>
+      "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> " +
+        "select (min(?o2) as ?minMeasurement) " +
+        " { " +
+        " ?s <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o2 . " +
+        "}"
+
     case "test_agg_1" =>
       "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> " +
-        "select (min(?o3) as ?minMeasurement ) (max(?o2) as ?maxMeasurement)" +
+        "select ?s (min(?o2 + ?o2) as ?minMeasurement ) (max(?o2) as ?maxMeasurement)" +
         " { " +
-        " ?s <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o1 .  " +
-        " ?o1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o2 ; " +
-        "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o3 . " +
+        " ?s <http://data.nasa.gov/qudt/owl/qudt/unit> ?o1 ;   " +
+        "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o2 . " +
         "}" +
         "group by ?s "
 
     case "test_agg_2" =>
-        "select ((?o2 + ?o2) as ?measurement ) " +
-        " { " +
-        " ?s <http://data.nasa.gov/qudt/owl/qudt/unit> ?o1 ;  " +
-        "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o2 . " +
-        "}"
+      "select ?s (min(?o6 + ?o6) as ?minMeasurement ) (min(?o6) as ?maxMeasurement)" +
+          " { " +
+          " ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o ; " +
+          "    <http://purl.oclc.org/NET/ssnx/ssn/isProducedBy> ?o1 ; " +
+          "    <http://purl.oclc.org/NET/ssnx/ssn/hasValue> ?o2 .  " +
+          " ?o2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o3 ; " +
+          "    <http://purl.oclc.org/NET/ssnx/ssn/startTime> ?o4 ; " +
+          "    <http://data.nasa.gov/qudt/owl/qudt/unit> ?o5 ; " +
+          "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o6 . " +
+          " } " +
+        "group by ?s"
 
     //////////////////////////////////////////////////
     // Test Queries group 3 LiteMat_Concept_Properties

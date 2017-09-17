@@ -44,6 +44,10 @@ class SparkOpExecutor(inputDF: DataFrame) extends
   }
 
   override def visit(sparkGroup: SparkGroup): Unit = {
+    stack.push(sparkGroup.execute(
+      sparkGroup.opName,
+      stack.pop()
+    ))
 
   }
 

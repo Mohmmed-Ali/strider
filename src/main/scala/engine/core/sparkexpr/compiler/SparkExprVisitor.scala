@@ -1,7 +1,6 @@
 package engine.core.sparkexpr.compiler
 
-import engine.core.sparkexpr.expr._
-import engine.core.sparkexpr.expr.aggregator.SparkExprAggregator
+import engine.core.sparkexpr.expr.{SparkExprAggregator, _}
 
 /**
   * Created by xiangnanren on 03/05/2017.

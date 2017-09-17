@@ -1,9 +1,6 @@
 package engine.core.sparkop.op
 
-import java.io.{File, PrintWriter}
-
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.DataFrame
 
 /**
   * Created by xiangnanren on 11/07/16.

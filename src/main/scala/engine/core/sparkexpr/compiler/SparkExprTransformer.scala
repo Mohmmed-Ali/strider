@@ -1,7 +1,6 @@
 package engine.core.sparkexpr.compiler
 
-import engine.core.sparkexpr.expr._
-import engine.core.sparkexpr.expr.aggregator.SparkExprAggregator
+import engine.core.sparkexpr.expr.{SparkExprAggregator, _}
 import engine.core.sparkop.compiler.SparkOpTransformer
 import org.apache.jena.sparql.expr._
 import org.apache.log4j.LogManager

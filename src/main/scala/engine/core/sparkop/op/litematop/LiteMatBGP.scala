@@ -11,19 +11,19 @@ import org.apache.spark.sql.DataFrame
   */
 class LiteMatBGP(opBGP: OpBGP,
                  triples: List[graph.Triple])
-  extends SparkBGP(opBGP, triples) with LiteMatBGPUtils{
+  extends SparkBGP(opBGP, triples) with LiteMatBGPUtils {
   private val liteMatEPHandler = LiteMatEPHandler(ucg.ucgNodes)
+
+  override def execute(opName: String,
+                       inputDF: DataFrame): SparkOpRes = {
+    SparkOpRes(computeLiteMatBGP(inputDF))
+  }
 
   def computeLiteMatBGP(inputDF: DataFrame): DataFrame = {
     val dfMap = computeDFMapViaLiteMat(
       liteMatEPHandler.liteMatBGPNodeMapping, inputDF)
 
     computeBGP(dfMap, inputDF)
-  }
-
-  override def execute(opName: String,
-                       inputDF: DataFrame): SparkOpRes = {
-    SparkOpRes(computeLiteMatBGP(inputDF))
   }
 
 }

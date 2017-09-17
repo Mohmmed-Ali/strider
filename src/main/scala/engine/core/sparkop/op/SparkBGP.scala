@@ -29,20 +29,12 @@ class SparkBGP(val opBGP: OpBGP,
   override def execute(opName: String,
                        inputDF: DataFrame): SparkOpRes = {
     SparkOpRes(
-      computeBGP(computeDFMap(triples, inputDF),inputDF))
+      computeBGP(computeDFMap(triples, inputDF), inputDF))
   }
 
-  override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {
-    sparkOpVisitor.visit(this)
-  }
-
-  def update(opName: String,
-             inputDF: DataFrame): Unit = ucg.edgeExistence match {
-    case true =>
-      log.info("Switch to backward adaptivity.")
-      adap_handler.currentAdapPlan =
-        Option(getAdapPlan(computeDFMap(triples, inputDF)))
-    case false =>
+  protected def computeBGP(dfMap: Map[graph.Triple, DataFrame],
+                           inputDF: DataFrame): DataFrame = {
+    computeEP(getCurrentEP(dfMap, inputDF), dfMap)
   }
 
   protected def getCurrentEP(dfMap: Map[graph.Triple, DataFrame],
@@ -57,16 +49,14 @@ class SparkBGP(val opBGP: OpBGP,
 
           case Some(oldAdapPlan) => log.debug(
             "\n \n Detailed Query plan info: " +
-            "\n" + getEPInfo(oldAdapPlan))
+              "\n" + getEPInfo(oldAdapPlan))
             adap_handler.currentAdapPlan = None
-            oldAdapPlan }
+            oldAdapPlan
+        }
       } else getStaticPlan
-    } else { getStaticPlan }
-  }
-
-  protected def computeBGP(dfMap: Map[graph.Triple, DataFrame],
-                           inputDF: DataFrame): DataFrame = {
-    computeEP(getCurrentEP(dfMap, inputDF), dfMap)
+    } else {
+      getStaticPlan
+    }
   }
 
   private def getStaticPlan: List[BGPGraph] = {
@@ -101,6 +91,19 @@ class SparkBGP(val opBGP: OpBGP,
       case _ => throw new UnsupportedOperationException(
         "Invalid adaptive execution plan.")
     }
+  }
+
+  override def visit(sparkOpVisitor: SparkOpVisitor): Unit = {
+    sparkOpVisitor.visit(this)
+  }
+
+  def update(opName: String,
+             inputDF:DataFrame): Unit = ucg.edgeExistence match {
+    case true =>
+      log.info("Switch to backward adaptivity.")
+      adap_handler.currentAdapPlan =
+        Option(getAdapPlan(computeDFMap(triples, inputDF)))
+    case false =>
   }
 
   /**

@@ -1,12 +1,11 @@
 package engine.core.sparkexpr.compiler
 
-import engine.core.sparkexpr.expr._
-import engine.core.sparkexpr.expr.aggregator.SparkExprAggregator
+import engine.core.sparkexpr.expr.{SparkExprAggregator, _}
 
 /**
   * Created by xiangnanren on 24/05/2017.
   */
-private[compiler] class SparkExprWalker(val visitor: SparkExprVisitor)
+private[sparkexpr] class SparkExprWalker(val visitor: SparkExprVisitor)
   extends SparkExprVisitorByType {
 
   def walkBottomUp(expr: SparkExpr): Unit = {
@@ -39,7 +38,7 @@ private[compiler] class SparkExprWalker(val visitor: SparkExprVisitor)
 }
 
 
-private[compiler] object SparkExprWalker {
+private[sparkexpr] object SparkExprWalker {
   def apply(visitor: SparkExprVisitor): SparkExprWalker =
     new SparkExprWalker(visitor)
 }

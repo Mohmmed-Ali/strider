@@ -15,11 +15,14 @@ import scala.collection.mutable.ListBuffer
 case class LiteMatBGPNode(bgpNode: BGPNode) extends LiteMatBGPGraph {
   // The mapping of a node in a given triple pattern
   // is represented as (rewritable, lowerBound, upperBound)
-  final val subjectMapping: (String, Int, Int) =
+
+  private type NodeMapping = (String, Int, Int)
+
+  final val subjectMapping: NodeMapping =
     setSubjectMapping(bgpNode, LiteMatCtx.RDCT.conceptMapping)
-  final val predicateMapping: (String, Int, Int) =
+  final val predicateMapping: NodeMapping =
     setPredicateMapping(bgpNode, LiteMatCtx.RDCT.propertyMapping)
-  final val objectMapping: (String, Int, Int) =
+  final val objectMapping: NodeMapping =
     setObjectMapping(bgpNode, LiteMatCtx.RDCT.conceptMapping)
   val liteMatFilters = generateFilters(
     List(subjectMapping, predicateMapping, objectMapping))
@@ -45,95 +48,60 @@ case class LiteMatBGPNode(bgpNode: BGPNode) extends LiteMatBGPGraph {
     else false
   }
 
-  def quoteString(s: String): String = "<" + s + ">"
-
-
-  /**
-    * Check whether subject is rewritable or not.
-    * The dictionary (mapping) of individual is not must be provided.
-    */
-  private def isSubjectRewritable(bgpNode: BGPNode,
-                                  boundConceptDct: Map[String, (String, String)],
-                                  boundIndividualDct: Map[String, String] =
-                                  Map.empty[String, String]): Boolean = {
-    !bgpNode.triple.getSubject.isVariable &&
-      boundIndividualDct.get(quoteString(bgpNode.triple.getSubject.toString)).nonEmpty
+  def compute(inputDF: DataFrame): DataFrame = {
+    computeLiteMatTriplePattern(rename(bgpNode, inputDF))
   }
 
   /**
-    * Check whether predicate is rewritable or not
-    */
-  private def isPredicateRewritable(bgpNode: BGPNode,
-                                    boundDct: Map[String, (Int, Int)]): Boolean = {
-    val bounds = boundDct.get(quoteString(bgpNode.triple.getPredicate.toString))
-
-    !bgpNode.triple.getPredicate.isVariable &&
-      bounds.nonEmpty &&
-      (bounds.get._1 != 0) // rdf:type is encoded as 0
-  }
-
-  /**
-    * Check whether object is rewritable or not.
-    * The dictionary (mapping) of individual is not must be provided.
-    */
-  private def isObjectRewritable(bgpNode: BGPNode,
-                                 boundConceptDct: Map[String, (String, String)],
-                                 boundIndividualDct: Map[String, String] =
-                                 Map.empty[String, String]): Boolean = {
-    !bgpNode.triple.getObject.isVariable && (
-      boundConceptDct.get(quoteString(bgpNode.triple.getObject.toString)).nonEmpty ||
-        boundIndividualDct.get(quoteString(bgpNode.triple.getObject.toString)).nonEmpty)
-  }
-
-
-  /**
-    * The method which applies LiteMat filter on concept.
-    * For the concept at object position, after encoding,
-    * it is necessary to add a prefix to distinguish the encoded
-    * value and the primitive value. So, here we just remove
-    * the first letter of an encoded value (the defined prefix for LiteMat
-    * is just a letter 'E'), then we convert the rest part of the string
-    * into integer for further filter operation.
+    * The method uses LiteMat to compute each
+    * triple pattern presents in current BGP
     *
+    * @return The result (DataFrame) of the given triple pattern
     */
-  def conceptsLMUdf(lowerBound: Int,
-                    upperBound: Int) = udf(
-    (arg: String) => arg.startsWith(LiteMatCtx.conceptPrefix) match {
-      case true => val parsedArg = arg.tail.toInt
-        parsedArg >= lowerBound && parsedArg < upperBound
-      case false => false
-    })
+  def computeLiteMatTriplePattern(inputDF: DataFrame): DataFrame = {
 
-  /**
-    * The method which applies LiteMat filter on property.
-    * Note that the property does not need a prefix to distinguish
-    * the encoded value and the primitive type value. So the input
-    * parameter "arg" in udf does not need to be removed the encoding prefix.
-    *
-    */
-  def propertiesLMUdf(lowerBound: Int,
-                      upperBound: Int) = udf((arg: Int) => {
-    arg >= lowerBound && arg < upperBound
-  })
+    val outputDF = {
+      if (liteMatFilters.isEmpty)
+        super.computeTriplePattern(this.bgpNode.triple, inputDF)
+      else {
+        liteMatFilters.length match {
+          case 1 =>
+            val columnName_0 = liteMatFilters.head._1
+            inputDF.filter(liteMatFilters.head._2(inputDF(s"$columnName_0")))
 
+          case 2 =>
+            val columnName_0 = liteMatFilters.head._1
+            val columnName_1 = liteMatFilters(1)._1
+            inputDF.filter(liteMatFilters.head._2(inputDF(s"$columnName_0"))).
+              filter(liteMatFilters(1)._2(inputDF(s"$columnName_1")))
 
-  def individualsLMUdf(mapping: String) = udf((arg: String) => arg == mapping)
+          case 3 =>
+            val columnName_0 = liteMatFilters.head._1
+            val columnName_1 = liteMatFilters(1)._1
+            val columnName_2 = liteMatFilters(2)._1
+            inputDF.filter(liteMatFilters.head._2(inputDF(s"$columnName_0"))).
+              filter(liteMatFilters(1)._2(inputDF(s"$columnName_1"))).
+              filter(liteMatFilters(2)._2(inputDF(s"$columnName_2")))
+        }
+      }
+    }.select(this.outpuSchema.head, this.outpuSchema.tail: _*)
 
-  def basicUdf(mapping: String) = udf((arg: String) => arg == mapping)
+    outputDF
+  }
 
   /**
     * If the subject is rewritable, rewrite the subject to its corresponding mapping.
     *
-    * @param boundConceptDct : The dictionary of concepts.
+    * @param boundConceptDct    : The dictionary of concepts.
     * @param boundIndividualDct : The dictionary of individual. The individual dictionary
-    *                             is initialized as empty, since it is not necessarily required.
+    *                           is initialized as empty, since it is not necessarily required.
     */
 
   private def setSubjectMapping(bgpNode: BGPNode,
                                 boundConceptDct: Map[String, (String, String)],
                                 boundIndividualDct: Map[String, String]
                                 = Map.empty[String, String]):
-  (String, Int, Int) = {
+  NodeMapping = {
     if (!isSubjectRewritable(bgpNode, boundConceptDct, boundIndividualDct))
       (LiteMatBGPNode.NOT_REWRITABLE, -1, -1)
     else {
@@ -153,6 +121,17 @@ case class LiteMatBGPNode(bgpNode: BGPNode) extends LiteMatBGPGraph {
     }
   }
 
+  /**
+    * Check whether subject is rewritable or not.
+    * The dictionary (mapping) of individual is not must be provided.
+    */
+  private def isSubjectRewritable(bgpNode: BGPNode,
+                                  boundConceptDct: Map[String, (String, String)],
+                                  boundIndividualDct: Map[String, String] =
+                                  Map.empty[String, String]): Boolean = {
+    !bgpNode.triple.getSubject.isVariable &&
+      boundIndividualDct.get(quoteString(bgpNode.triple.getSubject.toString)).nonEmpty
+  }
 
   /**
     * If the predicate is rewritable, rewrite the predicate to its corresponding mapping.
@@ -161,7 +140,7 @@ case class LiteMatBGPNode(bgpNode: BGPNode) extends LiteMatBGPGraph {
     */
   private def setPredicateMapping(bgpNode: BGPNode,
                                   boundPropertyDct: Map[String, (Int, Int)]):
-  (String, Int, Int) = {
+  NodeMapping = {
     if (!isPredicateRewritable(bgpNode, boundPropertyDct))
       (LiteMatBGPNode.NOT_REWRITABLE, -1, -1)
     else (LiteMatBGPNode.PROPERTIES_TYPE,
@@ -171,19 +150,30 @@ case class LiteMatBGPNode(bgpNode: BGPNode) extends LiteMatBGPGraph {
         get(quoteString(bgpNode.triple.getPredicate.toString)).get._2)
   }
 
+  /**
+    * Check whether predicate is rewritable or not
+    */
+  private def isPredicateRewritable(bgpNode: BGPNode,
+                                    boundDct: Map[String, (Int, Int)]): Boolean = {
+    val bounds = boundDct.get(quoteString(bgpNode.triple.getPredicate.toString))
+
+    !bgpNode.triple.getPredicate.isVariable &&
+      bounds.nonEmpty &&
+      (bounds.get._1 != 0) // rdf:type is encoded as 0
+  }
 
   /**
     * If the object is rewritable, rewrite the object to its corresponding mapping.
     *
-    * @param boundConceptDct : The dictionary of concepts.
+    * @param boundConceptDct    : The dictionary of concepts.
     * @param boundIndividualDct : The dictionary of individuals. The individual dictionary
-    *                             is initialized as empty, since it is not necessarily required.
+    *                           is initialized as empty, since it is not necessarily required.
     */
   private def setObjectMapping(bgpNode: BGPNode,
                                boundConceptDct: Map[String, (String, String)],
                                boundIndividualDct: Map[String, String]
                                = Map.empty[String, String]):
-  (String, Int, Int) = {
+  NodeMapping = {
     if (!isObjectRewritable(bgpNode, boundConceptDct))
       (LiteMatBGPNode.NOT_REWRITABLE, -1, -1)
     else {
@@ -201,6 +191,21 @@ case class LiteMatBGPNode(bgpNode: BGPNode) extends LiteMatBGPGraph {
   }
 
   /**
+    * Check whether object is rewritable or not.
+    * The dictionary (mapping) of individual is not must be provided.
+    */
+  private def isObjectRewritable(bgpNode: BGPNode,
+                                 boundConceptDct: Map[String, (String, String)],
+                                 boundIndividualDct: Map[String, String] =
+                                 Map.empty[String, String]): Boolean = {
+    !bgpNode.triple.getObject.isVariable && (
+      boundConceptDct.get(quoteString(bgpNode.triple.getObject.toString)).nonEmpty ||
+        boundIndividualDct.get(quoteString(bgpNode.triple.getObject.toString)).nonEmpty)
+  }
+
+  def quoteString(s: String): String = "<" + s + ">"
+
+  /**
     * This method generates a sequence of filter(udf) operators
     * for current BGP node.
     *
@@ -208,7 +213,7 @@ case class LiteMatBGPNode(bgpNode: BGPNode) extends LiteMatBGPGraph {
     *         The first element of each tuple determines which
     *         column to apply a litemat filter.
     */
-  private def generateFilters(epMapping: List[(String, Int, Int)]):
+  private def generateFilters(epMapping: List[NodeMapping]):
   Seq[(String, UserDefinedFunction)] = {
     val filters = ListBuffer[(String, UserDefinedFunction)]()
 
@@ -270,46 +275,39 @@ case class LiteMatBGPNode(bgpNode: BGPNode) extends LiteMatBGPGraph {
     filters
   }
 
-  def compute(inputDF: DataFrame): DataFrame = {
-    computeLiteMatTriplePattern(rename(bgpNode, inputDF))
-  }
+  /**
+    * The method which applies LiteMat filter on concept.
+    * For the concept at object position, after encoding,
+    * it is necessary to add a prefix to distinguish the encoded
+    * value and the primitive value. So, here we just remove
+    * the first letter of an encoded value (the defined prefix for LiteMat
+    * is just a letter 'E'), then we convert the rest part of the string
+    * into integer for further filter operation.
+    *
+    */
+  def conceptsLMUdf(lowerBound: Int,
+                    upperBound: Int) = udf(
+    (arg: String) => arg.startsWith(LiteMatCtx.conceptPrefix) match {
+      case true => val parsedArg = arg.tail.toInt
+        parsedArg >= lowerBound && parsedArg < upperBound
+      case false => false
+    })
 
   /**
-    * The method uses LiteMat to compute each
-    * triple pattern presents in current BGP
+    * The method which applies LiteMat filter on property.
+    * Note that the property does not need a prefix to distinguish
+    * the encoded value and the primitive type value. So the input
+    * parameter "arg" in udf does not need to be removed the encoding prefix.
     *
-    * @return The result (DataFrame) of the given triple pattern
     */
-  def computeLiteMatTriplePattern(inputDF: DataFrame): DataFrame = {
+  def propertiesLMUdf(lowerBound: Int,
+                      upperBound: Int) = udf((arg: Int) => {
+    arg >= lowerBound && arg < upperBound
+  })
 
-    val outputDF = {
-      if (liteMatFilters.isEmpty)
-        super.computeTriplePattern(this.bgpNode.triple, inputDF)
-      else {
-        liteMatFilters.length match {
-          case 1 =>
-            val columnName_0 = liteMatFilters.head._1
-            inputDF.filter(liteMatFilters.head._2(inputDF(s"$columnName_0")))
+  def individualsLMUdf(mapping: String) = udf((arg: String) => arg == mapping)
 
-          case 2 =>
-            val columnName_0 = liteMatFilters.head._1
-            val columnName_1 = liteMatFilters(1)._1
-            inputDF.filter(liteMatFilters.head._2(inputDF(s"$columnName_0"))).
-              filter(liteMatFilters(1)._2(inputDF(s"$columnName_1")))
-
-          case 3 =>
-            val columnName_0 = liteMatFilters.head._1
-            val columnName_1 = liteMatFilters(1)._1
-            val columnName_2 = liteMatFilters(2)._1
-            inputDF.filter(liteMatFilters.head._2(inputDF(s"$columnName_0"))).
-              filter(liteMatFilters(1)._2(inputDF(s"$columnName_1"))).
-              filter(liteMatFilters(2)._2(inputDF(s"$columnName_2")))
-        }
-      }
-    }.select(this.outpuSchema.head, this.outpuSchema.tail: _*)
-
-    outputDF
-  }
+  def basicUdf(mapping: String) = udf((arg: String) => arg == mapping)
 }
 
 object LiteMatBGPNode {

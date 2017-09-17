@@ -1,4 +1,4 @@
-package engine.core.sparkexpr.expr.aggregator
+package engine.core.sparkexpr.executor
 
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.expressions.{MutableAggregationBuffer, UserDefinedAggregateFunction}
@@ -12,7 +12,7 @@ import org.apache.spark.sql.types._
   * The Count aggregator bases on the type Long for computation
   *
   */
-private[sparkexpr] object SparkExprCount
+object SparkAggCount
   extends UserDefinedAggregateFunction {
   override def inputSchema: StructType = StructType(StructField("inputColumn", StringType) :: Nil)
 

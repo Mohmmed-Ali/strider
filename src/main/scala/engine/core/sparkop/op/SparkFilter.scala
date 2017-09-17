@@ -1,13 +1,12 @@
 package engine.core.sparkop.op
 
-import engine.core.sparkexpr.compiler.SparkExprTransformer
 import engine.core.sparkexpr.executor.ExprUDF
-import engine.core.sparkexpr.expr.{NullExprException, VarOutOfBoundException}
+import engine.core.sparkexpr.expr.{NullExprException, ExprElementOutOfBoundException}
 import engine.core.sparkop.compiler.SparkOpVisitor
 import org.apache.jena.sparql.algebra.op.OpFilter
 import org.apache.jena.sparql.expr.Expr
-import scala.collection.JavaConversions._
 
+import scala.collection.JavaConversions._
 
 
 /**
@@ -17,8 +16,10 @@ import scala.collection.JavaConversions._
 class SparkFilter(val opFilter: OpFilter,
                   subOp: SparkOp) extends
   SparkOp1(subOp: SparkOp) {
-  private val expr = opFilter.getExprs.iterator.next()
+  @throws(classOf[NullExprException])
   /**
+    * [[expr]] The used expression in filter operator
+    *
     * [[columnNames]] refers to the names of multiple columns
     * which are involved in filter.
     *
@@ -30,30 +31,23 @@ class SparkFilter(val opFilter: OpFilter,
     * which filter operation requires a single column by default.
     *
     */
+  private val expr = opFilter.getExprs.iterator.next()
   private val columnNames = setColumnName(expr)
   private val columnName = setColumnName(expr).head
-
-  @throws(classOf[NullExprException])
-  val transformedExpr = try {
-    (new SparkExprTransformer).transform(expr)
-  } catch {
-    case ex: Exception =>
-      throw NullExprException("The expression in" + this.opName + "is null")
-  }
-
-  val filterUDF = ExprUDF.BooleanTypeUDF(columnNames,transformedExpr)
+  val transformedExpr = transformExpr(expr, this.opName)
+  val filterUDF = ExprUDF.BooleanTypeUDF(columnNames, transformedExpr)
 
   /**
     * Set the name of output (filtered) column.
     * Limited by Spark, the filter UDF only allows a single input variable.
     */
-  @throws(classOf[VarOutOfBoundException])
+  @throws(classOf[ExprElementOutOfBoundException])
   def setColumnName(expr: Expr): Vector[String] = {
     expr.getVarsMentioned.size match {
       case size if size > 1 =>
-        throw VarOutOfBoundException(
+        throw ExprElementOutOfBoundException(
           "The number of variable in an expression should be less than 1")
-      case size if size == 1  => expr.getVarsMentioned.map(v => v.getVarName).toVector
+      case size if size == 1 => expr.getVarsMentioned.map(v => v.getVarName).toVector
     }
   }
 

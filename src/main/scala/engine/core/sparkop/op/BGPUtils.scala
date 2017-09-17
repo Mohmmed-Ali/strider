@@ -77,7 +77,7 @@ trait BGPUtils {
     else if (!tripleS.isVariable && tripleP.isVariable && !tripleO.isVariable && tripleO.isLiteral)
       inputDF.withColumnRenamed("pDefault", tripleP.getName).
         where(inputDF("sDefault") <=> normalizeURI(tripleS) &&
-          (inputDF("oDefault") <=> simplifiedLiteral|| inputDF("oDefault") <=> normalizedLiteral)).
+          (inputDF("oDefault") <=> simplifiedLiteral || inputDF("oDefault") <=> normalizedLiteral)).
         select(tripleP.getName)
     else if (tripleS.isVariable && tripleP.isVariable && !tripleO.isVariable && tripleO.isLiteral)
       inputDF.withColumnRenamed("sDefault", tripleS.getName).
@@ -91,7 +91,6 @@ trait BGPUtils {
     else throw new UnsupportedOperationException("The input triple pattern is not supported yet.")
 
   }
-
 
 
   //  /**

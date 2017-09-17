@@ -1,8 +1,7 @@
 package engine.core.sparkexpr.executor
 
 import engine.core.sparkexpr.compiler.{SparkExprVisitor, SparkExprWalker}
-import engine.core.sparkexpr.expr._
-import engine.core.sparkexpr.expr.aggregator.SparkExprAggregator
+import engine.core.sparkexpr.expr.{SparkExprAggregator, _}
 
 /**
   * Created by xiangnanren on 19/05/2017.

@@ -22,12 +22,12 @@ object ExprUDF {
       }
     })
 
-
   /**
-    * Double-type UDF, with a single input column
+    * Double-type UDF for the evaluation of arithmetic expression,
+    * requires a single input column
     */
-  def doubleTypeUDF_1(orderedColumnNames: Vector[String],
-                      expr: SparkExpr) = udf(
+  def doubleArithmeticUDF_1(orderedColumnNames: Vector[String],
+                            expr: SparkExpr) = udf(
     (arg0: String) => {
       val res = SparkExprExecutor(orderedColumnNames, arg0).execute(expr)
       res match {
@@ -36,10 +36,11 @@ object ExprUDF {
     })
 
   /**
-    * Double-type UDF, with two input columns
+    * Double-type UDF for the evaluation of arithmetic expression,
+    * requires two input columns
     */
-  def doubleTypeUDF_2(orderedColumnNames: Vector[String],
-                      expr: SparkExpr) = udf(
+  def doubleArithmeticUDF_2(orderedColumnNames: Vector[String],
+                            expr: SparkExpr) = udf(
     (arg0: String, arg1: String) => {
       val res = SparkExprExecutor(orderedColumnNames, arg0, arg1).execute(expr)
       res match {
@@ -49,10 +50,11 @@ object ExprUDF {
 
 
   /**
-    * Double-type UDF, with three input columns
+    * Double-type UDF for the evaluation of arithmetic expression,
+    * requires three input columns
     */
-  def doubleTypeUDF_3(orderedColumnNames: Vector[String],
-                      expr: SparkExpr) = udf(
+  def doubleArithmeticUDF_3(orderedColumnNames: Vector[String],
+                            expr: SparkExpr) = udf(
     (arg0: String, arg1: String, arg2: String) => {
       val res = SparkExprExecutor(orderedColumnNames, arg0, arg1, arg2).execute(expr)
       res match {
@@ -60,14 +62,12 @@ object ExprUDF {
       }
     })
 
-
-
-
   /**
-    * Float-type UDF, with a single input column
+    * Float-type UDF for the evaluation of arithmetic expression,
+    * requires a single input column
     */
-  def floatTypeUDF_1(orderedColumnNames: Vector[String],
-                      expr: SparkExpr) = udf(
+  def floatArithmeticUDF_1(orderedColumnNames: Vector[String],
+                           expr: SparkExpr) = udf(
     (arg0: String) => {
       val res = SparkExprExecutor(orderedColumnNames, arg0).execute(expr)
       res match {
@@ -76,10 +76,11 @@ object ExprUDF {
     })
 
   /**
-    * Float-type UDF, with two input columns
+    * Float-type UDF for the evaluation of arithmetic expression,
+    * requires two input columns
     */
-  def floatTypeUDF_2(orderedColumnNames: Vector[String],
-                      expr: SparkExpr) = udf(
+  def floatArithmeticUDF_2(orderedColumnNames: Vector[String],
+                           expr: SparkExpr) = udf(
     (arg0: String, arg1: String) => {
       val res = SparkExprExecutor(orderedColumnNames, arg0, arg1).execute(expr)
       res match {
@@ -87,12 +88,12 @@ object ExprUDF {
       }
     })
 
-
   /**
-    * Float-type UDF, with three input columns
+    * Float-type UDF for the evaluation of arithmetic expression,
+    * requires three input columns
     */
-  def floatTypeUDF_3(orderedColumnNames: Vector[String],
-                      expr: SparkExpr) = udf(
+  def floatArithmeticUDF_3(orderedColumnNames: Vector[String],
+                           expr: SparkExpr) = udf(
     (arg0: String, arg1: String, arg2: String) => {
       val res = SparkExprExecutor(orderedColumnNames, arg0, arg1, arg2).execute(expr)
       res match {

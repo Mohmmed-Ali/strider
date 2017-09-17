@@ -6,9 +6,9 @@ import org.apache.jena.sparql.expr.E_LessThan
 /**
   * Created by xiangnanren on 03/05/2017.
   */
-class SparkLessThan private[sparkexpr](@transient val expr: E_LessThan,
-                                       leftExpr: SparkExpr,
-                                       rightExpr: SparkExpr)
+class SparkLessThan private[sparkexpr] (@transient val expr: E_LessThan,
+                                        leftExpr: SparkExpr,
+                                        rightExpr: SparkExpr)
   extends SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
 
   override def execute(exprName: String,

@@ -1,4 +1,4 @@
-package engine.core.sparkexpr.expr.aggregator
+package engine.core.sparkexpr.executor
 
 import engine.core.sparkexpr.expr.ExprHelper
 import org.apache.spark.sql.Row
@@ -8,7 +8,7 @@ import org.apache.spark.sql.types.{DoubleType, LongType, _}
 /**
   * Created by xiangnanren on 04/09/2017.
   */
-private[sparkexpr] object SparkExprAvg
+object SparkAggAvg
   extends UserDefinedAggregateFunction {
   override def inputSchema: StructType =
     StructType(StructField("inputColumn", StringType) :: Nil)
@@ -29,13 +29,13 @@ private[sparkexpr] object SparkExprAvg
   }
 
   override def update(buffer: MutableAggregationBuffer, input: Row): Unit = {
-    if (!input.isNullAt(0)) {
-      ExprHelper.isNumValue(input.getString(0)) match {
+    val arg = input.getString(0)
+    if (arg != null) {
+      ExprHelper.isNumValue(arg) match {
         case true =>
-          val num = ExprHelper.getNumValueAsString(input.getString(0))(1).toDouble
-          buffer(0) = buffer.getDouble(0) + num
+          val numArg = ExprHelper.getNumValueAsString(arg).toDouble
+          buffer(0) = buffer.getDouble(0) + numArg
           buffer(1) = buffer.getLong(1) + 1
-
         case false =>
       }
     }

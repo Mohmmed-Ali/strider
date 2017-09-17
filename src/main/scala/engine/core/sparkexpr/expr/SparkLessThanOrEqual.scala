@@ -25,7 +25,7 @@ private[sparkexpr] class SparkLessThanOrEqual
   }
 }
 
-private[sparkexpr]  object SparkLessThanOrEqual {
+private[sparkexpr] object SparkLessThanOrEqual {
   def apply(@transient expr: E_LessThanOrEqual,
             leftExpr: SparkExpr,
             rightExpr: SparkExpr): SparkLessThanOrEqual =

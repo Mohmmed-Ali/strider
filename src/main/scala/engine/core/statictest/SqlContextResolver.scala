@@ -23,14 +23,13 @@ class SqlContextResolver(sc: SparkContext) {
   sqlContext.setConf("spark.sql.inMemoryColumnarStorage.compressed", "true")
   sqlContext.setConf("spark.sql.autoBroadcastJoinThreshold", "170000000")
   sqlContext.setConf("spark.sql.tungsten.enabled", "true")
-  sqlContext.setConf("spark.sql.shuffle.partitions", "8")
+  sqlContext.setConf("spark.sql.shuffle.partitions", "4")
 
   val wdf = sqlContext
-    .createDataFrame(rowRDD, SqlContextResolver.schema)
+    .createDataFrame(rowRDD, SqlContextResolver.schema).cache()
+  wdf.count()
 
   wdf.registerTempTable(LabelBase.INPUT_DATAFRAME_NAME)
-
-  wdf.persist(StorageLevel.MEMORY_ONLY).count()
 
   val tStart1 = System.nanoTime()
   val resSize = SizeEstimator.estimate(wdf)
@@ -60,6 +59,6 @@ object SqlContextResolver {
     sc.textFile(
       s"${LabelBase.INPUT_FILE}")
       .map(_.split(" "))
-      .map(attribute => Row(attribute(0), attribute(1), attribute(2).trim)).cache()
+      .map(attribute => Row(attribute(0), attribute(1), attribute(2).trim))
   }
 }

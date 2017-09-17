@@ -10,7 +10,7 @@ private[sparkexpr] class SparkSubtract
 (@transient val substract: E_Subtract,
  leftExpr: SparkExpr,
  rightExpr: SparkExpr)
-  extends SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr)  {
+  extends SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
 
   /**
     * The computation for subtraction bases on double type
