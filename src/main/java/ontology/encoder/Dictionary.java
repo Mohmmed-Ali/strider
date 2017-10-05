@@ -30,25 +30,35 @@ class Dictionary {
         return instance;
     }
 
-    void addConceptURL2IdItem(String concept, long id, int localLength, int encodingStart) {
-        conceptsURL2Id.put(concept, new IdContainer(id, encodingStart, localLength));
+    void addConceptURL2IdItem(String concept,
+                              long id,
+                              int localLength,
+                              int encodingStart) {
+        conceptsURL2Id.put(concept,
+                new IdContainer(id, encodingStart, localLength));
     }
 
-    void addPropertyURL2IdItem(String property, long id, int localLength, int encodingStart) {
-        propertiesURL2Id.put(property, new IdContainer(id, encodingStart, localLength));
+    void addPropertyURL2IdItem(String property,
+                               long id,
+                               int localLength,
+                               int encodingStart) {
+        propertiesURL2Id.put(property,
+                new IdContainer(id, encodingStart, localLength));
     }
 
     void displayConcepts() {
         Set<String> idSet = conceptsURL2Id.keySet();
         for (String concept : idSet) {
-            System.out.println(concept + "  => " + conceptsURL2Id.get(concept).prettyPrint());
+            System.out.println(concept + "  => " +
+                    conceptsURL2Id.get(concept).prettyPrint());
         }
     }
 
     void displayProperties() {
         Set<String> idSet = propertiesURL2Id.keySet();
         for (String property : idSet) {
-            System.out.println(property + "  => " + propertiesURL2Id.get(property).prettyPrint());
+            System.out.println(property + "  => " +
+                    propertiesURL2Id.get(property).prettyPrint());
         }
     }
 
@@ -120,7 +130,9 @@ class Dictionary {
         Set<String> idSet = map.keySet();
         int encodingLength = getMaxId(map, idSet);
         for (String key : idSet) {
-            int shift = encodingLength - (map.get(key).getEncodingStart() + map.get(key).getLocalLength());
+            int shift = encodingLength -
+                    (map.get(key).getEncodingStart() +
+                            map.get(key).getLocalLength());
             long prefix = map.get(key).getId() >> shift;
             long upperBound = (prefix + 1) << shift;
             ps.println(key + " E" +
@@ -134,7 +146,9 @@ class Dictionary {
         Set<String> idSet = map.keySet();
         int encodingLength = getMaxId(map, idSet);
         for (String key : idSet) {
-            int shift = encodingLength - (map.get(key).getEncodingStart() + map.get(key).getLocalLength());
+            int shift = encodingLength -
+                    (map.get(key).getEncodingStart() +
+                            map.get(key).getLocalLength());
             long prefix = map.get(key).getId() >> shift;
             long upperBound = (prefix + 1) << shift;
             ps.println(key + " C" +
@@ -148,7 +162,9 @@ class Dictionary {
         Set<String> idSet = map.keySet();
         int encodingLength = getMaxId(map, idSet);
         for (String key : idSet) {
-            int shift = encodingLength - (map.get(key).getEncodingStart() + map.get(key).getLocalLength());
+            int shift = encodingLength -
+                    (map.get(key).getEncodingStart() +
+                            map.get(key).getLocalLength());
             long prefix = map.get(key).getId() >> shift;
             long upperBound = (prefix + 1) << shift;
             ps.println(key + " P" +

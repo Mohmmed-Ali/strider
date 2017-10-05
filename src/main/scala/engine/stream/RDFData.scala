@@ -1,6 +1,5 @@
 package engine.stream
 
-import org.apache.jena.rdf.model.Model
 
 /**
   * Created by xiangnanren on 16/11/2016.
@@ -21,8 +20,3 @@ object RDFGraph {
 }
 
 
-
-case class WavesEvent(streamId: String,
-                      eventId: String,
-                      timestamp: Long,
-                      model: Model) extends RDFData

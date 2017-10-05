@@ -1,10 +1,10 @@
 package engine.core.conf
 
 import com.esotericsoftware.kryo.Kryo
-import engine.core.sparkexpr.expr.{SparkExpr, SparkExpr1}
+import engine.core.sparkexpr.expr.SparkExpr
 import engine.core.sparql.reasoning.{Decoder, Encoder}
 import engine.core.sparkop.executor.{ConstructExecutor, LiteMatConstructExecutor}
-import engine.stream.{RDFGraph, RDFTriple, WavesEvent}
+import engine.stream.{RDFGraph, RDFTriple}
 import org.apache.jena.rdf.model.Model
 import org.apache.spark.serializer.KryoRegistrator
 
@@ -31,7 +31,6 @@ class StriderKryoRegistrator extends KryoRegistrator {
     kryo.register(classOf[RDFTriple])
     kryo.register(classOf[Array[RDFTriple]])
     kryo.register(classOf[RDFGraph])
-    kryo.register(classOf[WavesEvent])
     kryo.register(classOf[Model])
     kryo.register(classOf[org.apache.jena.graph.Triple])
     kryo.register(classOf[org.apache.jena.query.Query])

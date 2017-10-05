@@ -7,7 +7,7 @@ import scala.util.parsing.combinator.JavaTokenParsers
 /**
   * Created by xiangnanren on 21/02/2017.
   */
-trait SyntaxParser extends JavaTokenParsers {
+trait  SyntaxParser extends JavaTokenParsers {
   @transient
   protected lazy val log = LogManager.
     getLogger(this.getClass)

@@ -127,6 +127,7 @@ class SparkGroup(val opGroup: OpGroup,
   /**
     * When the column name is created by col("name"),
     * it must include backtick, i.e. col("`name`")
+    *
     * @return
     */
   private def generateAggUDFs(): Seq[Column] = {
@@ -201,27 +202,26 @@ class SparkGroup(val opGroup: OpGroup,
     * @return
     */
   private def executeAggExprs (inputDF: DataFrame):
-  DataFrame =
-      if (groupVars.length == 1) {
-        if (aggUDFs.length == 1)
-          inputDF.groupBy(groupVars.head).
-            agg(aggUDFs.head)
-        else inputDF.groupBy(groupVars.head).
-          agg(aggUDFs.head, aggUDFs.tail:_*)
-      }
-      else if (groupVars.length > 1) {
-        if (aggUDFs.length == 1)
-          inputDF.groupBy(groupVars.head, groupVars.tail: _*).
-            agg(aggUDFs.head)
-        else inputDF.groupBy(groupVars.head, groupVars.tail: _*).
-          agg(aggUDFs.head, aggUDFs.tail:_*)
-      }
-      else {
-        if (aggUDFs.length == 1)
-          inputDF.agg(aggUDFs.head)
-        else inputDF.agg(aggUDFs.head, aggUDFs.tail:_*)
-      }
-
+  DataFrame = {
+    (groupVars.length, aggUDFs.length) match {
+      case (g_l, a_l) if g_l == 1 && a_l == 1 =>
+        inputDF.groupBy(groupVars.head).
+          agg(aggUDFs.head)
+      case (g_l, a_l) if g_l == 1 && a_l > 1 =>
+        inputDF.groupBy(groupVars.head).
+          agg(aggUDFs.head, aggUDFs.tail: _*)
+      case (g_l, a_l) if g_l > 1 && a_l == 1 =>
+        inputDF.groupBy(groupVars.head, groupVars.tail: _*).
+          agg(aggUDFs.head)
+      case (g_l, a_l) if g_l > 1 && a_l > 1 =>
+        inputDF.groupBy(groupVars.head, groupVars.tail: _*).
+          agg(aggUDFs.head, aggUDFs.tail: _*)
+      case (g_l, a_l) if g_l == 0 && a_l == 1 =>
+        inputDF.agg(aggUDFs.head)
+      case (g_l, a_l) if g_l == 0 && a_l > 1 =>
+        inputDF.agg(aggUDFs.head, aggUDFs.tail: _*)
+    }
+  }
 }
 
 

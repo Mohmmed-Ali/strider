@@ -10,6 +10,7 @@ object SparkCxtResolver {
   val conf = new SparkConf().
     setAppName("Strider").
     setMaster("local[*]").
+    set("spark.driver.host", "localhost").
     set("spark.kryo.registrationRequired", "true").
     set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
     set("spark.kryo.registrator", LabelBase.KRYO_REGISTRATOR_REF)

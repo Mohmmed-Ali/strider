@@ -414,7 +414,7 @@ object SparqlQueryInitializer extends QueryInitializer {
         "group by ?s "
 
     case "test_agg_2" =>
-      "select ?s (min(?o6 + ?o6) as ?minMeasurement ) (min(?o6) as ?maxMeasurement)" +
+      "select ?s (min(?o6 + ?o6) as ?minMeasurement ) (sum(?o6) as ?sumMeasurement)" +
           " { " +
           " ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o ; " +
           "    <http://purl.oclc.org/NET/ssnx/ssn/isProducedBy> ?o1 ; " +

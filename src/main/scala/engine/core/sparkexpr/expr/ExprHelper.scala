@@ -5,7 +5,7 @@ import scala.util.Try
 /**
   * Created by xiangnanren on 24/05/2017.
   */
-private[sparkexpr] object ExprHelper {
+object ExprHelper {
   val boolTypeURI = "http://www.w3.org/2001/XMLSchema#boolean"
   val decimalTypeURI = "http://www.w3.org/2001/XMLSchema#decimal"
   val doubleTypeURI = "http://www.w3.org/2001/XMLSchema#double"

@@ -87,15 +87,6 @@ class KafkaStreamProducer(brokerAddr: String,
               MsgRDFGraph.defaultTopic,
               _message
             ))
-
-      case _message: WavesEvent =>
-        producer.asInstanceOf[Producer[String, WavesEvent]].
-          send(
-            new KeyedMessage[String, WavesEvent](
-              MsgWavesEvent.distributeKey(numPartitions),
-              MsgWavesEvent.defaultTopic,
-              _message
-            ))
     }
   }
 
@@ -112,9 +103,6 @@ class KafkaStreamProducer(brokerAddr: String,
         if classTag[T] == classTag[RDFGraph] =>
         producer.send(_messages:_*)
 
-      case _messages: Seq[KeyedMessage[String, WavesEvent]@unchecked]
-        if classTag[T] == classTag[WavesEvent] =>
-        producer.send(_messages:_*)
     }
   }
 
@@ -123,8 +111,6 @@ class KafkaStreamProducer(brokerAddr: String,
                                 numPartitions: Int): Unit = {
     if (classTag[T] == classTag[RDFTriple]) producer.send(messages:_*)
     else if (classTag[T] == classTag[RDFGraph]) producer.send(messages:_*)
-    else if (classTag[T] == classTag[WavesEvent]) producer.send(messages:_*)
-
   }
 
 

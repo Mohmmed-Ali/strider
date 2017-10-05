@@ -6,7 +6,7 @@ package engine.stream
   */
 sealed trait StriderTopic {
   val defaultTopic: String
-  def distributeKey(partitionsNum: => Int): String = {
+  def distributeKey(partitionsNum: => Int = 8): String = {
     scala.util.Random.nextInt( partitionsNum + 1 ).toString
   }
 }
@@ -21,10 +21,6 @@ case object MsgRDFTriple extends StriderTopic {
 
 case object MsgRDFGraph extends StriderTopic {
   val defaultTopic = "MsgRDFGraph"
-}
-
-case object MsgWavesEvent extends StriderTopic {
-  val defaultTopic = "MsgWavesEvent"
 }
 
 case object MsgNTFile extends StriderTopic {

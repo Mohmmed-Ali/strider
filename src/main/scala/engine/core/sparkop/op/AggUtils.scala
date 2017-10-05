@@ -28,7 +28,6 @@ trait AggUtils {
     }
   }
 
-
   protected def evalArithmeticUDF(bindingName: String,
                                   funcArgs: Vector[String],
                                   arithmeticUDF: UserDefinedFunction,
