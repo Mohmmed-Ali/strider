@@ -94,11 +94,11 @@ class SparkGroup(val opGroup: OpGroup,
       val transformedExpr = transformExpr(aggExpr, this.opName)
       val originalBindingName = agg.getAggVar.getVarName
       val aggUDF = agg.getAggregator match {
-        case a : AggMax => AggMaxWrapper
-        case a : AggMin => AggMinWrapper
-        case a : AggAvg => AggAvgWrapper
-        case a : AggSum => AggSumWrapper
-        case a : AggCount => AggCountWrapper
+        case _ : AggMax => AggMaxWrapper
+        case _ : AggMin => AggMinWrapper
+        case _ : AggAvg => AggAvgWrapper
+        case _ : AggSum => AggSumWrapper
+        case _ : AggCount => AggCountWrapper
       }
 
       Option(aggExpr.getFunction) match {

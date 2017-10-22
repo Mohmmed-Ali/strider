@@ -2,7 +2,7 @@ package engine.core.sparkop.op
 
 import org.apache.jena.graph
 import org.apache.jena.graph.Node
-import org.apache.log4j.LogManager
+import org.apache.log4j.{LogManager, Logger}
 import org.apache.spark.sql._
 
 /**
@@ -10,17 +10,17 @@ import org.apache.spark.sql._
   */
 trait BGPUtils {
   @transient
-  protected lazy val log = LogManager.
+  protected lazy val log: Logger = LogManager.
     getLogger(this.getClass)
 
-  protected val normalize = (o: Node) => {
+  protected val normalize: (Node) => String = (o: Node) => {
     if (o.isLiteral) {
       "\"" + o.getLiteralValue + "\"" +
         "^^<" + o.getLiteralDatatypeURI + ">"
     } else ""
   }
 
-  protected val simplify = (o: Node) => {
+  protected val simplify: (Node) => String = (o: Node) => {
     if (o.isLiteral) o.getLiteralLexicalForm
     else ""
   }

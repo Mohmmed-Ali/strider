@@ -406,15 +406,14 @@ object SparqlQueryInitializer extends QueryInitializer {
 
     case "test_agg_1" =>
       "PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> " +
-        "select ?s (min(?o2 + ?o2) as ?minMeasurement ) (max(?o2) as ?maxMeasurement)" +
+        "select ?s ((?o2 + ?o2) as ?sum )" +
         " { " +
         " ?s <http://data.nasa.gov/qudt/owl/qudt/unit> ?o1 ;   " +
         "    <http://data.nasa.gov/qudt/owl/qudt/numericValue> ?o2 . " +
-        "}" +
-        "group by ?s "
+        "}"
 
     case "test_agg_2" =>
-      "select ?s (min(?o6 + ?o6) as ?minMeasurement ) (sum(?o6) as ?sumMeasurement)" +
+      "select ?s (min(?o6 - ?o6) as ?minMeasurement ) (sum(?o6) as ?sumMeasurement)" +
           " { " +
           " ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o ; " +
           "    <http://purl.oclc.org/NET/ssnx/ssn/isProducedBy> ?o1 ; " +

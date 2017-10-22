@@ -2,7 +2,8 @@ name := "strider"
 
 version := "1.0"
 
-scalaVersion := "2.11.7"
+scalaVersion in ThisBuild := "2.11.7"
+ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 libraryDependencies ++= Seq(
   "junit" % "junit" % "4.10" % "test",

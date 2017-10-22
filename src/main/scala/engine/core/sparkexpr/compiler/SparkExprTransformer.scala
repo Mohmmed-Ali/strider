@@ -84,7 +84,7 @@ class SparkExprTransformer extends ExprVisitor {
         SparkNotEquals(f, leftExpr, rightExpr)
 
       case f: E_Subtract => log.debug(s"exprID: $exprID, E_Subtract: $f")
-        println("substract visited: ")
+        println(s"substract visited: $f")
         SparkSubtract(f, leftExpr, rightExpr)
 
     }

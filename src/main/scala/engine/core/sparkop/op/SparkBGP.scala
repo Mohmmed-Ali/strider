@@ -123,9 +123,9 @@ class SparkBGP(val opBGP: OpBGP,
   @transient
   private object StaticEPHandler {
     private val staticTrigger = StaticTrigger(ucg)
-    val statType = getStatType(opSettings)
-    val staticGreedyEP = staticTrigger.triggerGreedyEP()
-    val staticBushyEP = staticTrigger.triggerBushyEP()
+    val statType: ExecutionPlanType = getStatType(opSettings)
+    val staticGreedyEP: List[BGPGraph] = staticTrigger.triggerGreedyEP()
+    val staticBushyEP: List[BGPGraph] = staticTrigger.triggerBushyEP()
 
     private def getStatType(opSettings: mutable.HashMap[String, String]):
     ExecutionPlanType = {
@@ -146,7 +146,7 @@ class SparkBGP(val opBGP: OpBGP,
     */
   @transient
   private object AdaptiveEPHandler {
-    val adapType = getAdaptiveType(opSettings)
+    val adapType: ExecutionPlanType = getAdaptiveType(opSettings)
     // Global variable modifying incurred, maybe
     // another way to avoid this side effect.
     var currentAdapPlan: Option[List[BGPGraph]] = None

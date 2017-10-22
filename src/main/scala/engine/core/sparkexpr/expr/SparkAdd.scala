@@ -8,8 +8,8 @@ import org.apache.jena.sparql.expr.E_Add
   */
 private[sparkexpr] class SparkAdd(@transient val add: E_Add,
                                   leftExpr: SparkExpr,
-                                  rightExpr: SparkExpr) extends
-  SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
+                                  rightExpr: SparkExpr)
+  extends SparkExpr2[SparkExpr, SparkExpr](leftExpr, rightExpr) {
 
 
   override def visit(sparkExprVisitor: SparkExprVisitor): Unit = {
@@ -24,6 +24,7 @@ private[sparkexpr] class SparkAdd(@transient val add: E_Add,
                        rightExpr: Any): Double = {
     (leftChild, rightExpr) match {
       case (l: Number, r: Number) => l.doubleValue() + r.doubleValue()
+      case (l: String, r: String) => l.toDouble + r.toDouble
     }
   }
 }
