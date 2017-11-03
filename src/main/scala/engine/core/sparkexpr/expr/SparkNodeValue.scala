@@ -12,8 +12,6 @@ private[sparkexpr] class SparkNodeValue
   val dataTypeURI: String = nv.getDatatypeURI
   val valueMapping: Any = getValueMapping
 
-  println("NodeValue: " + dataTypeURI)
-
   def getValueMapping: Any = {
     dataTypeURI match {
       case ExprHelper.boolTypeURI => nv.isBoolean

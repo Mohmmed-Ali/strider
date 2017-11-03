@@ -19,7 +19,7 @@ abstract class SparkOp1[T <: SparkOp](val subOp: T) extends
       (new SparkExprTransformer).
         transform(expr)
     } catch {
-      case ex: Exception =>
+      case _: Exception =>
         throw NullExprException("The expression in" + opName + "is null")
     }
   }
