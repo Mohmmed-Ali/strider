@@ -92,5 +92,6 @@ class SparkOpExecutor(inputDF: DataFrame) extends
 
 
 object SparkOpExecutor {
-  def apply(inputDF: DataFrame): SparkOpExecutor = new SparkOpExecutor(inputDF)
+  def apply(inputDF: DataFrame): SparkOpExecutor =
+    new SparkOpExecutor(inputDF)
 }

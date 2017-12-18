@@ -23,6 +23,7 @@ import org.apache.spark.sql.{DataFrame, Row}
   * not serializable.
   *
   * @param query : input Sparql query
+  *
   */
 sealed class QueryExecutor(@transient val query: SparqlQuery) {
   @transient
@@ -170,8 +171,7 @@ class ConstructExecutor(@transient override val query: ConstructQuery) extends
     val res = executeAlgebra(inputDF).result
     val resConstruct = res.mapPartitions(iter =>
       (for (i <- iter)
-        yield constructByTemplate(i, templateMapping)).
-        flatMap(rs => rs))(this.encoder)
+        yield constructByTemplate(i, templateMapping)).flatten)(this.encoder)
     SparkOpRes(resConstruct)
   }
 
@@ -205,10 +205,11 @@ class ConstructExecutor(@transient override val query: ConstructQuery) extends
     * @param row  : row in original DataFrame
     * @param node : node mapping of triples in construct clause
     */
-  private def lookup(row: Row, node: NodeMapping): String = {
-    node.isVariable match {
-      case true => row.getAs(node.mapping)
-      case false => node.mapping
+  private def lookup(row: Row, node: NodeMapping): Any = {
+    if (node.isVariable) {
+      row.getAs(node.mapping)
+    } else {
+      node.mapping
     }
   }
 }
@@ -226,8 +227,7 @@ class LiteMatConstructExecutor(@transient override val query: LiteMatConstructQu
     val res = executeLiteMatAlgebra(inputDF).result
     val resConstruct = res.mapPartitions(iter =>
       (for (i <- iter)
-        yield constructByTemplate(i, templateMapping)).
-        flatMap(rs => rs))(this.encoder)
+        yield constructByTemplate(i, templateMapping)).flatten)(this.encoder)
     SparkOpRes(resConstruct)
   }
 }

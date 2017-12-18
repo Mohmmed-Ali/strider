@@ -16,7 +16,7 @@ object ExprUDF {
   def BooleanTypeUDF(orderedColumnNames: Vector[String],
                      expr: SparkExpr) = udf(
     (arg: String) => {
-      val res = SparkExprExecutor(orderedColumnNames).execute(expr)
+      val res = SparkExprExecutor(orderedColumnNames, arg).execute(expr)
       res match {
         case _res: Boolean => _res
       }
@@ -34,7 +34,6 @@ object ExprUDF {
     })
 
 
-  
   /**
     * Double-type UDF for the evaluation of arithmetic expression,
     * requires single/two/three input columns

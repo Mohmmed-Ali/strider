@@ -24,7 +24,8 @@ private[sparkexpr] class SparkAdd(@transient val add: E_Add,
                        rightExpr: Any): Double = {
     (leftChild, rightExpr) match {
       case (l: Number, r: Number) => l.doubleValue() + r.doubleValue()
-      case (l: String, r: String) => l.toDouble + r.toDouble
+      case (l: Number, r) => l.doubleValue() + r.toString.toDouble
+      case (l, r: Number) => l.toString.toDouble + r.doubleValue()
     }
   }
 }

@@ -16,7 +16,10 @@ private[sparkexpr] class SparkLessThanOrEqual
                        leftChild: Any,
                        rightExpr: Any): Boolean =
     (leftChild, rightExpr) match {
-      case (l: Number, r: Number) => l.toString.toDouble <= r.toString.toDouble
+      case (l: Number, r: Number) => l.doubleValue() <= r.doubleValue()
+      case (l: Number, r) => l.doubleValue() <= r.toString.toDouble
+      case (l, r: Number) => l.toString.toDouble <= r.doubleValue()
+
     }
 
 

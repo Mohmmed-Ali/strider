@@ -19,7 +19,8 @@ private[sparkexpr] class SparkSubtract (@transient val subtract: E_Subtract,
                        rightChild: Any): Double =
     (leftChild, rightChild) match {
       case (l: Number, r: Number) => l.doubleValue() - r.doubleValue()
-      case (l: String, r: String) => l.toDouble - r.toDouble
+      case (l: Number, r) => l.doubleValue() - r.toString.toDouble
+      case (l, r: Number) => l.toString.toDouble - r.doubleValue()
     }
 
 

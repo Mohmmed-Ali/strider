@@ -9,5 +9,4 @@ abstract class SparkOp2[S, T <: SparkOp](val leftOp: S,
   def execute(opName: String,
               leftChild: SparkOpRes,
               rightChild: SparkOpRes): SparkOpRes
-
 }
