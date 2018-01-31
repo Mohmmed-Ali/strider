@@ -37,7 +37,6 @@ private[sparkexpr] class SparkExprWalker(val visitor: SparkExprVisitor)
   }
 }
 
-
 private[sparkexpr] object SparkExprWalker {
   def apply(visitor: SparkExprVisitor): SparkExprWalker =
     new SparkExprWalker(visitor)

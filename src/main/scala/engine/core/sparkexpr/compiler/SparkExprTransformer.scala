@@ -33,7 +33,8 @@ class SparkExprTransformer extends ExprVisitor {
     }
 
   override def visit(func: ExprFunction0): Unit = {
-    throw new UnsupportedOperationException("ExprFunction0 not supported yet.")
+    throw new UnsupportedOperationException("" +
+      "ExprFunction0 not supported yet.")
   }
 
   override def visit(func: ExprFunction1): Unit = {

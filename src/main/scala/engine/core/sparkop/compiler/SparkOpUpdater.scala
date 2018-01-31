@@ -6,7 +6,7 @@ import org.apache.spark.sql._
 /**
   * Created by xiangnanren on 22/03/2017.
   */
-class SparkOpUpdater(inputDF: DataFrame) extends SparkOpVisitorBase {
+class SparkOpUpdater(inputDF: DataFrame) extends SparkOpVisitor {
   def update(op: SparkOp): Unit = {
     SparkOpWalker(this).walkBottomUp(op)
   }

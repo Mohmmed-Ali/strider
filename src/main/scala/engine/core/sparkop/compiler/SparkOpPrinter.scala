@@ -23,7 +23,6 @@ class SparkOpPrinter(logWriter: PrintWriter)
   def visit1(op: SparkOp1[SparkOp]): Unit = {
     logWriter.println(delimiter + op.opName + "(")
     delimiter += "  "
-
     if (Option(op.subOp).nonEmpty) op.subOp.visit(this)
 
     delimiter = delimiter.substring(2)

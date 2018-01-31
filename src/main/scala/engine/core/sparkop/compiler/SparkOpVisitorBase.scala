@@ -70,7 +70,6 @@ class SparkOpVisitorBase extends SparkOpVisitor {
     log.error("UNION is not supported yet")
     throw new UnsupportedOperationException("UNION is not supported.")
   }
-
 }
 
 object SparkOpVisitorBase {

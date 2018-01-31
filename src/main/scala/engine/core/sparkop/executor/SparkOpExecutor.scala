@@ -48,7 +48,6 @@ class SparkOpExecutor(inputDF: DataFrame) extends
       sparkGroup.opName,
       stack.pop()
     ))
-
   }
 
   override def visit(sparkJoin: SparkJoin): Unit = {

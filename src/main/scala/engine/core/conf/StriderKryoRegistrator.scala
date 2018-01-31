@@ -22,6 +22,8 @@ class StriderKryoRegistrator extends KryoRegistrator {
 
     kryo.register(classOf[Array[Object]])
     kryo.register(classOf[Array[String]])
+    kryo.register(classOf[Array[Object]])
+    kryo.register(Class.forName("scala.collection.mutable.WrappedArray$ofRef"))
     kryo.register(Class.forName("[[B"))
     kryo.register(classOf[Encoder])
     kryo.register(classOf[Decoder])

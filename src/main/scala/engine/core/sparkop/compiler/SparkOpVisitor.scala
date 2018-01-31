@@ -7,25 +7,25 @@ import engine.core.sparkop.op._
   */
 trait SparkOpVisitor {
 
-  def visit(sparkBGP: SparkBGP): Unit
+  def visit(sparkBGP: SparkBGP): Unit = {}
 
-  def visit(sparkFilter: SparkFilter): Unit
+  def visit(sparkFilter: SparkFilter): Unit = {}
 
-  def visit(sparkExtend: SparkExtend): Unit
+  def visit(sparkExtend: SparkExtend): Unit = {}
 
-  def visit(sparkGroup: SparkGroup): Unit
+  def visit(sparkGroup: SparkGroup): Unit = {}
 
-  def visit(sparkJoin: SparkJoin): Unit
+  def visit(sparkJoin: SparkJoin): Unit = {}
 
-  def visit(sparkLeftJoin: SparkLeftJoin): Unit
+  def visit(sparkLeftJoin: SparkLeftJoin): Unit = {}
 
-  def visit(sparkSequence: SparkSequence): Unit
+  def visit(sparkSequence: SparkSequence): Unit = {}
 
-  def visit(sparkUnion: SparkUnion): Unit
+  def visit(sparkUnion: SparkUnion): Unit = {}
 
-  def visit(sparkDistinct: SparkDistinct): Unit
+  def visit(sparkDistinct: SparkDistinct): Unit = {}
 
-  def visit(sparkProject: SparkProjection): Unit
+  def visit(sparkProject: SparkProjection): Unit = {}
 
   //  def visit(sparkReduced: SparkReduced)
   //  def visit(sparkOrder: SparkOrder)

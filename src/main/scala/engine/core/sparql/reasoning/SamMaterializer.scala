@@ -18,16 +18,16 @@ object SamMaterializer {
   def materializeRDDPair(matDct: Map[String, Array[String]] ,
                      inputRDD: RDD[(String, RDFTriple)]): RDD[RDFTriple] = {
     inputRDD.mapPartitions( iter => {
-      for(i <- iter) yield {
+      for (i <- iter) yield {
         if (matDct.get(i._2.s).nonEmpty) {
-          for(j <- matDct(i._2.s)) yield RDFTriple(i._2.s, "<http://www.w3.org/2002/07/owl#sameAs>", j)
+          for (j <- matDct(i._2.s)) yield RDFTriple(i._2.s, "<http://www.w3.org/2002/07/owl#sameAs>", j)
         }
         else if (matDct.get(i._2.o).nonEmpty) {
-          for(j <- matDct(i._2.o)) yield RDFTriple(i._2.o, "<http://www.w3.org/2002/07/owl#sameAs>", j)
+          for (j <- matDct(i._2.o)) yield RDFTriple(i._2.o, "<http://www.w3.org/2002/07/owl#sameAs>", j)
         }
         else Array(i._2)
       }
-    }.flatMap(x => x))
+    }.flatten)
   }
 
   def materializeRDD(matDct: Map[String, Array[String]] ,

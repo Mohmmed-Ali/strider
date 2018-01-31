@@ -26,9 +26,8 @@ object BEPGenerator extends EPGenerator {
 
     nodeCandidates.add(ucgEdges.head.node1)
 
-    ucgEdges.nonEmpty match {
-
-      case true => ucgEdges.foreach { edge =>
+    if (ucgEdges.nonEmpty) {
+      ucgEdges.foreach { edge =>
 
         if (setContains(edge.node1, nodeCandidates)) {
           nodeCandidates.add(edge.node2)
@@ -42,8 +41,8 @@ object BEPGenerator extends EPGenerator {
             orderNodes.append(edge.node1)
         }
       }
-
-      case false => throw EmptyUCGException("The query  ucgEdges is empty")
+    } else {
+      throw EmptyUCGException("The query  ucgEdges is empty")
     }
     orderNodes.toList
   }
