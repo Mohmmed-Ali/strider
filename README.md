@@ -1,8 +1,8 @@
-**Strider
+# Strider
 
 Strider is a distributed RDF stream processing engine, which supports basic continuous SPARQL query processing, **RDFS** and **OWL:sameAS** stream reasoning. The project is a part of French national environmental project [WAVES FUI #17](http://www.waves-rsp.org).
 
-**Related Publication
+# Related Publication
 
 1. Strider: An Adaptive, Inference-enabled Distributed RDF Stream Processing Engine**, VLDB Demo 2017
 
