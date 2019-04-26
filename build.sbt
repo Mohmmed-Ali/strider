@@ -5,7 +5,7 @@ version := "1.0"
 scalaVersion in ThisBuild := "2.11.7"
 ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
-libraryDependencies ++= Seq(
+libraryDependencies ++= Seq(  
   "junit" % "junit" % "4.10" % "test",
   "org.apache.spark" % "spark-core_2.11" % "2.0.2",
   "org.apache.spark" % "spark-sql_2.11" % "2.0.2",
